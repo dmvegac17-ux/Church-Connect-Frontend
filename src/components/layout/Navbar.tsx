@@ -1,4 +1,10 @@
-import { Church, LogOut, Users, UserCircle } from "lucide-react";
+import {
+  Church,
+  HeartHandshake,
+  LogOut,
+  Users,
+  UserCircle,
+} from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../auth/useAuth";
@@ -35,6 +41,10 @@ export function Navbar() {
                 Usuarios
               </NavLink>
             ) : null}
+            <NavLink to="/ministries" className={linkClass}>
+              <HeartHandshake className="size-4" aria-hidden="true" />
+              Ministerios
+            </NavLink>
             <NavLink to="/profile" className={linkClass}>
               <UserCircle className="size-4" aria-hidden="true" />
               Mi perfil

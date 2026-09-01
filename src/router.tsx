@@ -8,6 +8,10 @@ import { ForbiddenPage } from "./pages/ForbiddenPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
+import { MinistriesListPage } from "./pages/ministries/MinistriesListPage";
+import { MinistryCreatePage } from "./pages/ministries/MinistryCreatePage";
+import { MinistryDetailPage } from "./pages/ministries/MinistryDetailPage";
+import { MinistryEditPage } from "./pages/ministries/MinistryEditPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { UserCreatePage } from "./pages/users/UserCreatePage";
 import { UserDetailPage } from "./pages/users/UserDetailPage";
@@ -71,6 +75,27 @@ export function AppRoutes() {
           element={
             <ProtectedRoute requiredRole="ADMIN">
               <UserEditPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ministerios: lectura para cualquier sesión; escritura solo ADMIN.
+            La ruta literal "nuevo" va antes de ":id". */}
+        <Route path="/ministries" element={<MinistriesListPage />} />
+        <Route
+          path="/ministries/nuevo"
+          element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <MinistryCreatePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/ministries/:id" element={<MinistryDetailPage />} />
+        <Route
+          path="/ministries/:id/editar"
+          element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <MinistryEditPage />
             </ProtectedRoute>
           }
         />

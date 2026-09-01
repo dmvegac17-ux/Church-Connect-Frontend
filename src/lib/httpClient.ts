@@ -156,6 +156,18 @@ export const httpClient = {
 
 /** Helper para leer `meta.totalUsers` de forma segura. */
 export function readListMeta(meta: Record<string, unknown> | null): ListMeta {
-  const total = meta?.["totalUsers"];
-  return { totalUsers: typeof total === "number" ? total : 0 };
+  return { totalUsers: readMetaTotal(meta, "totalUsers") };
+}
+
+/**
+ * Lee un contador total del `meta` del envelope de forma segura.
+ * Ej.: `readMetaTotal(meta, "totalMinistries")`, `readMetaTotal(meta, "totalMembers")`.
+ * Si la clave no existe o no es numérica, devuelve `0`.
+ */
+export function readMetaTotal(
+  meta: Record<string, unknown> | null,
+  key: string,
+): number {
+  const total = meta?.[key];
+  return typeof total === "number" ? total : 0;
 }
