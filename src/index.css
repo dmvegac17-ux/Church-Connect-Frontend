@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --background: #faf8f5;
+  --foreground: #2d3319;
+  --card: #ffffff;
+  --card-foreground: #2d3319;
+  --popover: #ffffff;
+  --popover-foreground: #2d3319;
+  --primary: #4a7c59;
+  --primary-foreground: #ffffff;
+  --secondary: #e8dcc8;
+  --secondary-foreground: #2d3319;
+  --muted: #f0ebe3;
+  --muted-foreground: #6b7356;
+  --accent: #d4c4a8;
+  --accent-foreground: #2d3319;
+  --destructive: #c84b31;
+  --destructive-foreground: #ffffff;
+  --border: rgba(106, 115, 86, 0.2);
+  --input: transparent;
+  --input-background: #f5f1ea;
+  --switch-background: #c9bda8;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #4a7c59;
+  --chart-1: #4a7c59;
+  --chart-2: #6b9a5f;
+  --chart-3: #8fb896;
+  --chart-4: #d4c4a8;
+  --chart-5: #e8dcc8;
+  --radius: 0.625rem;
+  --sidebar: #faf8f5;
+  --sidebar-foreground: #2d3319;
+  --sidebar-primary: #4a7c59;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0ebe3;
+  --sidebar-accent-foreground: #2d3319;
+  --sidebar-border: rgba(106, 115, 86, 0.2);
+  --sidebar-ring: #4a7c59;
+}
+
+.dark {
+  --background: #1a1f14;
+  --foreground: #f5f1ea;
+  --card: #252b1f;
+  --card-foreground: #f5f1ea;
+  --popover: #252b1f;
+  --popover-foreground: #f5f1ea;
+  --primary: #6b9a5f;
+  --primary-foreground: #1a1f14;
+  --secondary: #3d442f;
+  --secondary-foreground: #f5f1ea;
+  --muted: #2d3319;
+  --muted-foreground: #a8b092;
+  --accent: #3d442f;
+  --accent-foreground: #f5f1ea;
+  --destructive: #c84b31;
+  --destructive-foreground: #f5f1ea;
+  --border: rgba(168, 176, 146, 0.2);
+  --input: #2d3319;
+  --input-background: #2d3319;
+  --switch-background: #3d442f;
+  --ring: #6b9a5f;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: #6b9a5f;
+  --chart-2: #8fb896;
+  --chart-3: #a8b092;
+  --chart-4: #4a7c59;
+  --chart-5: #3d442f;
+  --sidebar: #1a1f14;
+  --sidebar-foreground: #f5f1ea;
+  --sidebar-primary: #6b9a5f;
+  --sidebar-primary-foreground: #1a1f14;
+  --sidebar-accent: #2d3319;
+  --sidebar-accent-foreground: #f5f1ea;
+  --sidebar-border: rgba(168, 176, 146, 0.2);
+  --sidebar-ring: #6b9a5f;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+}
