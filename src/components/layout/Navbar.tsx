@@ -1,4 +1,6 @@
 import {
+  CalendarClock,
+  CalendarDays,
   Church,
   HeartHandshake,
   LogOut,
@@ -41,9 +43,17 @@ export function Navbar() {
                 Usuarios
               </NavLink>
             ) : null}
+            <NavLink to="/events" className={linkClass}>
+              <CalendarDays className="size-4" aria-hidden="true" />
+              Eventos
+            </NavLink>
             <NavLink to="/ministries" className={linkClass}>
               <HeartHandshake className="size-4" aria-hidden="true" />
               Ministerios
+            </NavLink>
+            <NavLink to="/schedules" className={linkClass}>
+              <CalendarClock className="size-4" aria-hidden="true" />
+              Cronogramas
             </NavLink>
             <NavLink to="/profile" className={linkClass}>
               <UserCircle className="size-4" aria-hidden="true" />
