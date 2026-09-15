@@ -1,4 +1,5 @@
 import {
+  Bell,
   CalendarClock,
   CalendarDays,
   Church,
@@ -54,6 +55,10 @@ export function Navbar() {
             <NavLink to="/schedules" className={linkClass}>
               <CalendarClock className="size-4" aria-hidden="true" />
               Cronogramas
+            </NavLink>
+            <NavLink to="/notifications" className={linkClass}>
+              <Bell className="size-4" aria-hidden="true" />
+              Notificaciones
             </NavLink>
             <NavLink to="/profile" className={linkClass}>
               <UserCircle className="size-4" aria-hidden="true" />
