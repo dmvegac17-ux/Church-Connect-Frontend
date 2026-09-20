@@ -11,11 +11,14 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../auth/useAuth";
+import { useUnreadNotificationsCount } from "../../hooks/useUnreadNotificationsCount";
 import { ROLE_LABELS } from "../../types/user";
 
 export function Navbar() {
   const { user, role, logout } = useAuth();
   const navigate = useNavigate();
+  const { count: unreadCount } = useUnreadNotificationsCount();
+  const unreadLabel = unreadCount >= 100 ? "99+" : String(unreadCount);
 
   const handleLogout = () => {
     logout();
@@ -57,8 +60,21 @@ export function Navbar() {
               Cronogramas
             </NavLink>
             <NavLink to="/notifications" className={linkClass}>
-              <Bell className="size-4" aria-hidden="true" />
+              <span className="relative inline-flex">
+                <Bell className="size-4" aria-hidden="true" />
+                {unreadCount > 0 ? (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground"
+                  >
+                    {unreadLabel}
+                  </span>
+                ) : null}
+              </span>
               Notificaciones
+              {unreadCount > 0 ? (
+                <span className="sr-only">, {unreadCount} sin leer</span>
+              ) : null}
             </NavLink>
             <NavLink to="/profile" className={linkClass}>
               <UserCircle className="size-4" aria-hidden="true" />

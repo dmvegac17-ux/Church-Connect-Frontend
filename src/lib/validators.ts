@@ -8,6 +8,10 @@ export function required(value: string): boolean {
   return value.trim().length > 0;
 }
 
+export function maxLength(value: string, max: number): boolean {
+  return value.length <= max;
+}
+
 /** Enfoca el primer campo con error dentro de un formulario. */
 export function focusFirstError(form: HTMLFormElement | null): void {
   if (!form) {
