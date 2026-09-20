@@ -1,3 +1,4 @@
+import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -9,6 +10,7 @@ import { Card, PageHeader } from "../../components/layout/Page";
 import { useNotification } from "../../hooks/useNotification";
 import { useUserOptions } from "../../hooks/useUserOptions";
 import { parseValidationErrors } from "../../lib/formErrors";
+import { sanitizeNotificationHtml } from "../../lib/sanitizeHtml";
 import { notificationService } from "../../services/notificationService";
 import { ApiError } from "../../types/api";
 import type { UpdateNotificationDTO } from "../../types/notification";
@@ -50,7 +52,6 @@ export function NotificationEditPage() {
     : notification.usuario_id;
 
   const initial: NotificationFormValues = {
-    usuarioId: notification.usuario_id,
     titulo: notification.titulo,
     mensaje: notification.mensaje,
     leida: notification.leida,
@@ -61,7 +62,7 @@ export function NotificationEditPage() {
     setFieldErrors({});
 
     const titulo = values.titulo.trim();
-    const mensaje = values.mensaje.trim();
+    const mensaje = sanitizeNotificationHtml(values.mensaje);
 
     const payload: UpdateNotificationDTO = {};
     if (titulo !== notification.titulo) {
@@ -99,28 +100,37 @@ export function NotificationEditPage() {
 
   return (
     <div>
-      <PageHeader
-        title={`Editar: ${notification.titulo}`}
-        backTo="/notifications"
-      />
+      <PageHeader title="Editar notificación" backTo="/notifications" />
 
-      <Card className="max-w-2xl">
-        {error ? (
-          <div className="mb-4">
-            <ErrorAlert error={error} onClose={() => setError(null)} />
+      <div className="mx-auto w-full max-w-2xl">
+        <Card className="space-y-6 sm:p-8">
+          <div className="flex items-center gap-3 border-b border-border pb-5">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Pencil className="size-5" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="truncate text-base font-medium text-foreground">
+                {notification.titulo}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Actualiza el contenido de esta notificación.
+              </p>
+            </div>
           </div>
-        ) : null}
 
-        <NotificationForm
-          initial={initial}
-          lockedRecipientLabel={recipientLabel}
-          submitting={submitting}
-          submitLabel="Guardar cambios"
-          serverErrors={fieldErrors}
-          onSubmit={handleSubmit}
-          onCancel={() => navigate("/notifications")}
-        />
-      </Card>
+          {error ? <ErrorAlert error={error} onClose={() => setError(null)} /> : null}
+
+          <NotificationForm
+            initial={initial}
+            recipientLabel={recipientLabel}
+            submitting={submitting}
+            submitLabel="Guardar cambios"
+            serverErrors={fieldErrors}
+            onSubmit={handleSubmit}
+            onCancel={() => navigate("/notifications")}
+          />
+        </Card>
+      </div>
     </div>
   );
 }

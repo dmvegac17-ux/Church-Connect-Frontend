@@ -1,6 +1,8 @@
 import { httpClient, readMetaTotal } from "../lib/httpClient";
 import type {
-  CreateNotificationDTO,
+  BulkNotificationDTO,
+  BulkNotificationMeta,
+  BulkNotificationResult,
   Notification,
   UpdateNotificationDTO,
 } from "../types/notification";
@@ -46,12 +48,6 @@ async function getById(
   return data;
 }
 
-/** `POST /notificaciones` — solo ADMIN. `404` si `usuario_id` no existe. */
-async function create(dto: CreateNotificationDTO): Promise<Notification> {
-  const { data } = await httpClient.post<Notification>(BASE, dto);
-  return data;
-}
-
 /** `PUT /notificaciones/{id}` — solo ADMIN. Actualización parcial; `usuario_id` no se puede modificar. */
 async function update(
   id: string,
@@ -66,4 +62,36 @@ async function remove(id: string): Promise<void> {
   await httpClient.delete<null>(`${BASE}/${id}`);
 }
 
-export const notificationService = { list, getById, create, update, remove };
+function readBulkMeta(meta: Record<string, unknown> | null): BulkNotificationMeta {
+  return {
+    total: readMetaTotal(meta, "total"),
+    exitosas: readMetaTotal(meta, "exitosas"),
+    fallidas: readMetaTotal(meta, "fallidas"),
+  };
+}
+
+/**
+ * `POST /notificaciones/masivo` — solo ADMIN. A diferencia del resto de
+ * métodos, no lanza `ApiError` para `201/207/500`: esos tres traen un
+ * `ResponsePayload` de dominio válido y la UI decide el toast según el
+ * `status` devuelto (ver `httpClient.postRaw`).
+ */
+async function createBulk(
+  dto: BulkNotificationDTO,
+): Promise<BulkNotificationResult> {
+  const raw = await httpClient.postRaw<Notification[]>(`${BASE}/masivo`, dto);
+  return {
+    status: raw.status as BulkNotificationResult["status"],
+    data: raw.data ?? [],
+    errors: raw.errors,
+    meta: readBulkMeta(raw.meta),
+  };
+}
+
+export const notificationService = {
+  list,
+  getById,
+  createBulk,
+  update,
+  remove,
+};

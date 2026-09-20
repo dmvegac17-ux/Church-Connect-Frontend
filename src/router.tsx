@@ -16,7 +16,7 @@ import { MinistriesListPage } from "./pages/ministries/MinistriesListPage";
 import { MinistryCreatePage } from "./pages/ministries/MinistryCreatePage";
 import { MinistryDetailPage } from "./pages/ministries/MinistryDetailPage";
 import { MinistryEditPage } from "./pages/ministries/MinistryEditPage";
-import { NotificationCreatePage } from "./pages/notifications/NotificationCreatePage";
+import { NotificationDetailPage } from "./pages/notifications/NotificationDetailPage";
 import { NotificationEditPage } from "./pages/notifications/NotificationEditPage";
 import { NotificationsListPage } from "./pages/notifications/NotificationsListPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
@@ -151,17 +151,11 @@ export function AppRoutes() {
           }
         />
 
-        {/* Notificaciones: lectura para cualquier sesión; escritura solo ADMIN.
-            La ruta literal "nueva" va antes de ":id". */}
+        {/* Notificaciones: lectura de la propia bandeja para cualquier sesión;
+            envío/edición/eliminación solo ADMIN. El envío se hace desde un
+            popup (ComposeNotificationModal) en vez de una ruta propia. */}
         <Route path="/notifications" element={<NotificationsListPage />} />
-        <Route
-          path="/notifications/nueva"
-          element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <NotificationCreatePage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/notifications/:id" element={<NotificationDetailPage />} />
         <Route
           path="/notifications/:id/editar"
           element={
