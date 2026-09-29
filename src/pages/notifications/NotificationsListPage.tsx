@@ -21,6 +21,7 @@ import { useNotifications } from "../../hooks/useNotifications";
 import { useUserOptions } from "../../hooks/useUserOptions";
 import { formatDateTime } from "../../lib/format";
 import { htmlToPlainText } from "../../lib/htmlText";
+import { NOTIFICATIONS_CHANGED_EVENT } from "../../lib/notificationEvents";
 import { notificationService } from "../../services/notificationService";
 import { ApiError } from "../../types/api";
 import type { Notification } from "../../types/notification";
@@ -67,6 +68,7 @@ export function NotificationsListPage() {
     try {
       await notificationService.update(n.id, { leida: !n.leida });
       refetch();
+      window.dispatchEvent(new Event(NOTIFICATIONS_CHANGED_EVENT));
     } catch (err) {
       toast.error(
         err instanceof ApiError ? err.message : "No se pudo actualizar.",

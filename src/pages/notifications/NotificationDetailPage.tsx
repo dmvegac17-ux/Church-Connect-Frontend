@@ -2,12 +2,12 @@ import { Bell } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { useAuth } from "../../auth/useAuth";
 import { ErrorAlert } from "../../components/feedback/ErrorAlert";
 import { FullPageSpinner } from "../../components/feedback/Spinner";
 import { Card, PageHeader } from "../../components/layout/Page";
 import { useNotification } from "../../hooks/useNotification";
 import { formatDateTime } from "../../lib/format";
+import { NOTIFICATIONS_CHANGED_EVENT } from "../../lib/notificationEvents";
 import { sanitizeNotificationHtml } from "../../lib/sanitizeHtml";
 import { notificationService } from "../../services/notificationService";
 import { ApiError } from "../../types/api";
@@ -17,23 +17,18 @@ import { ApiError } from "../../types/api";
  * dueño (ni siquiera ADMIN puede ver la de otro usuario), así que un `403`
  * aquí significa "existe pero no es tuya".
  *
- * Al abrirla se marca como leída automáticamente. El `PUT` que hace esa
- * marca es **solo ADMIN** en el backend actual (un usuario normal no puede
- * marcar sus propias notificaciones), así que el auto-marcado solo se
- * dispara para ADMIN; para el resto de roles el estado simplemente se
- * muestra tal cual llega.
+ * Al abrirla se marca como leída automáticamente (el dueño de la
+ * notificación puede marcar su propia `leida`, y ADMIN puede marcar
+ * cualquiera).
  */
 export function NotificationDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { role } = useAuth();
-  const isAdmin = role === "ADMIN";
   const { notification, isLoading, error, refetch } = useNotification(id);
 
   const autoMarkedRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (
-      !isAdmin ||
       !notification ||
       notification.leida ||
       autoMarkedRef.current === notification.id
@@ -43,11 +38,14 @@ export function NotificationDetailPage() {
     autoMarkedRef.current = notification.id;
     notificationService
       .update(notification.id, { leida: true })
-      .then(() => refetch())
+      .then(() => {
+        refetch();
+        window.dispatchEvent(new Event(NOTIFICATIONS_CHANGED_EVENT));
+      })
       .catch(() => {
         // Silencioso: si falla el auto-marcado, el estado simplemente queda "No leída".
       });
-  }, [isAdmin, notification, refetch]);
+  }, [notification, refetch]);
 
   if (isLoading) {
     return <FullPageSpinner label="Cargando notificación…" />;

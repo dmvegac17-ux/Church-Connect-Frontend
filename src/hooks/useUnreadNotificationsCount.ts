@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { NOTIFICATIONS_CHANGED_EVENT } from "../lib/notificationEvents";
 import { notificationService } from "../services/notificationService";
 
 /** Límite máximo permitido por `GET /notificaciones`; también el punto de corte del badge ("99+"). */
@@ -37,6 +38,12 @@ export function useUnreadNotificationsCount(): { count: number; refetch: () => v
   useEffect(() => {
     const id = window.setInterval(() => setReloadKey((k) => k + 1), POLL_MS);
     return () => window.clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setReloadKey((k) => k + 1);
+    window.addEventListener(NOTIFICATIONS_CHANGED_EVENT, handler);
+    return () => window.removeEventListener(NOTIFICATIONS_CHANGED_EVENT, handler);
   }, []);
 
   const refetch = useCallback(() => setReloadKey((k) => k + 1), []);

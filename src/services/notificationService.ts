@@ -48,7 +48,11 @@ async function getById(
   return data;
 }
 
-/** `PUT /notificaciones/{id}` — solo ADMIN. Actualización parcial; `usuario_id` no se puede modificar. */
+/**
+ * `PUT /notificaciones/{id}` — ADMIN puede editar cualquier notificación por
+ * completo; el dueño solo puede marcar/desmarcar `leida` (enviar `titulo` o
+ * `mensaje` sin ser ADMIN devuelve `403`). `usuario_id` no se puede modificar.
+ */
 async function update(
   id: string,
   dto: UpdateNotificationDTO,
