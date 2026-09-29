@@ -6,7 +6,6 @@ import {
   HeartHandshake,
   LogOut,
   Users,
-  UserCircle,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -19,6 +18,8 @@ export function Navbar() {
   const navigate = useNavigate();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const unreadLabel = unreadCount >= 100 ? "99+" : String(unreadCount);
+
+  const fullName = user ? `${user.nombre} ${user.apellido ?? ""}`.trim() : "—";
 
   const handleLogout = () => {
     logout();
@@ -76,22 +77,25 @@ export function Navbar() {
                 <span className="sr-only">, {unreadCount} sin leer</span>
               ) : null}
             </NavLink>
-            <NavLink to="/profile" className={linkClass}>
-              <UserCircle className="size-4" aria-hidden="true" />
-              Mi perfil
-            </NavLink>
           </nav>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="hidden text-right sm:block">
-            <p className="text-sm font-medium text-foreground">
-              {user ? `${user.nombre} ${user.apellido ?? ""}`.trim() : "—"}
+          <NavLink
+            to="/profile"
+            className="hidden rounded-md px-2 py-1 text-right transition hover:bg-muted sm:block"
+            title="Ver mi perfil"
+          >
+            <p
+              className="max-w-[180px] truncate text-sm font-medium text-foreground"
+              title={fullName}
+            >
+              {fullName}
             </p>
             <p className="text-xs text-muted-foreground">
               {role ? ROLE_LABELS[role] : ""}
             </p>
-          </div>
+          </NavLink>
           <button
             type="button"
             onClick={handleLogout}

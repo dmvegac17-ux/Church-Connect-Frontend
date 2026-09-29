@@ -17,9 +17,12 @@ import { TextField } from "../../components/forms/TextField";
 import { AuthLayout } from "../../components/layout/AuthLayout";
 import { ApiError } from "../../types/api";
 import { parseValidationErrors } from "../../lib/formErrors";
-import { focusFirstError, isEmail, required } from "../../lib/validators";
-
-const MIN_PASSWORD = 8;
+import {
+  focusFirstError,
+  isEmail,
+  passwordLengthError,
+  required,
+} from "../../lib/validators";
 
 export function RegisterPage() {
   const { register, isAuthenticated } = useAuth();
@@ -61,8 +64,9 @@ export function RegisterPage() {
     }
     if (!required(values.contrasena)) {
       errors.contrasena = "La contraseña es obligatoria.";
-    } else if (values.contrasena.length < MIN_PASSWORD) {
-      errors.contrasena = `Usa al menos ${MIN_PASSWORD} caracteres.`;
+    } else {
+      const passwordError = passwordLengthError(values.contrasena);
+      if (passwordError) errors.contrasena = passwordError;
     }
     if (values.confirmar !== values.contrasena) {
       errors.confirmar = "Las contraseñas no coinciden.";
@@ -184,7 +188,7 @@ export function RegisterPage() {
           value={values.contrasena}
           onChange={setField("contrasena")}
           error={fieldErrors.contrasena}
-          hint={`Mínimo ${MIN_PASSWORD} caracteres`}
+          hint="Entre 8 y 20 caracteres"
         />
         <PasswordField
           label="Confirmar contraseña"

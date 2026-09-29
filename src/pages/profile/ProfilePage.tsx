@@ -10,11 +10,9 @@ import { TextField } from "../../components/forms/TextField";
 import { Card, PageHeader } from "../../components/layout/Page";
 import { ActiveBadge, RoleBadge } from "../../components/users/Badges";
 import { parseValidationErrors } from "../../lib/formErrors";
-import { isEmail, required } from "../../lib/validators";
+import { isEmail, passwordLengthError, required } from "../../lib/validators";
 import { userService } from "../../services/userService";
 import { ApiError } from "../../types/api";
-
-const MIN_PASSWORD = 8;
 
 export function ProfilePage() {
   const { user, refreshProfile } = useAuth();
@@ -206,9 +204,8 @@ function PasswordForm({ userId }: { userId: string }) {
     setError(null);
 
     const errors: Record<string, string> = {};
-    if (contrasena.length < MIN_PASSWORD) {
-      errors.contrasena = `Usa al menos ${MIN_PASSWORD} caracteres.`;
-    }
+    const passwordError = passwordLengthError(contrasena);
+    if (passwordError) errors.contrasena = passwordError;
     if (confirmar !== contrasena) {
       errors.confirmar = "Las contraseñas no coinciden.";
     }
@@ -256,7 +253,7 @@ function PasswordForm({ userId }: { userId: string }) {
           value={contrasena}
           onChange={(e) => setContrasena(e.target.value)}
           error={fieldErrors.contrasena}
-          hint={`Mínimo ${MIN_PASSWORD} caracteres`}
+          hint="Entre 8 y 20 caracteres"
         />
         <PasswordField
           label="Confirmar contraseña"
