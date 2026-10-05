@@ -1,6 +1,5 @@
 import {
   Bell,
-  CalendarClock,
   CalendarDays,
   Church,
   HeartHandshake,
@@ -55,10 +54,6 @@ export function Navbar() {
             <NavLink to="/ministries" className={linkClass}>
               <HeartHandshake className="size-4" aria-hidden="true" />
               Ministerios
-            </NavLink>
-            <NavLink to="/schedules" className={linkClass}>
-              <CalendarClock className="size-4" aria-hidden="true" />
-              Cronogramas
             </NavLink>
             <NavLink to="/notifications" className={linkClass}>
               <span className="relative inline-flex">

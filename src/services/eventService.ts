@@ -49,8 +49,8 @@ async function update(id: string, dto: UpdateEventDTO): Promise<Event> {
 }
 
 /**
- * `DELETE /events/{id}` — solo ADMIN.
- * `409` si el evento tiene cronogramas asociados (deben eliminarse primero).
+ * `DELETE /events/{id}` — solo ADMIN. Elimina en cascada su cronograma,
+ * asistencias, inscripciones y confirmaciones por correo asociadas.
  */
 async function remove(id: string): Promise<void> {
   await httpClient.delete<null>(`${BASE}/${id}`);

@@ -13,9 +13,15 @@ export interface Event {
   /** ISO datetime. */
   fecha_fin: string;
   lugar: string;
+  /** Dirección en texto libre, opcional (independiente del nombre del lugar). */
+  direccion: string | null;
+  latitud: number | null;
+  longitud: number | null;
   capacidad: number;
   /** id del usuario que creó el evento (asignado por el backend). */
   creado_por: string;
+  /** Cantidad de actividades del cronograma asociadas a este evento. */
+  total_actividades: number;
 }
 
 /** Cuerpo de `POST /events`. `creado_por` lo asigna el backend a partir del token. */
@@ -25,6 +31,9 @@ export interface CreateEventDTO {
   fecha_inicio: string;
   fecha_fin: string;
   lugar: string;
+  direccion?: string | null;
+  latitud?: number | null;
+  longitud?: number | null;
   capacidad: number;
 }
 
@@ -35,5 +44,8 @@ export interface UpdateEventDTO {
   fecha_inicio?: string;
   fecha_fin?: string;
   lugar?: string;
+  direccion?: string | null;
+  latitud?: number | null;
+  longitud?: number | null;
   capacidad?: number;
 }

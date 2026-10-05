@@ -7,6 +7,15 @@ interface TimeSelectProps {
   onChange: (value: string) => void;
   error?: string;
   name?: string;
+  /** Hora mínima permitida, 24h `HH:mm` (inclusive). Deshabilita horas/minutos anteriores. */
+  minTime?: string;
+  /** Hora máxima permitida, 24h `HH:mm` (inclusive). Deshabilita horas/minutos posteriores. */
+  maxTime?: string;
+}
+
+function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(":").map(Number);
+  return h * 60 + m;
 }
 
 const HOURS_12 = Array.from({ length: 12 }, (_, i) =>
@@ -42,12 +51,29 @@ export function TimeSelect({
   onChange,
   error,
   name = "hora",
+  minTime,
+  maxTime,
 }: TimeSelectProps) {
   const autoId = useId();
   const id = `field-${name}-${autoId}`;
   const [hh24Str, mm] = value ? value.split(":") : ["", ""];
   const hh24 = hh24Str === "" ? null : Number(hh24Str);
   const { hour12, period } = hh24 === null ? { hour12: "", period: "" as const } : to12Hour(hh24);
+
+  const minMinutes = minTime ? toMinutes(minTime) : null;
+  const maxMinutes = maxTime ? toMinutes(maxTime) : null;
+
+  const hourIntersectsRange = (candidateHh24: number): boolean => {
+    const start = candidateHh24 * 60;
+    const end = start + 59;
+    if (minMinutes !== null && end < minMinutes) {
+      return false;
+    }
+    if (maxMinutes !== null && start > maxMinutes) {
+      return false;
+    }
+    return true;
+  };
 
   const selectClass = `w-full rounded-lg border bg-input-background px-3 py-2.5 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-60 ${
     error
@@ -82,11 +108,18 @@ export function TimeSelect({
           <option value="" disabled>
             HH
           </option>
-          {HOURS_12.map((h) => (
-            <option key={h} value={h}>
-              {h}
-            </option>
-          ))}
+          {HOURS_12.map((h) => {
+            const hNum = Number(h);
+            const disabled =
+              (minMinutes !== null || maxMinutes !== null) &&
+              !hourIntersectsRange(to24Hour(hNum, "AM")) &&
+              !hourIntersectsRange(to24Hour(hNum, "PM"));
+            return (
+              <option key={h} value={h} disabled={disabled}>
+                {h}
+              </option>
+            );
+          })}
         </select>
         <span className="text-muted-foreground" aria-hidden="true">
           :
@@ -101,11 +134,22 @@ export function TimeSelect({
           <option value="" disabled>
             MM
           </option>
-          {MINUTES.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
+          {MINUTES.map((m) => {
+            const disabled =
+              hh24 !== null &&
+              (() => {
+                const total = hh24 * 60 + Number(m);
+                return (
+                  (minMinutes !== null && total < minMinutes) ||
+                  (maxMinutes !== null && total > maxMinutes)
+                );
+              })();
+            return (
+              <option key={m} value={m} disabled={disabled}>
+                {m}
+              </option>
+            );
+          })}
         </select>
         <select
           aria-label={`${label} — a. m. / p. m.`}
@@ -117,8 +161,17 @@ export function TimeSelect({
           <option value="" disabled>
             AM/PM
           </option>
-          <option value="AM">a. m.</option>
-          <option value="PM">p. m.</option>
+          {(["AM", "PM"] as const).map((p) => {
+            const disabled =
+              hour12 !== "" &&
+              (minMinutes !== null || maxMinutes !== null) &&
+              !hourIntersectsRange(to24Hour(Number(hour12), p));
+            return (
+              <option key={p} value={p} disabled={disabled}>
+                {p === "AM" ? "a. m." : "p. m."}
+              </option>
+            );
+          })}
         </select>
       </div>
       {error ? (

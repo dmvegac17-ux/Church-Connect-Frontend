@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ErrorAlert } from "../../components/feedback/ErrorAlert";
 import { useToast } from "../../components/feedback/useToast";
 import { Card, PageHeader } from "../../components/layout/Page";
-import { fromDatetimeLocalValue } from "../../lib/format";
+import { fromDateAndTimeValues } from "../../lib/format";
 import { parseValidationErrors } from "../../lib/formErrors";
 import { eventService } from "../../services/eventService";
 import { ApiError } from "../../types/api";
@@ -22,12 +22,18 @@ export function EventCreatePage() {
     setError(null);
     setFieldErrors({});
 
+    const latitud = values.latitud.trim();
+    const longitud = values.longitud.trim();
+
     const payload: CreateEventDTO = {
       titulo: values.titulo.trim(),
       descripcion: values.descripcion.trim(),
       lugar: values.lugar.trim(),
-      fecha_inicio: fromDatetimeLocalValue(values.fechaInicio),
-      fecha_fin: fromDatetimeLocalValue(values.fechaFin),
+      direccion: values.direccion.trim() || null,
+      latitud: latitud ? Number(latitud) : null,
+      longitud: longitud ? Number(longitud) : null,
+      fecha_inicio: fromDateAndTimeValues(values.fechaInicio, values.horaInicio),
+      fecha_fin: fromDateAndTimeValues(values.fechaFin, values.horaFin),
       capacidad: Number(values.capacidad),
     };
 

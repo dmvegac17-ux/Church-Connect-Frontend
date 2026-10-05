@@ -13,6 +13,7 @@ export interface Schedule {
   /** ISO datetime. */
   hora_fin: string;
   responsable: string;
+  descripcion: string | null;
 }
 
 /** Cuerpo de `POST /schedules`. */
@@ -22,6 +23,7 @@ export interface CreateScheduleDTO {
   hora_inicio: string;
   hora_fin: string;
   responsable: string;
+  descripcion?: string | null;
 }
 
 /**
@@ -34,4 +36,5 @@ export interface UpdateScheduleDTO {
   hora_inicio?: string;
   hora_fin?: string;
   responsable?: string;
+  descripcion?: string | null;
 }

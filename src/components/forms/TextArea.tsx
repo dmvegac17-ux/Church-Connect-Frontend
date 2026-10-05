@@ -9,10 +9,15 @@ interface TextAreaProps
   label: string;
   error?: string;
   hint?: string;
+  /** Oculta el contador de caracteres aunque se pase `maxLength`. */
+  hideCounter?: boolean;
 }
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  function TextArea({ label, error, hint, className = "", ...props }, ref) {
+  function TextArea(
+    { label, error, hint, hideCounter, className = "", ...props },
+    ref,
+  ) {
     const autoId = useId();
     const id = props.name ? `field-${props.name}` : autoId;
     const describedBy = error
@@ -20,17 +25,34 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       : hint
         ? `${id}-hint`
         : undefined;
+    const showCounter =
+      !hideCounter && typeof props.maxLength === "number";
+    const currentLength =
+      typeof props.value === "string" ? props.value.length : 0;
+    const nearLimit =
+      showCounter && currentLength >= (props.maxLength as number) * 0.9;
 
     return (
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={id} className="text-sm font-medium text-foreground">
-          {label}
-          {props.required ? (
-            <span className="ml-0.5 text-destructive" aria-hidden="true">
-              *
+        <div className="flex items-baseline justify-between gap-2">
+          <label htmlFor={id} className="text-sm font-medium text-foreground">
+            {label}
+            {props.required ? (
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
+                *
+              </span>
+            ) : null}
+          </label>
+          {showCounter ? (
+            <span
+              className={`text-xs tabular-nums ${
+                nearLimit ? "text-destructive" : "text-muted-foreground"
+              }`}
+            >
+              {currentLength}/{props.maxLength}
             </span>
           ) : null}
-        </label>
+        </div>
         <textarea
           ref={ref}
           id={id}

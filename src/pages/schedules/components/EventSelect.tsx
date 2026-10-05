@@ -15,10 +15,7 @@ interface EventSelectProps {
   optional?: boolean;
 }
 
-/**
- * Selector de evento alimentado por `eventService.list()` (lectura mínima,
- * no hay módulo de Eventos completo en el frontend).
- */
+/** Selector de evento alimentado por `useEventOptions` (lectura liviana, sin paginar). */
 export function EventSelect({
   value,
   onChange,

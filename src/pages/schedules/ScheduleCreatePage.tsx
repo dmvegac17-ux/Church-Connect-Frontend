@@ -28,6 +28,7 @@ export function ScheduleCreatePage() {
     const payload: CreateScheduleDTO = {
       evento_id: values.eventoId,
       actividad: values.actividad.trim(),
+      descripcion: values.descripcion.trim() || null,
       hora_inicio: fromDateAndTimeValues(values.fechaInicio, values.horaInicio),
       hora_fin: fromDateAndTimeValues(values.fechaFin, values.horaFin),
       responsable: values.responsable.trim(),
