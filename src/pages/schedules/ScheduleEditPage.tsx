@@ -53,6 +53,7 @@ export function ScheduleEditPage() {
   const initial: ScheduleFormValues = {
     eventoId: schedule.evento_id,
     actividad: schedule.actividad,
+    descripcion: schedule.descripcion ?? "",
     fechaInicio,
     horaInicio,
     fechaFin,
@@ -69,6 +70,7 @@ export function ScheduleEditPage() {
     setFieldErrors({});
 
     const actividad = values.actividad.trim();
+    const descripcion = values.descripcion.trim() || null;
     const responsable = values.responsable.trim();
     const horaInicioIso = fromDateAndTimeValues(
       values.fechaInicio,
@@ -79,6 +81,9 @@ export function ScheduleEditPage() {
     const payload: UpdateScheduleDTO = {};
     if (actividad !== schedule.actividad) {
       payload.actividad = actividad;
+    }
+    if (descripcion !== (schedule.descripcion ?? null)) {
+      payload.descripcion = descripcion;
     }
     if (responsable !== schedule.responsable) {
       payload.responsable = responsable;

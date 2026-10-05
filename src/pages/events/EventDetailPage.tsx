@@ -1,5 +1,5 @@
-import { CalendarClock, Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { CalendarClock, CalendarPlus, Pencil, Trash2 } from "lucide-react";
+import { lazy, Suspense, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useAuth } from "../../auth/useAuth";
@@ -8,12 +8,21 @@ import { FullPageSpinner, Spinner } from "../../components/feedback/Spinner";
 import { useToast } from "../../components/feedback/useToast";
 import { Button } from "../../components/forms/Button";
 import { Card, PageHeader } from "../../components/layout/Page";
+import { ScheduleTimeline } from "../../components/schedule/ScheduleTimeline";
 import { useEvent } from "../../hooks/useEvent";
 import { useSchedules } from "../../hooks/useSchedules";
 import { formatDateTime } from "../../lib/format";
 import { eventService } from "../../services/eventService";
 import { ApiError } from "../../types/api";
+import { AddScheduleModal } from "./components/AddScheduleModal";
 import { DeleteEventDialog } from "./components/DeleteEventDialog";
+
+/** Leaflet pesa ~150KB — se carga en un chunk separado, no en el bundle principal. */
+const EventLocationMap = lazy(() =>
+  import("../../components/map/EventLocationMap").then((m) => ({
+    default: m.EventLocationMap,
+  })),
+);
 
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,12 +31,17 @@ export function EventDetailPage() {
   const { role } = useAuth();
   const isAdmin = role === "ADMIN";
   const { event, isLoading, error } = useEvent(id);
-  const { schedules, total: totalSchedules, isLoading: loadingSchedules } =
-    useSchedules(id);
+  const {
+    schedules,
+    total: totalSchedules,
+    isLoading: loadingSchedules,
+    refetch: refetchSchedules,
+  } = useSchedules(id);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<unknown>(null);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
 
   if (isLoading) {
     return <FullPageSpinner label="Cargando evento…" />;
@@ -86,6 +100,13 @@ export function EventDetailPage() {
             <>
               <Button
                 variant="secondary"
+                onClick={() => setScheduleModalOpen(true)}
+              >
+                <CalendarPlus className="size-4" aria-hidden="true" />
+                Añadir cronograma
+              </Button>
+              <Button
+                variant="secondary"
                 onClick={() => navigate(`/events/${event.id}/editar`)}
               >
                 <Pencil className="size-4" aria-hidden="true" />
@@ -115,6 +136,9 @@ export function EventDetailPage() {
           <div>
             <h2 className="text-sm font-medium text-muted-foreground">Lugar</h2>
             <p className="mt-1 text-sm text-foreground">{event.lugar}</p>
+            {event.direccion ? (
+              <p className="text-sm text-muted-foreground">{event.direccion}</p>
+            ) : null}
           </div>
           <div>
             <h2 className="text-sm font-medium text-muted-foreground">Capacidad</h2>
@@ -133,6 +157,22 @@ export function EventDetailPage() {
             </p>
           </div>
         </div>
+        {event.latitud !== null && event.longitud !== null ? (
+          <Suspense
+            fallback={
+              <div className="flex h-56 w-full items-center justify-center rounded-lg border border-border">
+                <Spinner label="Cargando mapa…" />
+              </div>
+            }
+          >
+            <EventLocationMap
+              latitud={event.latitud}
+              longitud={event.longitud}
+              label={event.lugar}
+              className="h-56 w-full"
+            />
+          </Suspense>
+        ) : null}
       </Card>
 
       <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm">
@@ -161,19 +201,9 @@ export function EventDetailPage() {
             Este evento todavía no tiene cronogramas registrados.
           </p>
         ) : (
-          <ul className="divide-y divide-border">
-            {schedules.map((s) => (
-              <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
-                <div>
-                  <p className="font-medium text-foreground">{s.actividad}</p>
-                  <p className="text-muted-foreground">
-                    {formatDateTime(s.hora_inicio)} – {formatDateTime(s.hora_fin)}
-                  </p>
-                </div>
-                <span className="text-muted-foreground">{s.responsable}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="p-4 sm:p-6">
+            <ScheduleTimeline schedules={schedules} />
+          </div>
         )}
       </div>
 
@@ -183,6 +213,12 @@ export function EventDetailPage() {
         loading={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setConfirmOpen(false)}
+      />
+
+      <AddScheduleModal
+        event={scheduleModalOpen ? event : null}
+        onClose={() => setScheduleModalOpen(false)}
+        onSaved={refetchSchedules}
       />
     </div>
   );

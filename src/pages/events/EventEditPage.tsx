@@ -7,8 +7,8 @@ import { useToast } from "../../components/feedback/useToast";
 import { Card, PageHeader } from "../../components/layout/Page";
 import { useEvent } from "../../hooks/useEvent";
 import {
-  fromDatetimeLocalValue,
-  toDatetimeLocalValue,
+  fromDateAndTimeValues,
+  toDateAndTimeValues,
 } from "../../lib/format";
 import { parseValidationErrors } from "../../lib/formErrors";
 import { eventService } from "../../services/eventService";
@@ -41,12 +41,24 @@ export function EventEditPage() {
     );
   }
 
+  const { date: fechaInicioInit, time: horaInicioInit } = toDateAndTimeValues(
+    event.fecha_inicio,
+  );
+  const { date: fechaFinInit, time: horaFinInit } = toDateAndTimeValues(
+    event.fecha_fin,
+  );
+
   const initial: EventFormValues = {
     titulo: event.titulo,
     descripcion: event.descripcion,
     lugar: event.lugar,
-    fechaInicio: toDatetimeLocalValue(event.fecha_inicio),
-    fechaFin: toDatetimeLocalValue(event.fecha_fin),
+    direccion: event.direccion ?? "",
+    latitud: event.latitud !== null ? String(event.latitud) : "",
+    longitud: event.longitud !== null ? String(event.longitud) : "",
+    fechaInicio: fechaInicioInit,
+    horaInicio: horaInicioInit,
+    fechaFin: fechaFinInit,
+    horaFin: horaFinInit,
     capacidad: String(event.capacidad),
   };
 
@@ -57,8 +69,13 @@ export function EventEditPage() {
     const titulo = values.titulo.trim();
     const descripcion = values.descripcion.trim();
     const lugar = values.lugar.trim();
-    const fechaInicio = fromDatetimeLocalValue(values.fechaInicio);
-    const fechaFin = fromDatetimeLocalValue(values.fechaFin);
+    const direccion = values.direccion.trim() || null;
+    const latitudTrim = values.latitud.trim();
+    const longitudTrim = values.longitud.trim();
+    const latitud = latitudTrim ? Number(latitudTrim) : null;
+    const longitud = longitudTrim ? Number(longitudTrim) : null;
+    const fechaInicio = fromDateAndTimeValues(values.fechaInicio, values.horaInicio);
+    const fechaFin = fromDateAndTimeValues(values.fechaFin, values.horaFin);
     const capacidad = Number(values.capacidad);
 
     const payload: UpdateEventDTO = {};
@@ -70,6 +87,15 @@ export function EventEditPage() {
     }
     if (lugar !== event.lugar) {
       payload.lugar = lugar;
+    }
+    if (direccion !== event.direccion) {
+      payload.direccion = direccion;
+    }
+    if (latitud !== event.latitud) {
+      payload.latitud = latitud;
+    }
+    if (longitud !== event.longitud) {
+      payload.longitud = longitud;
     }
     if (
       new Date(fechaInicio).getTime() !== new Date(event.fecha_inicio).getTime()

@@ -1,19 +1,20 @@
-import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../auth/useAuth";
 import { ErrorAlert } from "../../components/feedback/ErrorAlert";
-import { Spinner } from "../../components/feedback/Spinner";
+import { FullPageSpinner } from "../../components/feedback/Spinner";
 import { useToast } from "../../components/feedback/useToast";
 import { Button } from "../../components/forms/Button";
 import { Card, PageHeader } from "../../components/layout/Page";
 import { useEvents } from "../../hooks/useEvents";
-import { formatDateTime } from "../../lib/format";
 import { eventService } from "../../services/eventService";
 import { ApiError } from "../../types/api";
 import type { Event } from "../../types/event";
+import { AddScheduleModal } from "./components/AddScheduleModal";
 import { DeleteEventDialog } from "./components/DeleteEventDialog";
+import { EventCard } from "./components/EventCard";
 
 export function EventsListPage() {
   const { role } = useAuth();
@@ -35,10 +36,10 @@ export function EventsListPage() {
   const [target, setTarget] = useState<Event | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<unknown>(null);
+  const [scheduleEvent, setScheduleEvent] = useState<Event | null>(null);
 
   const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const rangeEnd = Math.min(page * pageSize, total);
-  const colSpan = isAdmin ? 5 : 4;
 
   const confirmDelete = async () => {
     if (!target) {
@@ -95,118 +96,56 @@ export function EventsListPage() {
         </div>
       ) : null}
 
-      <Card className="!p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-muted text-xs uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3 font-medium">Título</th>
-                <th className="px-4 py-3 font-medium">Lugar</th>
-                <th className="px-4 py-3 font-medium">Inicio</th>
-                <th className="px-4 py-3 font-medium">Capacidad</th>
-                {isAdmin ? (
-                  <th className="px-4 py-3 text-right font-medium">
-                    Acciones
-                  </th>
-                ) : null}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {isLoading ? (
-                <tr>
-                  <td
-                    colSpan={colSpan}
-                    className="px-4 py-10 text-center text-muted-foreground"
-                  >
-                    <Spinner label="Cargando eventos…" />
-                  </td>
-                </tr>
-              ) : events.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={colSpan}
-                    className="px-4 py-10 text-center text-muted-foreground"
-                  >
-                    Todavía no hay eventos registrados.
-                  </td>
-                </tr>
-              ) : (
-                events.map((ev) => (
-                  <tr key={ev.id} className="hover:bg-muted/50">
-                    <td className="px-4 py-3 font-medium text-foreground">
-                      <Link
-                        to={`/events/${ev.id}`}
-                        className="hover:text-primary hover:underline"
-                      >
-                        {ev.titulo}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {ev.lugar}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {formatDateTime(ev.fecha_inicio)}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {ev.capacidad}
-                    </td>
-                    {isAdmin ? (
-                      <td className="px-4 py-3">
-                        <div className="flex justify-end gap-1">
-                          <Link
-                            to={`/events/${ev.id}/editar`}
-                            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-primary"
-                            aria-label={`Editar ${ev.titulo}`}
-                          >
-                            <Pencil className="size-4" aria-hidden="true" />
-                          </Link>
-                          <button
-                            type="button"
-                            onClick={() => setTarget(ev)}
-                            className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                            aria-label={`Eliminar ${ev.titulo}`}
-                          >
-                            <Trash2 className="size-4" aria-hidden="true" />
-                          </button>
-                        </div>
-                      </td>
-                    ) : null}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-4 text-sm text-muted-foreground">
-          <span>
-            {rangeStart}–{rangeEnd} de {total}
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setPage(page - 1)}
-              disabled={page <= 1 || isLoading}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 hover:bg-muted disabled:opacity-40"
-            >
-              <ChevronLeft className="size-4" aria-hidden="true" />
-              Anterior
-            </button>
-            <span>
-              Página {page} de {pageCount}
-            </span>
-            <button
-              type="button"
-              onClick={() => setPage(page + 1)}
-              disabled={page >= pageCount || isLoading}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 hover:bg-muted disabled:opacity-40"
-            >
-              Siguiente
-              <ChevronRight className="size-4" aria-hidden="true" />
-            </button>
+      {isLoading ? (
+        <FullPageSpinner label="Cargando eventos…" />
+      ) : events.length === 0 ? (
+        <Card className="text-center text-sm text-muted-foreground">
+          Todavía no hay eventos registrados.
+        </Card>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {events.map((ev) => (
+              <EventCard
+                key={ev.id}
+                event={ev}
+                isAdmin={isAdmin}
+                onDelete={setTarget}
+                onAddSchedule={setScheduleEvent}
+              />
+            ))}
           </div>
-        </div>
-      </Card>
+
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
+            <span>
+              {rangeStart}–{rangeEnd} de {total}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage(page - 1)}
+                disabled={page <= 1}
+                className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronLeft className="size-4" aria-hidden="true" />
+                Anterior
+              </button>
+              <span>
+                Página {page} de {pageCount}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage(page + 1)}
+                disabled={page >= pageCount}
+                className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 hover:bg-muted disabled:opacity-40"
+              >
+                Siguiente
+                <ChevronRight className="size-4" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       <DeleteEventDialog
         open={target !== null}
@@ -214,6 +153,12 @@ export function EventsListPage() {
         loading={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setTarget(null)}
+      />
+
+      <AddScheduleModal
+        event={scheduleEvent}
+        onClose={() => setScheduleEvent(null)}
+        onSaved={refetch}
       />
     </div>
   );

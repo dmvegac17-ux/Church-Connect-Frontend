@@ -1,6 +1,7 @@
 import { useRef, useState, type FormEvent } from "react";
 
 import { Button } from "../../../components/forms/Button";
+import { TextArea } from "../../../components/forms/TextArea";
 import { TextField } from "../../../components/forms/TextField";
 import { focusFirstError, required } from "../../../lib/validators";
 import { EventSelect } from "./EventSelect";
@@ -9,6 +10,7 @@ import { TimeSelect } from "./TimeSelect";
 export interface ScheduleFormValues {
   eventoId: string;
   actividad: string;
+  descripcion: string;
   /** `<input type="date">` (`YYYY-MM-DD`) + `TimeSelect` (`HH:mm`), hora local del navegador. */
   fechaInicio: string;
   horaInicio: string;
@@ -33,9 +35,14 @@ interface ScheduleFormProps {
   lockedEventTitle?: string;
 }
 
+const ACTIVIDAD_MAX = 150;
+const DESCRIPCION_MAX = 1000;
+const RESPONSABLE_MAX = 150;
+
 const EMPTY: ScheduleFormValues = {
   eventoId: "",
   actividad: "",
+  descripcion: "",
   fechaInicio: "",
   horaInicio: "",
   fechaFin: "",
@@ -60,6 +67,9 @@ export function ScheduleForm({
 
   const set = (name: keyof ScheduleFormValues, value: string) =>
     setValues((prev) => ({ ...prev, [name]: value }));
+
+  const sameDay =
+    values.fechaInicio !== "" && values.fechaInicio === values.fechaFin;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -129,9 +139,20 @@ export function ScheduleForm({
         label="Actividad"
         name="actividad"
         required
+        maxLength={ACTIVIDAD_MAX}
         value={values.actividad}
         onChange={(e) => set("actividad", e.target.value)}
         error={errors.actividad}
+      />
+
+      <TextArea
+        label="Descripción"
+        name="descripcion"
+        rows={2}
+        maxLength={DESCRIPCION_MAX}
+        value={values.descripcion}
+        onChange={(e) => set("descripcion", e.target.value)}
+        error={errors.descripcion}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -169,6 +190,7 @@ export function ScheduleForm({
           value={values.horaFin}
           onChange={(v) => set("horaFin", v)}
           error={errors.hora_fin}
+          minTime={sameDay ? values.horaInicio : undefined}
         />
       </div>
 
@@ -176,6 +198,7 @@ export function ScheduleForm({
         label="Responsable"
         name="responsable"
         required
+        maxLength={RESPONSABLE_MAX}
         value={values.responsable}
         onChange={(e) => set("responsable", e.target.value)}
         error={errors.responsable}

@@ -9,8 +9,8 @@ interface DeleteEventDialogProps {
 }
 
 /**
- * Confirmación para eliminar un evento. El backend rechaza con `409` si el
- * evento todavía tiene cronogramas asociados (hay que eliminarlos primero).
+ * Confirmación para eliminar un evento. El backend elimina en cascada su
+ * cronograma, asistencias, inscripciones y confirmaciones por correo.
  */
 export function DeleteEventDialog({
   open,
@@ -26,8 +26,8 @@ export function DeleteEventDialog({
       title="Eliminar evento"
       description={
         `¿Seguro que quieres eliminar "${eventTitle}"? ` +
-        "Si el evento tiene cronogramas asociados, primero debes eliminarlos. " +
-        "Esta acción no se puede deshacer."
+        "También se eliminará su cronograma y los registros de asistencia, " +
+        "inscripción y confirmación asociados. Esta acción no se puede deshacer."
       }
       confirmLabel="Eliminar"
       loading={loading}
