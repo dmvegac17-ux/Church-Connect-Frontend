@@ -1,5 +1,11 @@
-import { useEffect } from "react";
-import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
+import { useEffect, useRef, type RefObject } from "react";
+import {
+  MapContainer,
+  Marker,
+  TileLayer,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 
 import { fixLeafletDefaultIcon } from "../../lib/leafletIcon";
 
@@ -30,6 +36,33 @@ function ClickToSetMarker({
 }
 
 /**
+ * `MapContainer` solo lee `center`/`zoom` al montarse: cuando las coordenadas
+ * cambian desde fuera (sugerencia elegida, geocodificación, inputs) hay que
+ * mover la vista a mano. Los clics en el mapa no la mueven.
+ */
+function RecenterOnChange({
+  latitud,
+  longitud,
+  lastClick,
+}: {
+  latitud: number | null;
+  longitud: number | null;
+  lastClick: RefObject<string | null>;
+}) {
+  const map = useMap();
+  useEffect(() => {
+    if (latitud === null || longitud === null) {
+      return;
+    }
+    if (lastClick.current === `${latitud},${longitud}`) {
+      return;
+    }
+    map.setView([latitud, longitud], Math.max(map.getZoom(), 15));
+  }, [latitud, longitud, lastClick, map]);
+  return null;
+}
+
+/**
  * Mapa editable: un clic fija el marcador y reporta las coordenadas
  * (redondeadas a 6 decimales, igual precisión que la columna `NUMERIC(9,6)`
  * del backend). Usado en `EventForm` para fijar la ubicación del evento.
@@ -43,6 +76,8 @@ export function EventLocationPicker({
   useEffect(() => {
     fixLeafletDefaultIcon();
   }, []);
+
+  const lastClick = useRef<string | null>(null);
 
   const hasPosition = latitud !== null && longitud !== null;
   const center: [number, number] = hasPosition
@@ -60,7 +95,17 @@ export function EventLocationPicker({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
-        <ClickToSetMarker onChange={onChange} />
+        <ClickToSetMarker
+          onChange={(lat, lng) => {
+            lastClick.current = `${lat},${lng}`;
+            onChange(lat, lng);
+          }}
+        />
+        <RecenterOnChange
+          latitud={latitud}
+          longitud={longitud}
+          lastClick={lastClick}
+        />
         {hasPosition ? <Marker position={[latitud, longitud]} /> : null}
       </MapContainer>
     </div>
