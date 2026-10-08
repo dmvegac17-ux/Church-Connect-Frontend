@@ -44,7 +44,7 @@ export function RegisterPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/profile", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 

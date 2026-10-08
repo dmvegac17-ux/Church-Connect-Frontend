@@ -30,7 +30,7 @@ export function EventLocationMap({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <div className={`overflow-hidden rounded-lg border border-border ${className}`}>
+      <div className={`isolate overflow-hidden rounded-lg border border-border ${className}`}>
         <MapContainer
           center={[latitud, longitud]}
           zoom={15}

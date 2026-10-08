@@ -1,8 +1,6 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import { ProtectedRoute } from "./auth/ProtectedRoute";
-import { useAuth } from "./auth/useAuth";
-import { FullPageSpinner } from "./components/feedback/Spinner";
 import { AppShell } from "./components/layout/AppShell";
 import { ForbiddenPage } from "./pages/ForbiddenPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
@@ -12,6 +10,7 @@ import { EventCreatePage } from "./pages/events/EventCreatePage";
 import { EventDetailPage } from "./pages/events/EventDetailPage";
 import { EventEditPage } from "./pages/events/EventEditPage";
 import { EventsListPage } from "./pages/events/EventsListPage";
+import { HomePage } from "./pages/home/HomePage";
 import { MinistriesListPage } from "./pages/ministries/MinistriesListPage";
 import { MinistryCreatePage } from "./pages/ministries/MinistryCreatePage";
 import { MinistryDetailPage } from "./pages/ministries/MinistryDetailPage";
@@ -28,17 +27,6 @@ import { UserDetailPage } from "./pages/users/UserDetailPage";
 import { UserEditPage } from "./pages/users/UserEditPage";
 import { UsersListPage } from "./pages/users/UsersListPage";
 
-function IndexRedirect() {
-  const { isAuthenticated, isLoading, role } = useAuth();
-  if (isLoading) {
-    return <FullPageSpinner />;
-  }
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  return <Navigate to={role === "ADMIN" ? "/users" : "/profile"} replace />;
-}
-
 export function AppRoutes() {
   return (
     <Routes>
@@ -54,6 +42,9 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       >
+        {/* Inicio: pantalla de bienvenida tras iniciar sesión. */}
+        <Route path="/" element={<HomePage />} />
+
         <Route path="/profile" element={<ProfilePage />} />
 
         <Route
@@ -168,7 +159,6 @@ export function AppRoutes() {
         <Route path="/403" element={<ForbiddenPage />} />
       </Route>
 
-      <Route path="/" element={<IndexRedirect />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
