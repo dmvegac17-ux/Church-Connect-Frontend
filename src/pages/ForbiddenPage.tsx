@@ -13,10 +13,10 @@ export function ForbiddenPage() {
         contacta a un administrador.
       </p>
       <Link
-        to="/profile"
+        to="/"
         className="mt-6 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
       >
-        Ir a mi perfil
+        Ir al inicio
       </Link>
     </div>
   );

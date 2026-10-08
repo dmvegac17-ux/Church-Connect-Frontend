@@ -11,20 +11,16 @@ import { Checkbox } from "../../components/forms/Checkbox";
 import { PasswordField } from "../../components/forms/PasswordField";
 import { TextField } from "../../components/forms/TextField";
 import { AuthLayout } from "../../components/layout/AuthLayout";
+import { HOME_PATH } from "../../config/navigation";
 import { focusFirstError, isEmail, required } from "../../lib/validators";
-import type { UserRole } from "../../types/user";
 
 interface LocationState {
   from?: { pathname: string };
   registered?: boolean;
 }
 
-function landingFor(role: UserRole): string {
-  return role === "ADMIN" ? "/users" : "/profile";
-}
-
 export function LoginPage() {
-  const { login, isAuthenticated, role } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
@@ -39,10 +35,10 @@ export function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated && role) {
-      navigate(landingFor(role), { replace: true });
+    if (isAuthenticated) {
+      navigate(HOME_PATH, { replace: true });
     }
-  }, [isAuthenticated, role, navigate]);
+  }, [isAuthenticated, navigate]);
 
   // Aviso emergente tras un registro exitoso; se limpia el state de navegación
   // para que no reaparezca al refrescar o volver atrás.
@@ -83,11 +79,11 @@ export function LoginPage() {
 
     setSubmitting(true);
     try {
-      const userRole = await login(
+      await login(
         { correo: correo.trim(), contrasena },
         remember,
       );
-      const target = state?.from?.pathname ?? landingFor(userRole);
+      const target = state?.from?.pathname ?? HOME_PATH;
       navigate(target, { replace: true });
     } catch (err) {
       setError(err);

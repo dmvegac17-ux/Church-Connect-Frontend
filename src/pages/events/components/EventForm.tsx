@@ -5,7 +5,12 @@ import { Spinner } from "../../../components/feedback/Spinner";
 import { Button } from "../../../components/forms/Button";
 import { TextArea } from "../../../components/forms/TextArea";
 import { TextField } from "../../../components/forms/TextField";
-import { geocodeAddress, googleMapsUrl } from "../../../lib/geocoding";
+import { AddressAutocomplete } from "../../../components/map/AddressAutocomplete";
+import {
+  geocodeAddress,
+  googleMapsUrl,
+  type AddressSuggestion,
+} from "../../../lib/geocoding";
 import { focusFirstError, required } from "../../../lib/validators";
 import { TimeSelect } from "../../schedules/components/TimeSelect";
 
@@ -137,6 +142,22 @@ export function EventForm({
     }
   };
 
+  const handleSuggestionSelect = (suggestion: AddressSuggestion) => {
+    // Invalida cualquier geocodificación en curso: manda la sugerencia elegida.
+    geocodeRequestId.current++;
+    setGeocoding(false);
+    setValues((prev) => ({
+      ...prev,
+      direccion: suggestion.displayName.slice(0, DIRECCION_MAX),
+      latitud: String(Math.round(suggestion.lat * 1e6) / 1e6),
+      longitud: String(Math.round(suggestion.lon * 1e6) / 1e6),
+    }));
+    setGeocodeStatus({
+      kind: "success",
+      text: `Ubicación marcada: ${suggestion.displayName}`,
+    });
+  };
+
   const handleDireccionBlur = () => {
     const hasCoords = values.latitud.trim() !== "" && values.longitud.trim() !== "";
     if (!hasCoords) {
@@ -234,15 +255,21 @@ export function EventForm({
         hint="Nombre del lugar (ej. “Salón social”)."
       />
 
-      <TextField
+      <AddressAutocomplete
         label="Dirección"
         name="direccion"
         maxLength={DIRECCION_MAX}
         value={values.direccion}
-        onChange={(e) => set("direccion", e.target.value)}
+        onChange={(v) => set("direccion", v)}
+        onSelect={handleSuggestionSelect}
         onBlur={handleDireccionBlur}
+        bias={
+          values.latitud.trim() && values.longitud.trim()
+            ? { lat: Number(values.latitud), lon: Number(values.longitud) }
+            : null
+        }
         error={errors.direccion}
-        hint="Opcional: dirección exacta. Al salir del campo se busca y se marca sola en el mapa."
+        hint="Opcional: escribe la dirección y elige una sugerencia para marcarla en el mapa."
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -326,9 +353,9 @@ export function EventForm({
           </div>
         </div>
         <p className="text-xs text-muted-foreground">
-          Escribe la dirección y al salir del campo se busca sola en el
-          mapa. También puedes hacer clic en el mapa para ajustar el punto
-          exacto, o abrirlo en Google Maps para verificarlo.
+          Al elegir una sugerencia de dirección el marcador se ubica solo.
+          También puedes hacer clic en el mapa para ajustar el punto exacto,
+          o abrirlo en Google Maps para verificarlo.
         </p>
         {geocodeStatus ? (
           <p
