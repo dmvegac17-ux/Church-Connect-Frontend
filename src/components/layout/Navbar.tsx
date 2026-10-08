@@ -12,14 +12,16 @@ import { useAuth } from "../../auth/useAuth";
 import { HOME_PATH, modulesFor } from "../../config/navigation";
 import { useUnreadNotificationsCount } from "../../hooks/useUnreadNotificationsCount";
 import { ROLE_LABELS } from "../../types/user";
+import { DailyVerse } from "./DailyVerse";
 
 const ITEM_CLASS =
   "flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-sm font-medium outline-none transition focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40 active:bg-secondary";
 
 /**
- * Header de una sola línea, fijo arriba: logo (enlace al inicio) a la
- * izquierda y, a la derecha, un botón de menú desplegable con todos los
- * módulos disponibles para el rol y la opción de cerrar sesión.
+ * Header de una sola línea, fijo arriba y de borde a borde: logo (enlace al
+ * inicio) a la izquierda, versículo del día al centro y, a la derecha, un
+ * botón de menú desplegable con todos los módulos disponibles para el rol y
+ * la opción de cerrar sesión.
  */
 export function Navbar() {
   const { user, role, logout } = useAuth();
@@ -125,18 +127,20 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
+    <header className="sticky top-0 z-40 bg-header text-header-foreground shadow-sm">
+      <div className="flex h-14 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link
           to={HOME_PATH}
           aria-label="Church Connect, ir al inicio"
-          className="inline-flex items-center gap-2 rounded-md px-1 py-1 text-base font-medium whitespace-nowrap text-primary outline-none transition hover:text-primary/80 focus-visible:ring-2 focus-visible:ring-ring/40"
+          className="inline-flex items-center gap-2 rounded-md px-1 py-1 text-base font-medium whitespace-nowrap outline-none transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white"
         >
           <Church className="size-5" aria-hidden="true" />
           Church Connect
         </Link>
 
-        <div ref={containerRef} className="relative">
+        <DailyVerse className="hidden min-w-0 flex-1 sm:block" />
+
+        <div ref={containerRef} className="relative shrink-0">
           <button
             ref={buttonRef}
             type="button"
@@ -154,8 +158,8 @@ export function Navbar() {
               }
             }}
             onKeyDown={handleButtonKeyDown}
-            className={`inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-sm font-medium outline-none transition hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/40 active:bg-secondary ${
-              open ? "bg-muted text-foreground" : "text-muted-foreground"
+            className={`inline-flex items-center gap-2 rounded-lg border border-white/40 px-3 py-1.5 text-sm font-medium outline-none transition hover:bg-white/15 focus-visible:ring-2 focus-visible:ring-white active:bg-white/25 ${
+              open ? "bg-white/15" : ""
             }`}
           >
             <span className="relative inline-flex">
@@ -163,14 +167,14 @@ export function Navbar() {
               {unreadCount > 0 ? (
                 <span
                   aria-hidden="true"
-                  className="absolute -right-1 -top-1 size-2 rounded-full bg-destructive"
+                  className="absolute -right-1 -top-1 size-2 rounded-full bg-destructive ring-2 ring-header"
                 />
               ) : null}
             </span>
-            <span className="hidden max-w-[160px] truncate sm:inline">
+            <span className="hidden max-w-[160px] truncate lg:inline">
               {fullName}
             </span>
-            <span className="sm:hidden">Menú</span>
+            <span className="lg:hidden">Menú</span>
             <span className="sr-only">
               {" "}
               — abrir menú de navegación
