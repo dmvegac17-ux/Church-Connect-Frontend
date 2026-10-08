@@ -1,4 +1,4 @@
-import { ChevronDown, Church, LogOut, Menu } from "lucide-react";
+import { ChevronDown, LogOut, Menu } from "lucide-react";
 import {
   useEffect,
   useId,
@@ -12,6 +12,7 @@ import { useAuth } from "../../auth/useAuth";
 import { HOME_PATH, modulesFor } from "../../config/navigation";
 import { useUnreadNotificationsCount } from "../../hooks/useUnreadNotificationsCount";
 import { ROLE_LABELS } from "../../types/user";
+import { BrandLogo } from "./BrandLogo";
 import { DailyVerse } from "./DailyVerse";
 
 const ITEM_CLASS =
@@ -132,9 +133,9 @@ export function Navbar() {
         <Link
           to={HOME_PATH}
           aria-label="Church Connect, ir al inicio"
-          className="inline-flex items-center gap-2 rounded-md px-1 py-1 text-base font-medium whitespace-nowrap outline-none transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white"
+          className="inline-flex items-center gap-3 rounded-full py-1 pr-3 pl-1 text-base font-medium whitespace-nowrap outline-none transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white"
         >
-          <Church className="size-5" aria-hidden="true" />
+          <BrandLogo />
           Church Connect
         </Link>
 
