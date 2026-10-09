@@ -10,12 +10,15 @@ import { RoleSelect } from "../../components/forms/RoleSelect";
 import { TextField } from "../../components/forms/TextField";
 import { Card, PageHeader } from "../../components/layout/Page";
 import { parseValidationErrors } from "../../lib/formErrors";
-import { focusFirstError, isEmail, required } from "../../lib/validators";
+import {
+  focusFirstError,
+  isEmail,
+  passwordLengthError,
+  required,
+} from "../../lib/validators";
 import { userService } from "../../services/userService";
 import { ApiError } from "../../types/api";
 import type { CreateUserDTO, UserRole } from "../../types/user";
-
-const MIN_PASSWORD = 8;
 
 export function UserCreatePage() {
   const navigate = useNavigate();
@@ -51,9 +54,8 @@ export function UserCreatePage() {
     } else if (!isEmail(values.correo)) {
       errors.correo = "Ingresa un correo válido.";
     }
-    if (values.contrasena.length < MIN_PASSWORD) {
-      errors.contrasena = `Usa al menos ${MIN_PASSWORD} caracteres.`;
-    }
+    const passwordError = passwordLengthError(values.contrasena);
+    if (passwordError) errors.contrasena = passwordError;
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) {
       requestAnimationFrame(() => focusFirstError(formRef.current));
@@ -150,7 +152,7 @@ export function UserCreatePage() {
             value={values.contrasena}
             onChange={(e) => set("contrasena", e.target.value)}
             error={fieldErrors.contrasena}
-            hint={`Mínimo ${MIN_PASSWORD} caracteres`}
+            hint="Entre 8 y 20 caracteres"
           />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <RoleSelect value={rol} onChange={setRol} error={fieldErrors.rol} />

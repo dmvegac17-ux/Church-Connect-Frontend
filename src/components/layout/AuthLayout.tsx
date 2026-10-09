@@ -8,13 +8,14 @@ import {
   BookOpen,
   CalendarDays,
   Check,
-  Church,
   MessagesSquare,
   Music,
   Users,
 } from "lucide-react";
 import type { ComponentType, PointerEvent, ReactNode } from "react";
 import { Link } from "react-router-dom";
+
+import { BrandLogo } from "./BrandLogo";
 
 type IconType = ComponentType<{ className?: string }>;
 
@@ -107,11 +108,11 @@ function BrandPanel() {
       <div className="pointer-events-none absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px)] [background-size:46px_46px]" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-md flex-col px-12 py-16">
-        <div className="flex items-center gap-3">
-          <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-            <Church className="size-6" aria-hidden="true" />
+        <div className="flex items-center gap-4">
+          <BrandLogo className="size-20" />
+          <span className="text-3xl font-semibold tracking-tight">
+            Church Connect
           </span>
-          <span className="text-lg font-semibold">Church Connect</span>
         </div>
 
         <h1 className="mt-12 text-3xl font-semibold leading-tight tracking-tight xl:text-4xl">
@@ -205,10 +206,8 @@ export function AuthLayout({
           className="w-full max-w-md"
         >
           <div className="mb-8 flex flex-col items-center text-center lg:hidden">
-            <span className="flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
-              <Church className="size-8" aria-hidden="true" />
-            </span>
-            <span className="mt-3 text-xl font-semibold text-foreground">
+            <BrandLogo className="size-24 border border-border" />
+            <span className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
               Church Connect
             </span>
             <span className="mt-1 text-sm text-muted-foreground">

@@ -12,11 +12,13 @@ interface TextFieldProps
   hint?: string;
   /** Icono decorativo a la izquierda del input. */
   icon?: ReactNode;
+  /** Oculta el contador de caracteres aunque se pase `maxLength`. */
+  hideCounter?: boolean;
 }
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
   function TextField(
-    { label, error, hint, icon, className = "", ...props },
+    { label, error, hint, icon, hideCounter, className = "", ...props },
     ref,
   ) {
     const autoId = useId();
@@ -26,17 +28,34 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       : hint
         ? `${id}-hint`
         : undefined;
+    const showCounter =
+      !hideCounter && typeof props.maxLength === "number";
+    const currentLength =
+      typeof props.value === "string" ? props.value.length : 0;
+    const nearLimit =
+      showCounter && currentLength >= (props.maxLength as number) * 0.9;
 
     return (
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={id} className="text-sm font-medium text-foreground">
-          {label}
-          {props.required ? (
-            <span className="ml-0.5 text-destructive" aria-hidden="true">
-              *
+        <div className="flex items-baseline justify-between gap-2">
+          <label htmlFor={id} className="text-sm font-medium text-foreground">
+            {label}
+            {props.required ? (
+              <span className="ml-0.5 text-destructive" aria-hidden="true">
+                *
+              </span>
+            ) : null}
+          </label>
+          {showCounter ? (
+            <span
+              className={`text-xs tabular-nums ${
+                nearLimit ? "text-destructive" : "text-muted-foreground"
+              }`}
+            >
+              {currentLength}/{props.maxLength}
             </span>
           ) : null}
-        </label>
+        </div>
         <div className="relative">
           {icon ? (
             <span

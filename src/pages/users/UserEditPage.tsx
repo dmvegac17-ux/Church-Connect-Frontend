@@ -13,7 +13,12 @@ import { TextField } from "../../components/forms/TextField";
 import { Card, PageHeader } from "../../components/layout/Page";
 import { useUser } from "../../hooks/useUser";
 import { parseValidationErrors } from "../../lib/formErrors";
-import { focusFirstError, isEmail, required } from "../../lib/validators";
+import {
+  focusFirstError,
+  isEmail,
+  passwordLengthError,
+  required,
+} from "../../lib/validators";
 import { userService } from "../../services/userService";
 import { ApiError } from "../../types/api";
 import type { UpdateUserDTO, UserRole } from "../../types/user";
@@ -36,6 +41,7 @@ export function UserEditPage() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const isSelf = Boolean(id && currentUser?.id === id);
+  const canEditPassword = isSelf || currentUser?.rol === "ADMIN";
 
   const [form, setForm] = useState<FormState | null>(null);
   const [initial, setInitial] = useState<FormState | null>(null);
@@ -91,8 +97,9 @@ export function UserEditPage() {
     } else if (!isEmail(form.correo)) {
       errors.correo = "Ingresa un correo válido.";
     }
-    if (isSelf && contrasena && contrasena.length < 8) {
-      errors.contrasena = "Usa al menos 8 caracteres.";
+    if (canEditPassword && contrasena) {
+      const passwordError = passwordLengthError(contrasena);
+      if (passwordError) errors.contrasena = passwordError;
     }
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) {
@@ -111,7 +118,7 @@ export function UserEditPage() {
       payload.telefono = form.telefono.trim();
     if (form.rol !== initial.rol) payload.rol = form.rol;
     if (form.activo !== initial.activo) payload.activo = form.activo;
-    if (isSelf && contrasena) payload.contrasena = contrasena;
+    if (canEditPassword && contrasena) payload.contrasena = contrasena;
 
     if (Object.keys(payload).length === 0) {
       toast.info("No hay cambios por guardar.", "Sin cambios");
@@ -218,7 +225,7 @@ export function UserEditPage() {
             </div>
           </div>
 
-          {isSelf ? (
+          {canEditPassword ? (
             <PasswordField
               label="Nueva contraseña"
               name="contrasena"
@@ -226,12 +233,16 @@ export function UserEditPage() {
               value={contrasena}
               onChange={(e) => setContrasena(e.target.value)}
               error={fieldErrors.contrasena}
-              hint="Solo tu propia contraseña. Déjalo vacío para no cambiarla."
+              hint={
+                isSelf
+                  ? "Entre 8 y 20 caracteres. Déjalo vacío para no cambiarla."
+                  : "Como administrador puedes establecer una nueva contraseña para este usuario (entre 8 y 20 caracteres). Déjalo vacío para no cambiarla."
+              }
             />
           ) : (
             <p className="rounded-lg bg-muted p-3 text-xs text-muted-foreground">
-              La contraseña de otro usuario no se puede modificar (el backend
-              responde 403). El usuario debe cambiarla desde su propio perfil.
+              La contraseña de otro usuario no se puede modificar. El usuario
+              debe cambiarla desde su propio perfil.
             </p>
           )}
 
