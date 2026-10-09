@@ -4,7 +4,7 @@
  * nunca hardcodeadas en el código de negocio.
  */
 
-const rawApiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+const rawApiUrl = import.meta.env.VITE_BACKEND_BASE_URL ?? "http://localhost:8000";
 
 /** URL base del backend, sin barra final. */
 export const API_BASE_URL = rawApiUrl.replace(/\/+$/, "");
