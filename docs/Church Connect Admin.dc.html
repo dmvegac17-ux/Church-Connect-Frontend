@@ -232,7 +232,7 @@ button,input,select,textarea{font-family:inherit}
                   <td style="padding:10px 16px;color:#3A3D35">{{ e.cap }}</td>
                   <td style="padding:10px 16px"><span style="display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 9px;border-radius:13px;font-size:12px;font-weight:700;white-space:nowrap;background:{{ e.cronoBg }};color:{{ e.cronoColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">{{ e.cronoIcon }}</span>{{ e.cronoLabel }}</span></td>
                   <td style="padding:10px 16px"><div style="display:flex;justify-content:flex-end;gap:4px">
-                    <button onClick="{{ e.openSched }}" aria-label="{{ e.schedLabel }}" title="{{ e.schedLabel }}" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;color:#4C5047;cursor:pointer;display:grid;place-items:center" style-hover="background:#F1EDE5;color:#23261F"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">edit_calendar</span></button>
+                    <button onClick="{{ e.openSched }}" disabled="{{ e.past }}" aria-label="{{ e.schedAria }}" title="{{ e.schedAria }}" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;cursor:{{ e.schedCursor }};color:{{ e.schedColor }};display:grid;place-items:center" style-hover="background:#F1EDE5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ e.schedIcon }}</span></button>
                     <button onClick="{{ e.edit }}" aria-label="Editar evento" title="Editar evento" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;color:#4C5047;cursor:pointer;display:grid;place-items:center" style-hover="background:#F1EDE5;color:#23261F"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">edit</span></button>
                     <button onClick="{{ e.del }}" aria-label="Eliminar evento" title="Eliminar evento" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;color:#A3372A;cursor:pointer;display:grid;place-items:center" style-hover="background:#FBEDEA"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">delete</span></button>
                   </div></td>
@@ -291,7 +291,7 @@ button,input,select,textarea{font-family:inherit}
       <section style="background:#fff;border:1px solid #E6E1D8;border-radius:14px;overflow:hidden">
         <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #EFEAE1">
           <h2 style="margin:0;font-size:17px;font-weight:800">Cronograma</h2>
-          <button onClick="{{ ev.openSched }}" style="flex:none;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px;border:1px solid #D3CCBF;border-radius:9px;background:#fff;color:#23261F;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">edit_calendar</span>{{ ev.schedLabel }}</button>
+          <button onClick="{{ ev.openSched }}" disabled="{{ ev.past }}" aria-label="{{ ev.schedAria }}" title="{{ ev.schedAria }}" style="flex:none;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px;border:1px solid #D3CCBF;border-radius:9px;font-size:14px;font-weight:700;background:{{ ev.schedBg }};color:{{ ev.schedText }};cursor:{{ ev.schedCursor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">{{ ev.schedIcon }}</span>{{ ev.schedLabel }}</button>
         </div>
         <sc-if value="{{ evHasSched }}" hint-placeholder-val="{{ false }}">
           <ol style="list-style:none;margin:0;padding:0">
@@ -384,7 +384,7 @@ button,input,select,textarea{font-family:inherit}
   <div data-screen-label="Admin · Cronogramas" style="display:flex;flex-direction:column;gap:20px">
     <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between">
       <div style="display:flex;flex-direction:column;gap:4px"><h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Cronogramas</h1><span style="font-size:15px;color:#5F6259">Todas las actividades programadas, por evento.</span></div>
-      <button onClick="{{ newCrono }}" style="display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border:0;border-radius:10px;background:#3E6B4F;color:#fff;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap" style-hover="background:#2F5540"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">add</span>Nuevo cronograma</button>
+      <button onClick="{{ newCrono }}" disabled="{{ cronoEmptyPast }}" title="{{ newCronoTitle }}" style="display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border:0;border-radius:10px;font-size:15px;font-weight:700;white-space:nowrap;background:{{ newCronoBtn.bg }};color:{{ newCronoBtn.color }};cursor:{{ newCronoBtn.cursor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">add</span>Nuevo cronograma</button>
     </div>
     <section style="background:#fff;border:1px solid #E6E1D8;border-radius:14px;overflow:hidden">
       <div style="padding:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid #EFEAE1">
@@ -410,8 +410,8 @@ button,input,select,textarea{font-family:inherit}
                   <td style="padding:12px 16px;color:#3A3D35;white-space:nowrap">{{ r.time }}</td>
                   <td style="padding:12px 16px;color:#3A3D35">{{ r.who }}</td>
                   <td style="padding:12px 16px"><div style="display:flex;justify-content:flex-end;gap:4px">
-                    <button onClick="{{ r.edit }}" aria-label="{{ r.editAria }}" title="Editar en el cronograma" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;color:#4C5047;cursor:pointer;display:grid;place-items:center" style-hover="background:#F1EDE5;color:#23261F"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">edit</span></button>
-                    <button onClick="{{ r.del }}" aria-label="{{ r.delAria }}" title="Eliminar actividad" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;color:#A3372A;cursor:pointer;display:grid;place-items:center" style-hover="background:#FBEDEA"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">delete</span></button>
+                    <button onClick="{{ r.edit }}" disabled="{{ r.locked }}" aria-label="{{ r.editAria }}" title="{{ r.editAria }}" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;cursor:{{ r.lockCursor }};color:{{ r.lockColor }};display:grid;place-items:center" style-hover="background:#F1EDE5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">edit</span></button>
+                    <button onClick="{{ r.del }}" disabled="{{ r.locked }}" aria-label="{{ r.delAria }}" title="{{ r.delAria }}" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;color:{{ r.lockDel }};cursor:{{ r.lockCursor }};display:grid;place-items:center" style-hover="background:#FBEDEA"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">delete</span></button>
                   </div></td>
                 </tr>
               </sc-for>
@@ -423,8 +423,76 @@ button,input,select,textarea{font-family:inherit}
         <div style="padding:44px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
           <span aria-hidden="true" style="width:46px;height:46px;border-radius:12px;background:#FBF0D9;color:#7A5410;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:24px;line-height:1">event_busy</span>
           <span style="font-size:16px;font-weight:800">{{ cronoEmptyTitle }}</span>
-          <button onClick="{{ cronoEmptyAction }}" style="margin-top:4px;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:0;border-radius:10px;background:#3E6B4F;color:#fff;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#2F5540"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">add</span>Crear cronograma</button>
+          <sc-if value="{{ cronoEmptyPast }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:#5F6259">Este evento ya finalizó; su cronograma no se puede crear ni modificar.</span></sc-if>
+          <sc-if value="{{ cronoEmptyCan }}" hint-placeholder-val="{{ true }}"><button onClick="{{ cronoEmptyAction }}" style="margin-top:4px;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:0;border-radius:10px;background:#3E6B4F;color:#fff;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#2F5540"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">add</span>Crear cronograma</button></sc-if>
         </div>
+      </sc-if>
+    </section>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.participaciones }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Admin · Participaciones" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:4px"><h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Participaciones</h1><span style="font-size:15px;color:#5F6259">Invitaciones enviadas a participantes y sus respuestas, por actividad.</span></div>
+    <sc-if value="{{ invAlert }}" hint-placeholder-val="{{ true }}">
+      <div role="status" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#FBF0D9;border:1px solid #F0DDB4;color:#5E4210">
+        <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">assignment_late</span>
+        <span style="flex:1;min-width:200px;font-size:15px;font-weight:700">{{ invAlertText }}</span>
+        <button onClick="{{ invAlertGo }}" style="height:36px;padding:0 12px;border:1px solid #D9BE85;border-radius:9px;background:#fff;color:#5E4210;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap">Ver</button>
+      </div>
+    </sc-if>
+    <section style="background:#fff;border:1px solid #E6E1D8;border-radius:14px;overflow:hidden">
+      <div style="padding:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid #EFEAE1">
+        <div role="group" aria-label="Filtrar por estado" style="display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:#EFEAE1;border-radius:12px">
+          <sc-for list="{{ invTabsA }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.onClick }}" aria-pressed="{{ t.pressed }}" style="height:34px;padding:0 12px;border:0;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;background:{{ t.bg }};color:{{ t.color }};box-shadow:{{ t.shadow }}">{{ t.label }} · {{ t.count }}</button></sc-for>
+        </div>
+        <label style="position:relative;flex:1;max-width:320px;min-width:200px">
+          <span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Buscar participaciones</span>
+          <span aria-hidden="true" style="position:absolute;left:12px;top:11px;font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#6B6E65">search</span>
+          <input type="search" value="{{ invQ }}" onChange="{{ onInvQ }}" placeholder="Actividad, evento o participante" style="width:100%;height:42px;padding:0 12px 0 40px;border:1px solid #DDD6CA;border-radius:10px;background:#fff;font-size:15px;color:#23261F" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0">
+        </label>
+      </div>
+      <sc-if value="{{ invHasA }}" hint-placeholder-val="{{ true }}">
+        <div style="overflow-x:auto">
+          <table style="width:100%;min-width:860px;border-collapse:collapse;font-size:14px">
+            <thead><tr style="background:#FBFAF7">
+              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Actividad</th>
+              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Participante</th>
+              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Envío</th>
+              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Respuesta</th>
+              <th scope="col" style="text-align:right;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Acciones</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ invRowsA }}" as="r" hint-placeholder-count="6">
+                <tr style="border-top:1px solid #F2EEE7" style-hover="background:#FBFAF7">
+                  <td style="padding:12px 16px"><div style="font-weight:800;font-size:15px">{{ r.act }}</div><div style="font-size:13px;color:#5F6259">{{ r.evLine }}</div></td>
+                  <td style="padding:12px 16px"><div style="display:flex;align-items:center;gap:10px"><span aria-hidden="true" style="flex:none;width:32px;height:32px;border-radius:50%;background:#F1EADF;color:#5E4E37;display:grid;place-items:center;font-size:12px;font-weight:800">{{ r.whoIni }}</span><span style="font-weight:700">{{ r.who }}</span></div></td>
+                  <td style="padding:12px 16px;white-space:nowrap">
+                    <sc-if value="{{ r.mailOk }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:6px;color:#3A3D35"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:#2F7D4F">mark_email_read</span>Enviada {{ r.sent }}</span></sc-if>
+                    <sc-if value="{{ r.mailErr }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:13px;font-size:12px;font-weight:700;background:#FBE9E5;color:#862C21"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">error</span>Error de envío</span></sc-if>
+                  </td>
+                  <td style="padding:12px 16px">
+                    <span style="display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:13px;font-size:12px;font-weight:700;white-space:nowrap;background:{{ r.stBg }};color:{{ r.stColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">{{ r.stIcon }}</span>{{ r.stLabel }}</span>
+                    <sc-if value="{{ r.hasAnswered }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#5F6259;margin-top:4px">{{ r.answered }}</div></sc-if>
+                    <sc-if value="{{ r.hasReason }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#4C5047;margin-top:2px;max-width:240px">{{ r.reason }}</div></sc-if>
+                    <sc-if value="{{ r.hasDue }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#5F6259;margin-top:4px">{{ r.dueLabel }}</div></sc-if>
+                    <sc-if value="{{ r.hasMoved }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#2B5A3E;margin-top:4px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:14px;line-height:1">swap_horiz</span>{{ r.movedLabel }}</div></sc-if>
+                    <sc-if value="{{ r.needs }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:#7A5410;margin-top:4px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:14px;line-height:1">assignment_late</span>Pendiente de asignación</div></sc-if>
+                  </td>
+                  <td style="padding:12px 16px"><div style="display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap">
+                    <sc-if value="{{ r.mailErr }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.resend }}" style="height:34px;padding:0 10px;border:1px solid #D3CCBF;border-radius:9px;background:#fff;color:#23261F;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap" style-hover="background:#F4F0E8">Reenviar</button></sc-if>
+                    <sc-if value="{{ r.needs }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.reassign }}" aria-label="{{ r.reassignAria }}" style="height:34px;padding:0 10px;border:0;border-radius:9px;background:#3E6B4F;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap" style-hover="background:#2F5540">Reasignar</button></sc-if>
+                    <sc-if value="{{ r.canRevoke }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.revoke }}" aria-label="{{ r.revokeAria }}" style="height:34px;padding:0 10px;border:1px solid #E7C3BC;border-radius:9px;background:#fff;color:#A3372A;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap" style-hover="background:#FBEDEA">Revocar y cambiar</button></sc-if>
+                    <sc-if value="{{ r.canCancel }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.cancel }}" aria-label="{{ r.cancelAria }}" title="Cancelar invitación" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:#A3372A;cursor:pointer;display:grid;place-items:center" style-hover="background:#FBEDEA"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">block</span></button></sc-if>
+                  </div></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </sc-if>
+      <sc-if value="{{ invEmptyA }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:44px 20px;text-align:center;font-size:15px;color:#5F6259">No hay invitaciones en esta vista.</div>
       </sc-if>
     </section>
   </div>
@@ -703,8 +771,8 @@ button,input,select,textarea{font-family:inherit}
 </div>
 </div>
 <sc-if value="{{ drawer }}" hint-placeholder-val="{{ false }}">
-  <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;z-index:70;background:rgba(35,38,31,0.40)"></div>
-  <form role="dialog" aria-modal="true" aria-label="{{ drawerTitle }}" onSubmit="{{ submit }}" novalidate="true" style="position:fixed;top:0;right:0;bottom:0;z-index:71;width:min(500px,100%);background:#fff;display:flex;flex-direction:column;box-shadow:-12px 0 32px rgba(35,38,31,0.16)">
+  <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:rgba(35,38,31,0.40);z-index:{{ drawerZ }}"></div>
+  <form role="dialog" aria-modal="true" aria-label="{{ drawerTitle }}" onSubmit="{{ submit }}" novalidate="true" style="position:fixed;top:0;right:0;bottom:0;z-index:{{ drawerZ2 }};width:min(500px,100%);background:#fff;display:flex;flex-direction:column;box-shadow:-12px 0 32px rgba(35,38,31,0.16)">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid #EFEAE1">
       <h2 style="margin:0;font-size:19px;font-weight:800">{{ drawerTitle }}</h2>
       <button type="button" onClick="{{ closeDrawer }}" aria-label="Cerrar" style="width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:#4C5047;cursor:pointer;display:grid;place-items:center" style-hover="background:#F1EDE5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">close</span></button>
@@ -713,8 +781,11 @@ button,input,select,textarea{font-family:inherit}
 
       <sc-if value="{{ dUser }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;gap:16px">
+          <sc-if value="{{ fromSmNote }}" hint-placeholder-val="{{ false }}">
+            <div role="note" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#E4EEF6;color:#2A5C82;font-size:14px;line-height:1.45"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">info</span>Se registrará con el rol Participante y quedará asignado a la actividad del cronograma. Al terminar volverás al cronograma.</div>
+          </sc-if>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:14px">
-            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Nombre</span><input maxlength="50" value="{{ ff.nombre.value }}" onChange="{{ ff.nombre.onChange }}" onBlur="{{ ff.nombre.onBlur }}" aria-invalid="{{ ff.nombre.hasErr }}" style="height:42px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ ff.nombre.border }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><sc-if value="{{ ff.nombre.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ ff.nombre.err }}</span></sc-if></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Nombre</span><input autoFocus="{{ true }}" maxlength="50" value="{{ ff.nombre.value }}" onChange="{{ ff.nombre.onChange }}" onBlur="{{ ff.nombre.onBlur }}" aria-invalid="{{ ff.nombre.hasErr }}" style="height:42px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ ff.nombre.border }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><sc-if value="{{ ff.nombre.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ ff.nombre.err }}</span></sc-if></label>
             <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Apellido</span><input maxlength="50" value="{{ ff.apellido.value }}" onChange="{{ ff.apellido.onChange }}" onBlur="{{ ff.apellido.onBlur }}" aria-invalid="{{ ff.apellido.hasErr }}" style="height:42px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ ff.apellido.border }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><sc-if value="{{ ff.apellido.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ ff.apellido.err }}</span></sc-if></label>
           </div>
           <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Correo</span><input type="email" maxlength="100" value="{{ ff.correo.value }}" onChange="{{ ff.correo.onChange }}" onBlur="{{ ff.correo.onBlur }}" aria-invalid="{{ ff.correo.hasErr }}" style="height:42px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ ff.correo.border }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><sc-if value="{{ ff.correo.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ ff.correo.err }}</span></sc-if></label>
@@ -856,7 +927,7 @@ button,input,select,textarea{font-family:inherit}
           <span style="font-size:14px;color:#5F6259">{{ smV.window }}</span>
           <sc-if value="{{ smV.pick }}" hint-placeholder-val="{{ false }}">
             <label style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:14px;font-weight:700">Evento
-              <select value="{{ smV.evId }}" onChange="{{ smV.onPick }}" style="height:38px;padding:0 10px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;font-size:14px;color:#23261F;max-width:100%"><sc-for list="{{ evOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.id }}">{{ o.label }}</option></sc-for></select></label>
+              <select value="{{ smV.evId }}" onChange="{{ smV.onPick }}" style="height:38px;padding:0 10px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;font-size:14px;color:#23261F;max-width:100%"><sc-for list="{{ evOptionsOpen }}" as="o" hint-placeholder-count="4"><option value="{{ o.id }}">{{ o.label }}</option></sc-for></select></label>
           </sc-if>
         </div>
         <button onClick="{{ closeSm }}" aria-label="Cerrar" style="flex:none;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:#4C5047;cursor:pointer;display:grid;place-items:center" style-hover="background:#F1EDE5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">close</span></button>
@@ -894,8 +965,29 @@ button,input,select,textarea{font-family:inherit}
               <span style="grid-column:1/-1;margin-top:-4px;font-size:12px;color:#5F6259">{{ r.rangeHint }}</span>
               <div style="grid-column:1/-1;display:flex;flex-direction:column;gap:6px">
                 <span style="font-size:13px;font-weight:700">Responsable</span>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:stretch">
-                  <button type="button" onClick="{{ r.toggleWho }}" aria-expanded="{{ r.whoOpenAria }}" aria-haspopup="listbox" style="flex:1;min-width:200px;display:flex;align-items:center;justify-content:space-between;gap:8px;height:40px;padding:0 10px 0 12px;border-radius:9px;background:#fff;font-size:15px;cursor:pointer;text-align:left;color:{{ r.whoColor }};border:1px solid {{ r.bWho }}"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.whoLabel }}</span><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#4C5047">{{ r.whoChevron }}</span></button>
+                <sc-if value="{{ r.whoLocked }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border:1px solid #DDD6CA;border-radius:9px;background:#F4F0E8;color:#3A3D35;font-size:15px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:#5F6259">lock</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.whoLabel }}</span></div>
+                </sc-if>
+                <sc-if value="{{ r.hasCard }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;border:1px solid {{ r.card.bd }};background:{{ r.card.bg }};color:{{ r.card.c }}">
+                    <span aria-hidden="true" style="flex:none;font-family:'Material Symbols Rounded';font-size:19px;line-height:1.2">{{ r.card.icon }}</span>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                      <sc-if value="{{ r.hasSt }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:12px;font-size:12px;font-weight:800;background:{{ r.st.bg }};color:{{ r.st.c }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:14px;line-height:1">{{ r.st.i }}</span>Estado: {{ r.st.l }}</span></sc-if>
+                      <span style="font-size:14px;font-weight:700;line-height:1.4">{{ r.card.title }}</span>
+                      <sc-if value="{{ r.cardHasBody }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;line-height:1.45;color:#4C5047">{{ r.card.body }}</span></sc-if>
+                      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px">
+                        <sc-if value="{{ r.cardRevoke }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ r.revokeAcc }}" style="height:34px;padding:0 12px;border:1px solid #E7C3BC;border-radius:9px;background:#fff;color:#A3372A;font-size:13px;font-weight:700;cursor:pointer" style-hover="background:#FBEDEA">Revocar aceptación</button></sc-if>
+                        <sc-if value="{{ r.cardResend }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ r.resendInv }}" style="height:34px;padding:0 12px;border:1px solid #D3CCBF;border-radius:9px;background:#fff;color:#23261F;font-size:13px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Reenviar invitación</button></sc-if>
+                        <sc-if value="{{ r.cardCancel }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ r.cancelInv }}" style="height:34px;padding:0 12px;border:1px solid #E7C3BC;border-radius:9px;background:#fff;color:#A3372A;font-size:13px;font-weight:700;cursor:pointer" style-hover="background:#FBEDEA">Cancelar invitación</button></sc-if>
+                        <sc-if value="{{ r.cardChange }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ r.changeWho }}" style="height:34px;padding:0 12px;border:0;border-radius:9px;background:#3E6B4F;color:#fff;font-size:13px;font-weight:700;cursor:pointer" style-hover="background:#2F5540">Cambiar responsable</button></sc-if>
+                        <sc-if value="{{ r.cardReinvite }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ r.reinviteFn }}" style="height:34px;padding:0 12px;border:1px solid #D3CCBF;border-radius:9px;background:#fff;color:#23261F;font-size:13px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">{{ r.reinviteLabel }}</button></sc-if>
+                        <sc-if value="{{ r.reinviting }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ r.undoReinvite }}" style="height:34px;padding:0 10px;border:0;border-radius:9px;background:transparent;color:#3E6B4F;font-size:13px;font-weight:700;cursor:pointer">No volver a invitar</button></sc-if>
+                      </div>
+                    </div>
+                  </div>
+                </sc-if>
+                <div style="display:{{ r.whoPickDisplay }};flex-wrap:wrap;gap:8px;align-items:stretch">
+                  <button type="button" data-who-btn="{{ r.rid }}" onClick="{{ r.toggleWho }}" aria-expanded="{{ r.whoOpenAria }}" aria-haspopup="listbox" style="flex:1;min-width:200px;display:flex;align-items:center;justify-content:space-between;gap:8px;height:40px;padding:0 10px 0 12px;border-radius:9px;background:#fff;font-size:15px;cursor:pointer;text-align:left;color:{{ r.whoColor }};border:1px solid {{ r.bWho }}"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.whoLabel }}</span><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#4C5047">{{ r.whoChevron }}</span></button>
                   <button type="button" onClick="{{ r.openNew }}" style="flex:none;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:1px solid #3E6B4F;border-radius:9px;background:#EEF3EE;color:#2F5540;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap" style-hover="background:#E0EBE2"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">person_add</span>Registrar participante nuevo</button>
                 </div>
                 <sc-if value="{{ r.whoOpen }}" hint-placeholder-val="{{ false }}">
@@ -914,11 +1006,20 @@ button,input,select,textarea{font-family:inherit}
                   </div>
                 </sc-if>
                 <sc-if value="{{ r.hasErrWho }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ r.errWho }}</span></sc-if>
+                <sc-if value="{{ r.needDays }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid #E6E1D8;border-radius:12px;background:#FBFAF7">
+                    <label style="display:flex;flex-wrap:wrap;align-items:center;gap:10px"><span style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:#3E6B4F">send</span>Días para confirmar</span>
+                      <input data-days-input="{{ r.rid }}" type="text" inputmode="numeric" value="{{ r.days }}" onChange="{{ r.onDays }}" placeholder="Ej. 7" aria-invalid="{{ r.daysShow }}" style="width:90px;height:38px;padding:0 10px;border-radius:9px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ r.bDays }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><span style="font-size:14px;color:#4C5047">días</span></label>
+                    <span style="font-size:12px;color:#5F6259">{{ r.daysHelp }}</span>
+                    <sc-if value="{{ r.daysShow }}" hint-placeholder-val="{{ false }}"><span role="alert" style="display:flex;gap:6px;align-items:center;font-size:13px;color:#A3372A"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">error</span>{{ r.daysErr }}</span></sc-if>
+                    <sc-if value="{{ r.hasDue }}" hint-placeholder-val="{{ false }}"><span style="display:flex;gap:6px;align-items:center;font-size:13px;font-weight:700;color:#2B5A3E"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">mark_email_unread</span>{{ r.dueText }}</span></sc-if>
+                  </div>
+                </sc-if>
                 <sc-if value="{{ r.showNew }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;flex-direction:column;gap:12px;padding:14px;border:1px solid #CFE0D3;border-radius:12px;background:#F3F7F2">
                     <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:800;color:#2F5540">Registrar participante</span><span style="font-size:13px;color:#4C5047">Se agregará a Usuarios con el rol Participante y quedará como responsable de esta actividad.</span></div>
                     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:10px">
-                      <label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;font-weight:700">Nombre</span><input maxlength="50" value="{{ r.np.nombre }}" onChange="{{ r.np.onNombre }}" style="height:40px;padding:0 10px;border-radius:9px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ r.np.bN }}"><sc-if value="{{ r.np.hN }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ r.np.eN }}</span></sc-if></label>
+                      <label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;font-weight:700">Nombre</span><input autoFocus="{{ true }}" maxlength="50" value="{{ r.np.nombre }}" onChange="{{ r.np.onNombre }}" style="height:40px;padding:0 10px;border-radius:9px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ r.np.bN }}"><sc-if value="{{ r.np.hN }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ r.np.eN }}</span></sc-if></label>
                       <label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;font-weight:700">Apellido</span><input maxlength="50" value="{{ r.np.apellido }}" onChange="{{ r.np.onApellido }}" style="height:40px;padding:0 10px;border-radius:9px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ r.np.bA }}"><sc-if value="{{ r.np.hA }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ r.np.eA }}</span></sc-if></label>
                       <label style="display:flex;flex-direction:column;gap:4px;grid-column:1/-1"><span style="font-size:13px;font-weight:700">Correo</span><input type="email" maxlength="100" value="{{ r.np.correo }}" onChange="{{ r.np.onCorreo }}" style="height:40px;padding:0 10px;border-radius:9px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ r.np.bC }}"><sc-if value="{{ r.np.hC }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ r.np.eC }}</span></sc-if></label>
                     </div>
@@ -962,6 +1063,38 @@ button,input,select,textarea{font-family:inherit}
       <div style="padding:14px 20px;border-top:1px solid #EFEAE1;display:flex;justify-content:flex-end;gap:10px">
         <button type="button" onClick="{{ closeAm }}" style="height:42px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer">Cancelar</button>
         <button type="button" onClick="{{ amV.assign }}" disabled="{{ amV.btn.disabled }}" style="height:42px;padding:0 18px;border:0;border-radius:10px;font-size:15px;font-weight:700;background:{{ amV.btn.bg }};color:{{ amV.btn.color }};cursor:{{ amV.btn.cursor }}">{{ amV.btn.label }}</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ rDlg }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:85;background:rgba(35,38,31,0.45);display:grid;place-items:center;padding:16px">
+    <div role="dialog" aria-modal="true" aria-label="{{ rTitle }}" style="width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;background:#fff;border-radius:16px;display:flex;flex-direction:column;box-shadow:0 24px 48px rgba(35,38,31,0.22)">
+      <div style="padding:18px 22px;border-bottom:1px solid #EFEAE1;display:flex;gap:12px;align-items:flex-start">
+        <div style="flex:1;display:flex;flex-direction:column;gap:4px;min-width:0"><h2 style="margin:0;font-size:19px;font-weight:800">{{ rTitle }}</h2><span style="font-size:15px;font-weight:700">{{ rAct }}</span><span style="font-size:14px;color:#5F6259">{{ rEv }}</span></div>
+        <button onClick="{{ rClose }}" aria-label="Cerrar" style="flex:none;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:#4C5047;cursor:pointer;display:grid;place-items:center" style-hover="background:#F1EDE5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">close</span></button>
+      </div>
+      <div style="padding:18px 22px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#FBFAF7;border:1px solid #EFEAE1">
+          <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#4C5047">person</span>
+          <span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:13px;color:#5F6259">Asignado actualmente</span><span style="font-size:15px;font-weight:700">{{ rCur }}</span><span style="font-size:13px;color:#5F6259">{{ rCurState }}</span><sc-if value="{{ rHasReason }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#4C5047">{{ rCurReason }}</span></sc-if></span>
+        </div>
+        <sc-if value="{{ rRev }}" hint-placeholder-val="{{ false }}">
+          <div role="note" style="display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:#FBE9E5;color:#862C21;font-size:14px;line-height:1.45"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">warning</span>Su confirmación quedará revocada y se le notificará que ya no está asignado a esta actividad.</div>
+        </sc-if>
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Nuevo participante</span>
+          <select value="{{ rTo }}" onChange="{{ onRTo }}" aria-invalid="{{ rShowTo }}" style="height:42px;padding:0 10px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ rToBorder }}"><option value="">Selecciona un usuario</option><sc-for list="{{ rUsers }}" as="u" hint-placeholder-count="5"><option value="{{ u.id }}">{{ u.label }}</option></sc-for></select>
+          <sc-if value="{{ rShowTo }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ rToErr }}</span></sc-if></label>
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Días para confirmar</span>
+          <span style="display:flex;align-items:center;gap:10px"><input type="text" inputmode="numeric" value="{{ rDays }}" onChange="{{ onRDays }}" placeholder="Ej. 7" aria-invalid="{{ rShowDays }}" style="width:110px;height:42px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ rDaysBorder }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><span style="font-size:15px;color:#4C5047">días</span></span>
+          <span style="font-size:13px;color:#5F6259">{{ rHelp }}</span>
+          <sc-if value="{{ rShowDays }}" hint-placeholder-val="{{ false }}"><span role="alert" style="display:flex;gap:6px;align-items:center;font-size:13px;color:#A3372A"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">error</span>{{ rDaysErr }}</span></sc-if>
+          <sc-if value="{{ rHasDue }}" hint-placeholder-val="{{ false }}"><span style="display:flex;gap:6px;align-items:center;font-size:13px;font-weight:700;color:#2B5A3E"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">event_available</span>{{ rDue }}</span></sc-if></label>
+      </div>
+      <div style="padding:14px 22px;border-top:1px solid #EFEAE1;display:flex;justify-content:flex-end;gap:10px">
+        <button onClick="{{ rClose }}" style="height:42px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Cancelar</button>
+        <button onClick="{{ rSubmit }}" style="height:42px;padding:0 18px;border:0;border-radius:10px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;background:{{ rBtnBg }}">{{ rBtn }}</button>
       </div>
     </div>
   </div>
@@ -1062,11 +1195,13 @@ const EVENTS = [
   { id:'e4', name:'Santa Cena', desc:'Servicio de comunión para toda la congregación.', place:'Templo central', addr:'', date:'2026-10-24', dateEnd:'2026-10-24', ini:'10:00', fin:'12:30', cap:200, lat:'', lng:'' },
 ];
 const SCHED = [
-  { id:'s1', ev:'e2', act:'Reunión y oración inicial', desc:'', ini:'06:00', fin:'06:30', who:'u8' },
-  { id:'s2', ev:'e2', act:'Entrega de flores en el parque', desc:'', ini:'06:30', fin:'10:00', who:'u2' },
+  { id:'s1', ev:'e2', act:'Reunión y oración inicial', desc:'', ini:'06:00', fin:'06:30', who:'u12' },
+  { id:'s2', ev:'e2', act:'Entrega de flores en el parque', desc:'', ini:'06:30', fin:'10:00', who:'u8' },
   { id:'s3', ev:'e2', act:'Cierre y testimonios', desc:'', ini:'10:00', fin:'11:00', who:'u9' },
-  { id:'s4', ev:'e3', act:'Alabanza', desc:'', ini:'19:00', fin:'19:30', who:'u6' },
+  { id:'s4', ev:'e3', act:'Alabanza', desc:'', ini:'19:00', fin:'19:30', who:'u8' },
   { id:'s5', ev:'e3', act:'Estudio bíblico', desc:'', ini:'19:30', fin:'20:30', who:'u11' },
+  { id:'s6', ev:'e4', act:'Recepción y bienvenida', desc:'Recibir a los asistentes en la entrada.', ini:'10:00', fin:'10:30', who:'u8' },
+  { id:'s7', ev:'e4', act:'Lectura bíblica', desc:'', ini:'11:00', fin:'11:15', who:'u8' },
 ];
 const MINS = [
   { id:'m1', name:'Escuela Sabatica', icon:'menu_book', desc:'Enfocado en la lectura y estudio de la lección de escuela sabatica para adultos', members:['u5'] },
@@ -1083,6 +1218,25 @@ const NOTIFS = [
   { id:'n4', title:'Mira la campanita', body:'Holis hola hello hi\nAtte, Marcela Vega', to:'u8', ts:'2026-10-08T22:11', read:false },
   { id:'n5', title:'Probando manualmente la plantilla 3.0', body:'mandenmen pantallazo de lo que les aparezca\nAtte, Marcela Vega', to:'u8', ts:'2026-09-21T17:32', read:false },
 ];
+const INV_ST = {
+  pendiente:{ l:'Pendiente', i:'hourglass_top', bg:'#FBF0D9', c:'#7A5410' },
+  aceptada:{ l:'Aceptada', i:'check_circle', bg:'#E3EEE5', c:'#2B5A3E' },
+  rechazada:{ l:'Rechazada', i:'cancel', bg:'#FBE9E5', c:'#862C21' },
+  vencida:{ l:'Vencida', i:'timer_off', bg:'#EFEAE1', c:'#55594F' },
+  cancelada:{ l:'Cancelada', i:'block', bg:'#EFEAE1', c:'#55594F' },
+  revocada:{ l:'Revocada', i:'undo', bg:'#EFEAE1', c:'#55594F' },
+};
+const INVS = [
+  { id:'i1', ev:'e3', act:'Alabanza', ini:'19:00', fin:'19:30', who:'u8', sent:'2026-10-05', mail:'ok', st:'pendiente' },
+  { id:'i2', ev:'e3', act:'Estudio bíblico', ini:'19:30', fin:'20:30', who:'u8', sent:'2026-10-05', mail:'ok', st:'pendiente' },
+  { id:'i3', ev:'e2', act:'Entrega de flores en el parque', ini:'06:30', fin:'10:00', who:'u8', sent:'2026-10-01', mail:'ok', st:'aceptada', answered:'2026-10-02' },
+  { id:'i4', ev:'e4', act:'Recepción y bienvenida', ini:'10:00', fin:'10:30', who:'u8', sent:'2026-10-03', mail:'ok', st:'rechazada', answered:'2026-10-06', reason:'Estaré de viaje ese fin de semana.' },
+  { id:'i5', ev:'e4', act:'Lectura bíblica', ini:'11:00', fin:'11:15', who:'u8', sent:'2026-09-28', mail:'ok', st:'vencida', due:'2026-10-05' },
+  { id:'i6', ev:'e4', act:'Lectura de la palabra', ini:'10:30', fin:'11:00', who:'u8', sent:'2026-10-03', mail:'ok', st:'cancelada' },
+  { id:'i7', ev:'e2', act:'Cierre y testimonios', ini:'10:00', fin:'11:00', who:'u9', sent:'2026-10-01', mail:'ok', st:'aceptada', answered:'2026-10-01' },
+  { id:'i8', ev:'e3', act:'Estudio bíblico', ini:'19:30', fin:'20:30', who:'u11', sent:'2026-10-05', mail:'error', st:'pendiente' },
+  { id:'i9', ev:'e2', act:'Reunión y oración inicial', ini:'06:00', fin:'06:30', who:'u12', sent:'2026-10-04', mail:'ok', st:'pendiente' },
+];
 const MAXES = { titulo:150, descripcion:2000, lugar:200, direccion:255, nombre:255, desc:255, ntitulo:200 };
 
 class Component extends DCLogic {
@@ -1097,7 +1251,7 @@ class Component extends DCLogic {
     window.addEventListener('resize', this.onR);
     this.onKey = e => { if (e.key !== 'Escape') return; const s = this.state;
       if (s.confirm) this.setState({ confirm:null }); else if (s.am) this.setState({ am:null });
-      else if (s.recipOpen) this.setState({ recipOpen:false }); else if (s.sm) this.closeSm();
+      else if (s.recipOpen) this.setState({ recipOpen:false }); else if (s.drawer && s.fromSm) this.closeDrawer(); else if (s.sm) this.closeSm();
       else if (s.drawer) this.closeDrawer(); else if (s.navOpen) this.setState({ navOpen:false }); };
     document.addEventListener('keydown', this.onKey);
   }
@@ -1111,7 +1265,8 @@ class Component extends DCLogic {
   dirty() { return JSON.stringify(this.state.form) !== JSON.stringify(this.state.formInit); }
   guard(fn) { if (this.dirty()) this.ask({ title:'¿Descartar cambios?', body:'Los cambios que hiciste no se guardarán.', label:'Descartar', action:fn }); else fn(); }
   openForm(kind, init, id = null, asDrawer = true) { this.setState({ formKind:kind, form:{...init}, formInit:{...init}, formId:id, tried:false, touched:{}, showPw:false, recipOpen:false, recipQ:'', drawer: asDrawer ? kind : null }); }
-  closeDrawer() { this.guard(() => this.setState({ drawer:null, formKind:null })); }
+  closeDrawer() { const rid = this.state.fromSm; this.guard(() => { this.setState({ drawer:null, formKind:null, fromSm:null });
+    if (rid) setTimeout(() => { const el = document.querySelector(`[data-who-btn="${rid}"]`); el && el.focus(); }, 50); }); }
   setF(k, v) { this.setState(s => { const form = { ...s.form, [k]:v };
     if (s.formKind === 'event') {
       if (k === 'fechaIni' && v && (!form.fechaFin || form.fechaFin < v)) form.fechaFin = v;
@@ -1153,7 +1308,11 @@ class Component extends DCLogic {
     if (kind === 'user') {
       const data = { nombre:f.nombre.trim(), apellido:f.apellido.trim(), correo:f.correo.trim(), tel:f.tel, rol:f.rol, activo:f.activo };
       if (s.formId) done('Cambios guardados.', { users: s.users.map(u => u.id === s.formId ? { ...u, ...data } : u) });
-      else done(`Usuario ${data.nombre} ${data.apellido} creado.`, { users:[{ id:nid('u'), created:TODAY, ...data }, ...s.users], uPage:0 });
+      else { const id = nid('u'); const rid = s.fromSm && s.sm ? s.fromSm : null;
+        done(rid ? `${data.nombre} ${data.apellido} quedó registrado y asignado. Indica los días para confirmar.` : `Usuario ${data.nombre} ${data.apellido} creado.`,
+          { users:[{ id, created:TODAY, ...data }, ...s.users], uPage:0, fromSm:null, ...(rid ? { sm:{ ...s.sm, reload:rid, rows: s.sm.rows.map(x => x.id === rid ? { ...x, who:id } : x) } } : {}) });
+        if (rid) { clearTimeout(this.reloadT); this.reloadT = setTimeout(() => { this.setState(st => st.sm ? { sm:{ ...st.sm, reload:null } } : null);
+          const el = document.querySelector(`[data-days-input="${rid}"]`) || document.querySelector(`[data-who-btn="${rid}"]`); el && el.focus(); }, 700); } }
     }
     if (kind === 'min') {
       if (s.formId) done('Ministerio actualizado.', { mins: s.mins.map(m => m.id === s.formId ? { ...m, name:f.nombre.trim(), desc:f.desc } : m) });
@@ -1181,7 +1340,8 @@ class Component extends DCLogic {
   delEvent(e) { const n = this.state.sched.filter(x => x.ev === e.id).length;
     this.ask({ title:'Eliminar evento', body:`Se eliminará «${e.name}» del ${fmtD(e.date)}${n ? ` junto con su cronograma (${n} actividades)` : ''}. Esta acción no se puede deshacer.`, label:'Eliminar evento',
       action:() => { this.setState(s => ({ events:s.events.filter(x => x.id !== e.id), sched:s.sched.filter(x => x.ev !== e.id) })); this.go('eventos'); this.toast('Evento eliminado.'); } }); }
-  openSm(evId, pick = false) { const rows = this.state.sched.filter(x => x.ev === evId).map(x => ({ ...x }));
+  isPastEv(id) { const e = this.state.events.find(x => x.id === id); return !!e && (e.dateEnd || e.date) < TODAY; }
+  openSm(evId, pick = false) { if (this.isPastEv(evId)) { this.toast('Este evento ya finalizó: su cronograma no se puede modificar.'); return; } const rows = this.state.sched.filter(x => x.ev === evId).map(x => ({ ...x }));
     this.setState({ sm:{ evId, pick, rows: rows.length ? rows : [], init: JSON.stringify(rows), tried:false } }); }
   closeSm() { const sm = this.state.sm; if (!sm) return; if (JSON.stringify(sm.rows) !== sm.init) this.ask({ title:'¿Descartar cambios?', body:'Los cambios del cronograma no se guardarán.', label:'Descartar', action:() => this.setState({ sm:null }) }); else this.setState({ sm:null }); }
   smSet(fn) { this.setState(s => ({ sm:{ ...s.sm, rows: fn(s.sm.rows) } })); }
@@ -1203,6 +1363,69 @@ class Component extends DCLogic {
   delNotif(n) { this.ask({ title:'Eliminar notificación', body:`¿Seguro que quieres eliminar "${n.title}" enviada a ${this.uname(this.user(n.to))}? Esta acción no se puede deshacer.`, label:'Eliminar',
     action:() => { this.setState(s => ({ notifs:s.notifs.filter(x => x.id !== n.id), nSel: s.nSel === n.id ? null : s.nSel })); this.toast('Notificación eliminada.'); } }); }
 
+  invVals() {
+    const s = this.state; const invs = s.invs || INVS; const tab = s.invTab || 'todas'; const q = (s.invQ || '').trim().toLowerCase();
+    const evOk = i => { const e = s.events.find(x => x.id === i.ev); return !!e && Math.round((pd(e.date) - pd(TODAY)) / 86400000) >= 2; };
+    const needs = i => (i.st === 'rechazada' || i.st === 'vencida' || i.st === 'revocada' || i.st === 'cancelada') && !i.moved && evOk(i);
+    const F = { todas: () => true, pendiente: i => i.st === 'pendiente', aceptada: i => i.st === 'aceptada', asignar: needs, error: i => i.mail === 'error' };
+    const cnt = k => invs.filter(F[k]).length;
+    const rows = invs.filter(F[tab]).map(i => ({ i, e: s.events.find(e => e.id === i.ev), u: this.user(i.who) }))
+      .filter(r => !q || (r.i.act + ' ' + (r.e ? r.e.name : '') + ' ' + this.uname(r.u)).toLowerCase().includes(q))
+      .sort((a,b) => ((a.e ? a.e.date : '') + a.i.ini).localeCompare((b.e ? b.e.date : '') + b.i.ini))
+      .map(({ i, e, u }) => { const m = INV_ST[i.st]; const err = i.mail === 'error'; const nd = needs(i);
+        return { act:i.act, evLine: e ? `${e.name} · ${fmtD(e.date)} · ${fmtT(i.ini)} – ${fmtT(i.fin)}` : '', who:this.uname(u), whoIni: ini(this.uname(u)),
+          sent: fmtD(i.sent), mailErr: err, mailOk: !err, stLabel:m.l, stIcon:m.i, stBg:m.bg, stColor:m.c,
+          hasAnswered: !!i.answered, answered: i.answered ? `Respondió el ${fmtD(i.answered)}` : '', hasReason: !!i.reason, reason: i.reason ? `«${i.reason}»` : '',
+          needs: nd, canCancel: i.st === 'pendiente', canRevoke: i.st === 'aceptada' && evOk(i),
+          hasMoved: !!i.moved, movedLabel: i.moved ? `Reasignada a ${this.uname(this.user(i.moved))}` : '',
+          hasDue: i.st === 'pendiente' && !!i.due, dueLabel: i.due ? `Plazo: ${fmtD(i.due)}` : '',
+          revoke: () => this.setState({ rDlg:{ id:i.id, mode:'revocar', to:'', days:'', tried:false } }), revokeAria:`Revocar confirmación de ${this.uname(u)}`,
+          resend: () => { this.setState(st => ({ invs:(st.invs || INVS).map(x => x.id === i.id ? { ...x, mail:'ok', sent:TODAY } : x) })); this.toast(`Invitación reenviada a ${this.uname(u)}.`); },
+          reassign: () => this.setState({ rDlg:{ id:i.id, mode:'reasignar', to:'', days:'', tried:false } }), reassignAria:`Reasignar ${i.act}`,
+          cancel: () => this.ask({ title:'Cancelar invitación', body:`${this.uname(u)} ya no podrá responder la invitación a «${i.act}». La actividad quedará sin asignar.`, label:'Cancelar invitación',
+            action: () => { this.setState(st => ({ invs:(st.invs || INVS).map(x => x.id === i.id ? { ...x, st:'cancelada' } : x) })); this.toast('Invitación cancelada.'); } }),
+          cancelAria:`Cancelar invitación de ${this.uname(u)}` }; });
+    const tabs = [['todas','Todas'],['pendiente','Pendientes'],['aceptada','Aceptadas'],['asignar','Por reasignar'],['error','Error de envío']].map(([k,l]) => ({ label:l, count:cnt(k), pressed: tab === k ? 'true' : 'false',
+      bg: tab === k ? '#fff' : 'transparent', color: tab === k ? '#23261F' : '#4C5047', shadow: tab === k ? '0 1px 3px rgba(35,38,31,0.12)' : 'none', onClick: () => this.setState({ invTab:k }) }));
+    const nA = cnt('asignar'), nE = cnt('error');
+    let rV = { rDlg:false };
+    const d = s.rDlg; const ri = d && invs.find(x => x.id === d.id);
+    if (ri) { const e = s.events.find(x => x.id === ri.ev); const cur = this.user(ri.who); const rev = d.mode === 'revocar';
+      const toEv = e ? Math.round((pd(e.date) - pd(TODAY)) / 86400000) : 0; const maxD = Math.min(30, toEv - 1);
+      const err = {}; const n = Number(d.days);
+      if (!d.to) err.to = 'Elige a quién asignar la actividad.';
+      if (maxD < 1) err.days = 'El evento es mañana o ya pasó: no queda tiempo para pedir confirmación.';
+      else if (!String(d.days).trim()) err.days = `Escribe un número de días entre 1 y ${maxD}.`;
+      else if (!/^\d+$/.test(String(d.days).trim())) err.days = 'Usa solo números enteros.';
+      else if (n < 1 || n > 30) err.days = 'El plazo debe estar entre 1 y 30 días.';
+      else if (n > maxD) err.days = `El evento empieza en ${toEv} días. El plazo máximo es de ${maxD} ${maxD === 1 ? 'día' : 'días'}.`;
+      const okDays = !err.days && maxD >= 1; const dueDate = okDays ? new Date(pd(TODAY).getTime() + n * 86400000) : null;
+      const dueStr = dueDate ? `${dueDate.getFullYear()}-${String(dueDate.getMonth() + 1).padStart(2,'0')}-${String(dueDate.getDate()).padStart(2,'0')}` : '';
+      const show = k => !!err[k] && (d.tried || (k === 'days' && (String(d.days).length > 0 || maxD < 1)));
+      const setD = (k, v) => this.setState(st => ({ rDlg:{ ...st.rDlg, [k]:v } }));
+      const taken = invs.filter(x => x.ev === ri.ev && x.act === ri.act && x.st === 'pendiente').map(x => x.who);
+      rV = { rDlg:true, rRev: rev, rReas: !rev, rTitle: rev ? 'Revocar confirmación y cambiar participante' : 'Reasignar actividad',
+        rAct: ri.act, rEv: e ? `${e.name} · ${fmtD(e.date)} · ${fmtT(ri.ini)} – ${fmtT(ri.fin)}` : '',
+        rCur: this.uname(cur), rCurState: rev ? 'Confirmó su participación' : (ri.st === 'vencida' ? 'No respondió a tiempo' : 'Indicó que no podrá participar'),
+        rCurReason: ri.reason ? `«${ri.reason}»` : '', rHasReason: !!ri.reason,
+        rUsers: s.users.filter(u => u.activo && u.id !== ri.who && !taken.includes(u.id)).map(u => ({ id:u.id, label:`${this.uname(u)} · ${u.rol}` })),
+        rTo: d.to, onRTo: ev => setD('to', ev.target.value), rDays: d.days, onRDays: ev => setD('days', ev.target.value.replace(/[^\d]/g, '').slice(0, 2)),
+        rToErr: err.to || '', rShowTo: show('to'), rToBorder: show('to') ? '#A3372A' : '#DDD6CA',
+        rDaysErr: err.days || '', rShowDays: show('days'), rDaysBorder: show('days') ? '#A3372A' : '#DDD6CA',
+        rMax: maxD, rHelp: maxD >= 1 ? `Entre 1 y ${maxD} días. El evento es el ${e ? fmtD(e.date) : ''} (en ${toEv} días).` : '',
+        rHasDue: !!dueStr, rDue: dueStr ? `Deberá responder antes del ${fmtD(dueStr)}, ${toEv - n} ${toEv - n === 1 ? 'día' : 'días'} antes del evento.` : '',
+        rBtn: rev ? 'Revocar y enviar invitación' : 'Enviar invitación', rBtnBg: rev ? '#A3372A' : '#3E6B4F',
+        rClose: () => this.setState({ rDlg:null }),
+        rSubmit: () => { if (Object.keys(err).length) { setD('tried', true); return; }
+          const nu = this.user(d.to); const nid2 = 'i' + Date.now();
+          this.setState(st => ({ rDlg:null, invs:[ ...(st.invs || INVS).map(x => x.id === ri.id ? { ...x, st: rev ? 'revocada' : x.st, moved: d.to } : x),
+            { id:nid2, ev:ri.ev, act:ri.act, ini:ri.ini, fin:ri.fin, who:d.to, sent:TODAY, mail:'ok', st:'pendiente', due:dueStr } ] }));
+          this.toast(`${rev ? 'Confirmación revocada. ' : ''}Invitación enviada a ${this.uname(nu)}; tiene hasta el ${fmtD(dueStr)} para responder.`); } };
+    }
+    return { ...rV, invTabsA: tabs, invRowsA: rows, invHasA: !!rows.length, invEmptyA: !rows.length, invQ: s.invQ || '', onInvQ: e => this.setState({ invQ:e.target.value }),
+      invAlert: nA + nE > 0, invAlertText: [nA ? `${nA} ${nA === 1 ? 'actividad necesita' : 'actividades necesitan'} una nueva asignación` : '', nE ? `${nE} ${nE === 1 ? 'invitación no se pudo enviar' : 'invitaciones no se pudieron enviar'}` : ''].filter(Boolean).join(' y ') + '.',
+      invAlertGo: () => this.setState({ invTab: nA ? 'asignar' : 'error' }), goParticipaciones: () => this.go('participaciones') };
+  }
   renderVals() {
     const s = this.state; const go = (k, x) => () => this.go(k, x);
     const btn = (on, label) => ({ disabled:!on, label, bg: on ? '#3E6B4F' : '#ECE7DE', color: on ? '#fff' : '#7C7E76', cursor: on ? 'pointer' : 'not-allowed' });
@@ -1212,12 +1435,13 @@ class Component extends DCLogic {
       { k:'usuarios', l:'Usuarios', i:'group', m:['usuarios'] },
       { k:'eventos', l:'Eventos', i:'calendar_month', m:['eventos','evento','eventoForm'] },
       { k:'cronogramas', l:'Cronogramas', i:'list_alt', m:['cronogramas'] },
+      { k:'participaciones', l:'Participaciones', i:'how_to_reg', m:['participaciones'] },
       { k:'ministerios', l:'Ministerios', i:'diversity_3', m:['ministerios','ministerio'] },
       { k:'notificaciones', l:'Notificaciones', i:'notifications', m:['notificaciones'] },
     ];
     const navItem = n => { const on = n.m.includes(s.screen); return { label:n.l, icon:n.i, current: on ? 'page' : undefined,
       bg: on ? 'rgba(255,255,255,0.14)' : 'transparent', color: on ? '#fff' : '#D6E3D9', weight: on ? 800 : 600, onClick: go(n.k) }; };
-    const is = {}; ['inicio','usuarios','eventos','evento','eventoForm','cronogramas','ministerios','ministerio','notificaciones','perfil','guia'].forEach(k => is[k] = s.screen === k);
+    const is = {}; ['inicio','usuarios','eventos','evento','eventoForm','cronogramas','ministerios','ministerio','notificaciones','perfil','guia','participaciones'].forEach(k => is[k] = s.screen === k);
 
     // events
     const evV = e => { const past = (e.dateEnd || e.date) < TODAY; const n = s.sched.filter(x => x.ev === e.id).length; const d = pd(e.date);
@@ -1233,8 +1457,9 @@ class Component extends DCLogic {
         sub: multi ? `${range} · ${nDays} días · ${past ? 'Finalizado' : 'Próximo'}` : `${fmtT(e.ini)} – ${fmtT(e.fin)} · ${past ? 'Finalizado' : 'Próximo'}`, stLabel: past ? 'Finalizado' : 'Próximo', stBg: past ? '#EFEAE1' : '#E3EEE5', stColor: past ? '#55594F' : '#2B5A3E',
         dateBg: past ? '#EFEAE1' : '#EEF3EE', dateColor: past ? '#55594F' : '#2F5540',
         cronoLabel: n ? `${n} actividades` : 'Sin cronograma', cronoBg: n ? '#E3EEE5' : '#FBF0D9', cronoColor: n ? '#2B5A3E' : '#7A5410', cronoIcon: n ? 'event_available' : 'warning',
-        open: go('evento', { evId:e.id }), openSched: () => this.openSm(e.id), edit: () => this.openEventForm(e), del: () => this.delEvent(e),
-        schedLabel: n ? 'Editar cronograma' : 'Crear cronograma' }; };
+        open: go('evento', { evId:e.id }), openSched: past ? undefined : () => this.openSm(e.id), edit: () => this.openEventForm(e), del: () => this.delEvent(e),
+        schedLabel: past ? 'Evento finalizado' : n ? 'Editar cronograma' : 'Crear cronograma', schedAria: past ? 'Evento finalizado: el cronograma no se puede modificar' : (n ? 'Editar cronograma' : 'Crear cronograma'),
+        schedIcon: past ? 'lock' : 'edit_calendar', schedColor: past ? '#9A9C93' : '#4C5047', schedCursor: past ? 'not-allowed' : 'pointer', schedBg: past ? '#F4F0E8' : '#fff', schedText: past ? '#6B6E65' : '#23261F' }; };
     const evAll = [...s.events].sort((a,b) => a.date.localeCompare(b.date)).map(evV);
     const upcoming = evAll.filter(e => !e.past);
 
@@ -1275,12 +1500,12 @@ class Component extends DCLogic {
     const f = s.form; const fk = s.formKind; const errs = fk ? this.validate(fk, f) : {};
     const ff = fk ? this.fields(f, errs, s.tried, s.touched, (k, v) => { if (typeof v === 'string') { if (fk === 'user' && (k === 'nombre' || k === 'apellido')) v = cleanName(v); else if (k === 'tel') v = cleanPhone(v); else if (k === 'correo') v = v.replace(/\s/g, '').slice(0, 100); else if (MAXES[k] && !(fk === 'event' && k === 'descripcion')) v = v.slice(0, MAXES[k]); } this.setF(k, v); }, k => this.setState(st => ({ touched:{ ...st.touched, [k]:true } }))) : {};
     const dirty = fk ? this.dirty() : false;
-    const submitLabels = { user: s.formId ? 'Guardar cambios' : 'Crear usuario', min: s.formId ? 'Guardar cambios' : 'Crear ministerio', event: s.formId ? 'Guardar cambios' : 'Crear evento', notif:'Enviar', notifEdit:'Guardar cambios' };
+    const submitLabels = { user: s.formId ? 'Guardar cambios' : s.fromSm ? 'Registrar y asignar' : 'Crear usuario', min: s.formId ? 'Guardar cambios' : 'Crear ministerio', event: s.formId ? 'Guardar cambios' : 'Crear evento', notif:'Enviar', notifEdit:'Guardar cambios' };
     const canSubmit = fk && (s.formId ? dirty : true) && !Object.keys(errs).length;
     const errN = Object.keys(errs).length;
     const formStatus = s.tried && errN ? { icon:'error', color:'#A3372A', text:`Revisa ${errN === 1 ? 'el campo marcado' : `los ${errN} campos marcados`}.` }
       : (s.formId && !dirty) ? { icon:'check_circle', color:'#5F6259', text:'Sin cambios por guardar.' } : errN ? { icon:'info', color:'#7A5410', text:'Completa o corrige los campos obligatorios para continuar.' } : dirty ? { icon:'edit', color:'#7A5410', text:'Tienes cambios sin guardar.' } : { icon:'info', color:'#5F6259', text:'Los campos marcados como opcionales pueden quedar vacíos.' };
-    const drawerTitles = { user: s.formId ? 'Editar usuario' : 'Nuevo usuario', min: s.formId ? 'Editar ministerio' : 'Nuevo ministerio', notif:'Enviar notificación', notifEdit:'Editar notificación' };
+    const drawerTitles = { user: s.formId ? 'Editar usuario' : s.fromSm ? 'Registrar participante' : 'Nuevo usuario', min: s.formId ? 'Editar ministerio' : 'Nuevo ministerio', notif:'Enviar notificación', notifEdit:'Editar notificación' };
     // recipients
     const to = f.to || []; const rq = s.recipQ.trim().toLowerCase();
     const recipList = s.users.filter(u => !rq || (this.uname(u) + ' ' + u.correo).toLowerCase().includes(rq)).map(u => { const on = to.includes(u.id);
@@ -1293,6 +1518,12 @@ class Component extends DCLogic {
     let smV = {};
     if (s.sm) { const e = s.events.find(x => x.id === s.sm.evId); const w0 = mins(e.ini), w1 = mins(e.fin); const win = w1 - w0;
       let asig = 0;
+      const initMap = {}, initAct = {}; JSON.parse(s.sm.init || '[]').forEach(x => { initMap[x.id] = x.who; initAct[x.id] = x.act; });
+      const allInv = s.invs || INVS;
+      const invFor = (rid) => { const w = initMap[rid]; if (!w) return null; return allInv.filter(x => x.ev === e.id && x.act === initAct[rid] && x.who === w && !x.moved).slice(-1)[0] || null; };
+      const setInv = (id, patch) => this.setState(st => ({ invs:(st.invs || INVS).map(x => x.id === id ? { ...x, ...patch } : x) }));
+      const toEv = Math.round((pd(e.date) - pd(TODAY)) / 86400000); const maxD = Math.min(30, toEv - 1);
+      const addD = n => { const d = new Date(pd(TODAY).getTime() + n * 86400000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
       const rows = s.sm.rows.map((r, i) => { const er = {};
         if (!r.act.trim()) er.act = 'Escribe el título.'; if (!r.who.trim()) er.who = 'Indica el responsable.';
         if (!r.ini || !r.fin) er.time = 'Indica la hora de inicio y de fin.';
@@ -1308,12 +1539,49 @@ class Component extends DCLogic {
         const pickWho = id => this.setState(st => ({ sm:{ ...st.sm, whoOpen:null, whoQ:'', newP: st.sm.newP && st.sm.newP.rowId === r.id ? null : st.sm.newP, rows: st.sm.rows.map(x => x.id === r.id ? { ...x, who:id } : x) } }));
         const whoOpts = s.users.filter(u => (u.activo || u.id === r.who) && (!wq || (this.uname(u) + ' ' + u.correo).toLowerCase().includes(wq))).sort((a,b) => this.uname(a).localeCompare(this.uname(b)))
           .map(u => { const on = u.id === r.who; return { id:u.id, name:this.uname(u), ini:ini(this.uname(u)), rol:u.rol, email:u.correo || 'sin correo', sel: on ? 'true' : 'false', bg: on ? '#F3F7F2' : '#fff', check: on ? 'check' : '', pick: () => pickWho(u.id) }; });
-        const whoU = this.user(r.who);
-        const whoUI = { whoOpen, whoOpenAria: whoOpen ? 'true' : 'false', whoChevron: whoOpen ? 'expand_less' : 'expand_more', whoQ: s.sm.whoQ || '', whoEmpty: whoOpen && !whoOpts.length,
-          whoLabel: whoU ? `${this.uname(whoU)} · ${whoU.rol}` : 'Selecciona un usuario registrado', whoColor: whoU ? '#23261F' : '#6B6E65',
-          toggleWho: () => this.setState(st => ({ sm:{ ...st.sm, whoOpen: st.sm.whoOpen === r.id ? null : r.id, whoQ:'' } })),
+        const whoU = this.user(r.who); const reloading = s.sm.reload === r.id;
+        const newAssign = !!whoU && (r.who !== (initMap[r.id] || '') || !!r.reinvite); const dv = String(r.days || '').trim();
+        if (newAssign) { if (maxD < 1) er.days = 'El evento es mañana o ya pasó: no queda tiempo para pedir confirmación.';
+          else if (!dv) er.days = `Indica de 1 a ${maxD} días para confirmar.`;
+          else if (+dv < 1 || +dv > 30) er.days = 'El plazo debe estar entre 1 y 30 días.';
+          else if (+dv > maxD) er.days = `El evento empieza en ${toEv} días. El plazo máximo es de ${maxD} ${maxD === 1 ? 'día' : 'días'}.`; }
+        const daysShow = !!er.days && (show || dv.length > 0 || maxD < 1);
+        const daysUI = { rid:r.id, needDays:newAssign, days:r.days || '', onDays: ev2 => { const v = ev2.target.value.replace(/[^\d]/g, '').slice(0, 2); this.smSet(rs => rs.map(x => x.id === r.id ? { ...x, days:v } : x)); },
+          daysShow, daysErr: er.days || '', bDays: daysShow ? '#A3372A' : '#DDD6CA', daysHelp: maxD >= 1 ? `Entre 1 y ${maxD} días. El evento es el ${fmtD(e.date)} (en ${toEv} días).` : '',
+          hasDue: newAssign && !er.days, dueText: newAssign && !er.days ? `Se le enviará la invitación al guardar. Deberá responder antes del ${fmtD(addD(+dv))}.` : '' };
+        const inv = invFor(r.id); const sameWho = !!inv && r.who === inv.who; const invU = inv ? this.user(inv.who) : null; const invName = this.uname(invU);
+        const locked = sameWho && (inv.st === 'aceptada' || inv.st === 'pendiente');
+        let card = null;
+        if (inv && sameWho) {
+          if (inv.st === 'aceptada') card = { icon:'verified', bg:'#F3F7F2', bd:'#CFE0D3', c:'#2B5A3E', title:`${invName} confirmó su participación${inv.answered ? ' el ' + fmtD(inv.answered) : ''}.`,
+            body:'El responsable no se puede cambiar mientras la aceptación esté vigente. Si ya no podrá participar, revoca la aceptación primero. Si cambias el horario, se le avisará del cambio.', revoke:true };
+          else if (inv.st === 'pendiente' && inv.mail === 'error') card = { icon:'error', bg:'#FDF5F3', bd:'#F4DCD6', c:'#862C21', title:`La invitación a ${invName} no se pudo enviar.`, body:'Reenvíala o cancélala para poder elegir otro responsable.', resend:true, cancel:true };
+          else if (inv.st === 'pendiente') card = { icon:'hourglass_top', bg:'#FBF7EE', bd:'#F0DDB4', c:'#7A5410', title:`Invitación enviada a ${invName} el ${fmtD(inv.sent)}${inv.due ? ' · plazo hasta el ' + fmtD(inv.due) : ''}. Pendiente de respuesta.`,
+            body:'Mientras esté pendiente no se puede cambiar el responsable. Reenvíala como recordatorio o cancela la invitación para elegir a otra persona.', resend:true, cancel:true };
+          else if (inv.st === 'rechazada') card = { icon:'cancel', bg:'#FDF5F3', bd:'#F4DCD6', c:'#862C21', title:`${invName} indicó que no podrá participar.`, body: inv.reason ? `Motivo: «${inv.reason}». Elige otro responsable.` : 'Elige otro responsable.', change:true };
+          else if (inv.st === 'vencida') card = { icon:'timer_off', bg:'#F8F7F3', bd:'#E6E1D8', c:'#55594F', title:`${invName} no respondió a tiempo.`, body:'El plazo terminó. Cambia de responsable o vuelve a invitar a la misma persona con un plazo nuevo.', change:true, reinvite:true };
+          else if (inv.st === 'cancelada') card = { icon:'block', bg:'#F8F7F3', bd:'#E6E1D8', c:'#55594F', title:`Invitación a ${invName} cancelada.`, body:'La actividad quedó sin confirmar. Cambia de responsable o vuelve a invitar a la misma persona.', change:true, reinvite:true };
+          else if (inv.st === 'revocada') card = { icon:'undo', bg:'#F8F7F3', bd:'#E6E1D8', c:'#55594F', title:`Aceptación de ${invName} revocada.`, body:'Elige un nuevo responsable para enviarle la invitación al guardar.', change:true };
+        } else if (inv && !sameWho && inv.st === 'pendiente') card = { icon:'info', bg:'#FBF7EE', bd:'#F0DDB4', c:'#7A5410', title:`Al guardar se cancelará la invitación pendiente de ${invName}.`, body:'' };
+        const stM = inv && sameWho ? (inv.st === 'pendiente' && inv.mail === 'error' ? { l:'Error de envío', i:'error', bg:'#FBE9E5', c:'#862C21' } : INV_ST[inv.st]) : null;
+        const cardUI = { hasCard: !!card, card: card || {}, cardHasBody: !!(card && card.body), cardRevoke: !!(card && card.revoke), cardResend: !!(card && card.resend), whoEditable: !locked, whoLocked: locked,
+          hasSt: !!stM, st: stM || {},
+          cardCancel: !!(card && card.cancel), cardChange: !!(card && card.change) && !r.reinvite, cardReinvite: !!(card && card.reinvite) && !r.reinvite, reinviting: !!r.reinvite,
+          reinviteLabel: `Volver a invitar a ${invName}`,
+          cancelInv: () => this.ask({ title:'Cancelar invitación', body:`${invName} ya no podrá responder la invitación a «${inv.act}». Podrás elegir otro responsable o volver a invitarlo.`, label:'Cancelar invitación',
+            action: () => { setInv(inv.id, { st:'cancelada' }); this.toast(`Invitación a ${invName} cancelada.`); } }),
+          changeWho: () => this.setState(st => ({ sm:{ ...st.sm, whoOpen:r.id, whoQ:'' } })),
+          reinviteFn: () => { this.smSet(rs => rs.map(x => x.id === r.id ? { ...x, reinvite:true, days:'' } : x)); setTimeout(() => { const el = document.querySelector(`[data-days-input="${r.id}"]`); el && el.focus(); }, 50); },
+          undoReinvite: () => this.smSet(rs => rs.map(x => x.id === r.id ? { ...x, reinvite:false, days:'' } : x)),
+          revokeAcc: () => this.ask({ title:'Revocar aceptación', body:`${invName} confirmó que participará en «${inv.act}». Al revocar, se le notificará que ya no está asignado y podrás elegir a otra persona.`, label:'Revocar aceptación',
+            action: () => { setInv(inv.id, { st:'revocada', answered: inv.answered }); this.toast(`Aceptación de ${invName} revocada. Elige un nuevo responsable.`); } }),
+          resendInv: () => { setInv(inv.id, { mail:'ok', sent:TODAY }); this.toast(`Invitación reenviada a ${invName}.`); } };
+        cardUI.whoPickDisplay = locked ? 'none' : 'flex';
+        const whoUI = { whoOpen, ...daysUI, ...cardUI, whoOpenAria: whoOpen ? 'true' : 'false', whoChevron: whoOpen ? 'expand_less' : 'expand_more', whoQ: s.sm.whoQ || '', whoEmpty: whoOpen && !whoOpts.length,
+          whoLabel: reloading ? 'Actualizando lista de usuarios…' : whoU ? `${this.uname(whoU)} · ${whoU.rol}` : 'Selecciona un usuario registrado', whoColor: whoU && !reloading ? '#23261F' : '#6B6E65',
+          toggleWho: () => !reloading && this.setState(st => ({ sm:{ ...st.sm, whoOpen: st.sm.whoOpen === r.id ? null : r.id, whoQ:'' } })),
           onWhoQ: ev2 => { const v = ev2.target.value; this.setState(st => ({ sm:{ ...st.sm, whoQ:v } })); },
-          openNew: () => this.setState(st => ({ sm:{ ...st.sm, whoOpen:null, newP:{ rowId:r.id, nombre:'', apellido:'', correo:'', tried:false } } })) };
+          openNew: () => { this.setState(st => ({ sm:{ ...st.sm, whoOpen:null, newP:null }, fromSm:r.id })); this.openForm('user', { nombre:'', apellido:'', correo:'', tel:'', password:'', rol:'Participante', activo:true }, null); } };
         const NP = s.sm.newP && s.sm.newP.rowId === r.id ? s.sm.newP : null;
         let np = {};
         if (NP) { const ne = {}; const c = NP.correo.trim();
@@ -1326,8 +1594,10 @@ class Component extends DCLogic {
             cancel: () => this.setState(st => ({ sm:{ ...st.sm, newP:null } })), okBg: npOk ? '#3E6B4F' : '#ECE7DE', okColor: npOk ? '#fff' : '#7C7E76', okCursor: npOk ? 'pointer' : 'not-allowed', okDis: !npOk,
             save: () => { if (Object.keys(ne).length) { this.setState(st => ({ sm:{ ...st.sm, newP:{ ...st.sm.newP, tried:true } } })); return; }
               const nu = { id:nid('u'), nombre:NP.nombre.trim(), apellido:NP.apellido.trim(), correo:c, tel:'', rol:'Participante', activo:true, created:TODAY };
-              this.setState(st => ({ users:[nu, ...st.users], sm:{ ...st.sm, newP:null, rows: st.sm.rows.map(x => x.id === r.id ? { ...x, who:nu.id } : x) } }));
-              this.toast(`${nu.nombre} ${nu.apellido} quedó registrado como participante.`); } }; }
+              this.setState(st => ({ users:[nu, ...st.users], sm:{ ...st.sm, newP:null, reload:r.id, rows: st.sm.rows.map(x => x.id === r.id ? { ...x, who:nu.id } : x) } }));
+              clearTimeout(this.reloadT); this.reloadT = setTimeout(() => { this.setState(st => st.sm ? { sm:{ ...st.sm, reload:null } } : null);
+                const el = document.querySelector(`[data-days-input="${r.id}"]`) || document.querySelector(`[data-who-btn="${r.id}"]`); el && el.focus(); }, 700);
+              this.toast(`${nu.nombre} ${nu.apellido} quedó registrado como participante y asignado. Indica los días para confirmar.`); } }; }
         const onWho = ev2 => { const v = ev2.target.value;
           if (v === '__new') this.setState(st => ({ sm:{ ...st.sm, newP:{ rowId:r.id, nombre:'', apellido:'', correo:'', tried:false } } }));
           else this.setState(st => ({ sm:{ ...st.sm, newP: st.sm.newP && st.sm.newP.rowId === r.id ? null : st.sm.newP, rows: st.sm.rows.map(x => x.id === r.id ? { ...x, who:v } : x) } })); };
@@ -1337,7 +1607,9 @@ class Component extends DCLogic {
           up: () => this.smSet(rs => { const a = [...rs]; if (i > 0) [a[i-1], a[i]] = [a[i], a[i-1]]; return a; }),
           down: () => this.smSet(rs => { const a = [...rs]; if (i < a.length - 1) [a[i+1], a[i]] = [a[i], a[i+1]]; return a; }),
           upColor: i === 0 ? '#C9C6BD' : '#4C5047', downColor: i === s.sm.rows.length - 1 ? '#C9C6BD' : '#4C5047',
-          del: () => this.smSet(rs => rs.filter(x => x.id !== r.id)), delAria:`Eliminar actividad ${i + 1}` }; });
+          del: () => { const iv = invFor(r.id); const go2 = () => this.smSet(rs => rs.filter(x => x.id !== r.id));
+            if (iv && (iv.st === 'pendiente' || iv.st === 'aceptada')) this.ask({ title:'Eliminar actividad', body:`${this.uname(this.user(iv.who))} tiene una invitación ${iv.st === 'aceptada' ? 'aceptada' : 'pendiente'} para «${iv.act}». Al guardar el cronograma se cancelará y se le notificará.`, label:'Eliminar actividad', action: go2 });
+            else go2(); }, delAria:`Eliminar actividad ${i + 1}` }; });
       const over = asig > win; const allOk = rows.every(r => r.ok); const changed = JSON.stringify(s.sm.rows) !== s.sm.init;
       smV = { title:`Cronograma de «${e.name}»`, window:`${fmtD(e.date)} · ${fmtT(e.ini)} – ${fmtT(e.fin)}`, pick:s.sm.pick, evId:e.id,
         asig: dur(asig), rest: dur(Math.max(0, win - asig)), pct: `${Math.min(100, Math.round(asig / win * 100))}%`, barColor: over ? '#A3372A' : '#3E6B4F', over,
@@ -1345,15 +1617,27 @@ class Component extends DCLogic {
         add: () => { const last = s.sm.rows[s.sm.rows.length - 1]; this.smSet(rs => [...rs, { id:nid('s'), ev:e.id, act:'', desc:'', ini: last ? last.fin : e.ini, fin:'', who:'' }]); },
         save: () => { if (!changed) return; if (!allOk) { this.setState(st => ({ sm:{ ...st.sm, tried:true } })); return; }
           const rs = s.sm.rows.map(r => ({ ...r, ev:e.id, act:r.act.trim(), who:r.who.trim() }));
-          this.setState(st => ({ sched:[...st.sched.filter(x => x.ev !== e.id), ...rs], sm:null })); this.toast(`Cronograma de «${e.name}» guardado.`); },
+          const clean = rs.map(({ reinvite, ...x }) => x);
+          const newInv = rs.filter(r => this.user(r.who) && (r.who !== (initMap[r.id] || '') || r.reinvite)).map(r => ({ id:'i' + r.id + Date.now(), ev:e.id, act:r.act, ini:r.ini, fin:r.fin, who:r.who, sent:TODAY, mail:'ok', st:'pendiente', due:addD(+r.days) }));
+          this.setState(st => ({ sched:[...st.sched.filter(x => x.ev !== e.id), ...clean], sm:null,
+            invs:[ ...(st.invs || INVS).map(x => { if (x.ev !== e.id || x.moved) return x;
+              const row = Object.keys(initAct).find(id => initAct[id] === x.act && initMap[id] === x.who); const kept = row && rs.find(r => r.id === row);
+              if (row && !kept && (x.st === 'pendiente' || x.st === 'aceptada')) return { ...x, st:'cancelada' };
+              const nv = row && newInv.find(n => n.id.startsWith('i' + row));
+              if (!nv) return x;
+              return x.st === 'pendiente' ? { ...x, st:'cancelada', moved:nv.who } : { ...x, moved:nv.who }; }), ...newInv ] }));
+          const names = newInv.map(n => this.uname(this.user(n.who)));
+          this.toast(newInv.length ? `Cronograma guardado. Invitación enviada a ${names.length === 1 ? names[0] : names.length + ' participantes'}.` : `Cronograma de «${e.name}» guardado.`, newInv.length ? 'Ver participaciones' : undefined, newInv.length ? () => this.go('participaciones') : undefined); },
         onPick: ev2 => this.openSm(ev2.target.value, true) };
     }
 
     // cronogramas
     const cronoRows = s.sched.filter(x => s.cronoEv === 'all' || x.ev === s.cronoEv).map(x => ({ x, e: s.events.find(v => v.id === x.ev) }))
       .sort((a,b) => (a.e.date + a.x.ini).localeCompare(b.e.date + b.x.ini))
-      .map(({ x, e }) => ({ act:x.act, who:this.wn(x.who), time:`${fmtT(x.ini)} – ${fmtT(x.fin)}`, evName:e.name, evDate:fmtD(e.date), openEv: go('evento', { evId:e.id }), edit: () => this.openSm(e.id), editAria:`Editar cronograma de ${e.name}`,
-        del: () => this.ask({ title:'Eliminar actividad', body:`Se quitará «${x.act}» del cronograma de «${e.name}».`, label:'Eliminar', action: () => { this.setState(st => ({ sched: st.sched.filter(y => y.id !== x.id) })); this.toast('Actividad eliminada.'); } }), delAria:`Eliminar ${x.act}` }));
+      .map(({ x, e }) => { const lk = (e.dateEnd || e.date) < TODAY; return { act:x.act, who:this.wn(x.who), time:`${fmtT(x.ini)} – ${fmtT(x.fin)}`, evName:e.name, evDate: lk ? `${fmtD(e.date)} · Finalizado` : fmtD(e.date), openEv: go('evento', { evId:e.id }),
+        locked: lk, lockColor: lk ? '#B9B6AD' : '#4C5047', lockDel: lk ? '#C9B6B1' : '#A3372A', lockCursor: lk ? 'not-allowed' : 'pointer',
+        edit: lk ? undefined : () => this.openSm(e.id), editAria: lk ? `Evento finalizado: no se puede editar ${x.act}` : `Editar cronograma de ${e.name}`,
+        del: lk ? undefined : () => this.ask({ title:'Eliminar actividad', body:`Se quitará «${x.act}» del cronograma de «${e.name}».`, label:'Eliminar', action: () => { this.setState(st => ({ sched: st.sched.filter(y => y.id !== x.id) })); this.toast('Actividad eliminada.'); } }), delAria: lk ? `Evento finalizado: no se puede eliminar ${x.act}` : `Eliminar ${x.act}` }; });
     const cronoEvObj = s.events.find(e => e.id === s.cronoEv);
 
     // ministries
@@ -1463,11 +1747,14 @@ class Component extends DCLogic {
       nEditTo: nEditTo ? `${this.uname(nEditTo)} — ${nEditTo.correo}` : '',
       readT: { bg: f.read ? '#3E6B4F' : '#C9C3B7', x: f.read ? '22px' : '2px', label: f.read ? 'Leída' : 'No leída', aria: f.read ? 'true' : 'false', toggle: () => this.setF('read', !f.read) },
       sm: !!s.sm, smV, closeSm: () => this.closeSm(),
-      evOptions: evAll.map(e => ({ id:e.id, label:`${e.name} · ${e.dateLabel}` })), cronoEv:s.cronoEv, onCronoEv: e => this.setState({ cronoEv:e.target.value }),
+      evOptions: evAll.map(e => ({ id:e.id, label:`${e.name} · ${e.dateLabel}${e.past ? ' (finalizado)' : ''}` })), evOptionsOpen: upcoming.map(e => ({ id:e.id, label:`${e.name} · ${e.dateLabel}` })), cronoEv:s.cronoEv, onCronoEv: e => this.setState({ cronoEv:e.target.value }),
       cronoRows, cronoHas: !!cronoRows.length, cronoEmpty: !cronoRows.length, cronoCount:`${cronoRows.length} ${cronoRows.length === 1 ? 'actividad' : 'actividades'}`,
       cronoEmptyTitle: cronoEvObj ? `«${cronoEvObj.name}» aún no tiene cronograma` : 'Todavía no hay cronogramas',
-      cronoEmptyAction: () => this.openSm(cronoEvObj ? cronoEvObj.id : (upcoming[0] || evAll[0]).id, !cronoEvObj),
-      newCrono: () => { const target = cronoEvObj || upcoming.find(e => !e.nAct) || upcoming[0] || evAll[0]; this.openSm(target.id, true); },
+      cronoEmptyAction: () => { const t = cronoEvObj && !this.isPastEv(cronoEvObj.id) ? cronoEvObj : upcoming[0]; if (t) this.openSm(t.id, !cronoEvObj || t.id !== cronoEvObj.id); else this.toast('No hay eventos próximos para crear un cronograma.'); },
+      cronoEmptyPast: !!(cronoEvObj && this.isPastEv(cronoEvObj.id)), cronoEmptyCan: !(cronoEvObj && this.isPastEv(cronoEvObj.id)),
+      newCronoBtn: (cronoEvObj && this.isPastEv(cronoEvObj.id)) ? { bg:'#ECE7DE', color:'#7C7E76', cursor:'not-allowed' } : { bg:'#3E6B4F', color:'#fff', cursor:'pointer' },
+      newCronoTitle: (cronoEvObj && this.isPastEv(cronoEvObj.id)) ? 'El evento seleccionado ya finalizó' : 'Crear un cronograma',
+      newCrono: () => { if (cronoEvObj && this.isPastEv(cronoEvObj.id)) return; const target = (cronoEvObj && !this.isPastEv(cronoEvObj.id) ? cronoEvObj : null) || upcoming.find(e => !e.nAct) || upcoming[0]; if (target) this.openSm(target.id, true); else this.toast('No hay eventos próximos para crear un cronograma.'); },
       minList: s.mins.map(minV), newMin: () => this.openMin(null), min, editMin: () => this.openMin(m0), delMin: () => this.delMin(m0),
       am: !!s.am, amV, openAm: () => this.setState({ am:{ q:'', sel:[] } }), closeAm: () => this.setState({ am:null }), onAmQ: e => { const v = e.target.value; this.setState(st => ({ am:{ ...st.am, q:v } })); },
       nTabs: [ tab(s.nTab,'todas','Todas', nBase.length,'nTab'), tab(s.nTab,'noleidas','No leídas', nUnreadF,'nTab'), tab(s.nTab,'leidas','Leídas', nBase.length - nUnreadF,'nTab') ],
@@ -1514,7 +1801,8 @@ class Component extends DCLogic {
       cfOk: () => { const a = cf.action; this.setState({ confirm:null }); a(); }, cfAlt: () => { const a = cf.alt; this.setState({ confirm:null }); a(); }, cfCancel: () => this.setState({ confirm:null }),
       hasToast: !!s.toast, toastMsg: s.toast ? s.toast.msg : '', toastHasAction: !!(s.toast && s.toast.actionLabel), toastActionLabel: s.toast ? s.toast.actionLabel : '',
       toastAction: () => { const a = s.toast && s.toast.action; this.setState({ toast:null }); a && a(); }, toastClose: () => this.setState({ toast:null }),
-      stop: e => e.stopPropagation(),
+      drawerZ: s.fromSm ? 86 : 70, drawerZ2: s.fromSm ? 87 : 71, fromSmNote: !!s.fromSm,
+      ...this.invVals(), stop: e => e.stopPropagation(),
     };
   }
 }
