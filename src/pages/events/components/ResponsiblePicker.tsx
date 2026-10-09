@@ -22,7 +22,8 @@ import { ROLE_LABELS, type User } from "../../../types/user";
 interface ResponsiblePickerProps {
   /** Nombre del responsable tal como se guarda en la actividad. */
   value: string;
-  onChange: (name: string) => void;
+  /** `user` es la cuenta elegida: permite enviarle la invitación al guardar. */
+  onChange: (name: string, user: User) => void;
   /** Usuarios activos disponibles. */
   users: User[];
   loading: boolean;
@@ -96,7 +97,7 @@ export function ResponsiblePicker({
   const matches = users.filter((u) => matchesPerson(u, query));
 
   const pick = (user: User) => {
-    onChange(fullNameOf(user));
+    onChange(fullNameOf(user), user);
     setOpen(false);
     setQuery("");
   };
@@ -220,7 +221,7 @@ export function ResponsiblePicker({
           onCancel={() => setShowNew(false)}
           onCreated={(user) => {
             onUserCreated(user);
-            onChange(fullNameOf(user));
+            onChange(fullNameOf(user), user);
             setShowNew(false);
           }}
         />
@@ -311,8 +312,8 @@ function NewParticipantForm({
     >
       <p className="text-[13px] leading-snug text-text-secondary">
         Se creará su cuenta con el rol <strong>Participante</strong> y quedará
-        como responsable. Para que pueda iniciar sesión, asígnale después una
-        contraseña desde Usuarios.
+        como responsable. Para que pueda iniciar sesión y confirmar su
+        participación, asígnale después una contraseña desde Usuarios.
       </p>
       {failure ? <Alert variant="error" message={failure} /> : null}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

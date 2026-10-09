@@ -13,6 +13,7 @@ import { AdminEventsPage } from "./pages/admin/events/AdminEventsPage";
 import { AdminMinistriesPage } from "./pages/admin/ministries/AdminMinistriesPage";
 import { AdminMinistryDetailPage } from "./pages/admin/ministries/AdminMinistryDetailPage";
 import { AdminNotificationsPage } from "./pages/admin/notifications/AdminNotificationsPage";
+import { AdminParticipationsPage } from "./pages/admin/participations/AdminParticipationsPage";
 import { AdminSchedulesPage } from "./pages/admin/schedules/AdminSchedulesPage";
 import { AdminUsersPage } from "./pages/admin/users/AdminUsersPage";
 import { LoginPage } from "./pages/auth/LoginPage";
@@ -26,6 +27,7 @@ import { MinistriesListPage } from "./pages/ministries/MinistriesListPage";
 import { MinistryDetailPage } from "./pages/ministries/MinistryDetailPage";
 import { NotificationDetailPage } from "./pages/notifications/NotificationDetailPage";
 import { NotificationsListPage } from "./pages/notifications/NotificationsListPage";
+import { ParticipationsPage } from "./pages/participations/ParticipationsPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { SchedulesListPage } from "./pages/schedules/SchedulesListPage";
 import { UserDetailPage } from "./pages/users/UserDetailPage";
@@ -236,6 +238,22 @@ export function AppRoutes() {
             <AdminOnly>
               <AdminNotificationsPage mode="edit" />
             </AdminOnly>
+          }
+        />
+
+        {/* Participaciones: el administrador supervisa; el participante
+            confirma las suyas. El miembro no tiene esta vista. */}
+        <Route
+          path="/participations"
+          element={
+            <ByRole
+              admin={<AdminParticipationsPage />}
+              member={
+                <ProtectedRoute requiredRole="PARTICIPANT">
+                  <ParticipationsPage />
+                </ProtectedRoute>
+              }
+            />
           }
         />
 

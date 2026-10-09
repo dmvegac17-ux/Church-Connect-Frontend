@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   ListChecks,
   User,
+  UserCheck,
   Users,
   UsersRound,
   type LucideIcon,
@@ -46,7 +47,51 @@ const NOTIFICATIONS: NavItem = {
   icon: Bell,
 };
 
-/** Barra superior de la vista de miembro (y participante). */
+export const PARTICIPATIONS_PATH = "/participations";
+
+/** Solo rol participante: confirmar sus invitaciones a actividades. */
+const OWN_PARTICIPATIONS: NavItem = {
+  to: PARTICIPATIONS_PATH,
+  label: "Participaciones",
+  description: "Acepta o rechaza las actividades a las que te invitaron.",
+  icon: UserCheck,
+};
+
+/**
+ * Menú "Eventos" del participante: agrupa eventos, cronogramas y sus
+ * invitaciones. El miembro conserva los enlaces sueltos de siempre.
+ */
+export const PARTICIPANT_EVENT_MENU: readonly NavItem[] = [
+  {
+    ...EVENTS,
+    label: "Todos los eventos",
+    description: "Calendario, lugar y detalle de cada evento",
+  },
+  { ...SCHEDULES, description: "Actividades programadas por evento" },
+  {
+    ...OWN_PARTICIPATIONS,
+    label: "Confirmar participaciones",
+    description: "Acepta o rechaza tus invitaciones",
+  },
+];
+
+/** Navegación del participante en móvil: la del miembro más sus invitaciones. */
+export const PARTICIPANT_NAV: readonly NavItem[] = [
+  { to: HOME_PATH, label: "Inicio", description: "Resumen del día.", icon: Home },
+  EVENTS,
+  SCHEDULES,
+  OWN_PARTICIPATIONS,
+  MINISTRIES,
+  NOTIFICATIONS,
+];
+
+/** Acceso rápido extra del Inicio del participante. */
+export const PARTICIPANT_QUICK_LINK: NavItem = {
+  ...OWN_PARTICIPATIONS,
+  label: "Confirmar participaciones",
+};
+
+/** Barra superior de la vista de miembro. */
 export const MEMBER_NAV: readonly NavItem[] = [
   { to: HOME_PATH, label: "Inicio", description: "Resumen del día.", icon: Home },
   EVENTS,
@@ -88,6 +133,12 @@ export const ADMIN_NAV_MANAGE: readonly NavItem[] = [
   },
   EVENTS,
   SCHEDULES,
+  {
+    to: PARTICIPATIONS_PATH,
+    label: "Participaciones",
+    description: "Supervisa las invitaciones y sus respuestas.",
+    icon: UserCheck,
+  },
   MINISTRIES,
   NOTIFICATIONS,
 ];

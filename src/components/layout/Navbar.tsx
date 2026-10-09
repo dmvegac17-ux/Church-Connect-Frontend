@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp, LogOut, Menu, User, X } from "lucide-react";
 import {
+  Fragment,
   useEffect,
   useId,
   useRef,
@@ -9,11 +10,20 @@ import {
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../auth/useAuth";
-import { HOME_PATH, MEMBER_NAV, PROFILE_PATH } from "../../config/navigation";
+import {
+  HOME_PATH,
+  MEMBER_NAV,
+  PARTICIPANT_EVENT_MENU,
+  PARTICIPANT_NAV,
+  PARTICIPATIONS_PATH,
+  PROFILE_PATH,
+} from "../../config/navigation";
+import { usePendingInvitationsCount } from "../../hooks/usePendingInvitationsCount";
 import { useUnreadNotificationsCount } from "../../hooks/useUnreadNotificationsCount";
 import { fullNameOf } from "../../lib/people";
 import { Avatar } from "../ui/primitives";
 import { BrandLogo } from "./BrandLogo";
+import { ParticipantEventsMenu } from "./ParticipantEventsMenu";
 
 /**
  * Barra superior de la vista de miembro: logo, navegación horizontal,
@@ -21,11 +31,28 @@ import { BrandLogo } from "./BrandLogo";
  * navegación pasa a un panel desplegable con ítems de 48px.
  */
 export function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, role, logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const unreadLabel = unreadCount >= 100 ? "99+" : String(unreadCount);
+
+  // La opción de participaciones solo existe para el rol participante; el
+  // miembro conserva su navegación sin cambios.
+  const isParticipant = role === "PARTICIPANT";
+  const pendingCount = usePendingInvitationsCount(isParticipant);
+  const pendingLabel = pendingCount >= 100 ? "99+" : String(pendingCount);
+  const groupedPaths = new Set(PARTICIPANT_EVENT_MENU.map((item) => item.to));
+  const desktopNav = isParticipant
+    ? MEMBER_NAV.filter((item) => !groupedPaths.has(item.to))
+    : MEMBER_NAV;
+  const mobileNav = isParticipant ? PARTICIPANT_NAV : MEMBER_NAV;
+  const badgeFor = (to: string) =>
+    to === "/notifications" && unreadCount > 0
+      ? { label: unreadLabel, text: `${unreadCount} sin leer` }
+      : to === PARTICIPATIONS_PATH && pendingCount > 0
+        ? { label: pendingLabel, text: `${pendingCount} pendientes` }
+        : null;
 
   const menuId = useId();
   const panelId = useId();
@@ -125,27 +152,31 @@ export function Navbar() {
           aria-label="Principal"
           className="hidden min-w-0 flex-1 gap-0.5 min-[920px]:flex"
         >
-          {MEMBER_NAV.map(({ to, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === HOME_PATH}
-              className={({ isActive }) =>
-                `flex h-10 items-center gap-2 rounded-[10px] px-3 text-[15px] whitespace-nowrap transition-colors hover:bg-white/[0.12] hover:text-white ${
-                  isActive
-                    ? "bg-white/[0.16] font-extrabold text-white"
-                    : "font-semibold text-[#E3ECE5]"
-                }`
-              }
-            >
-              {label}
-              {to === "/notifications" && unreadCount > 0 ? (
-                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-secondary px-1.5 text-xs font-extrabold text-primary-hover">
-                  <span aria-hidden="true">{unreadLabel}</span>
-                  <span className="sr-only">{unreadCount} sin leer</span>
-                </span>
+          {desktopNav.map(({ to, label }) => (
+            <Fragment key={to}>
+              <NavLink
+                to={to}
+                end={to === HOME_PATH}
+                className={({ isActive }) =>
+                  `flex h-10 items-center gap-2 rounded-[10px] px-3 text-[15px] whitespace-nowrap transition-colors hover:bg-white/[0.12] hover:text-white ${
+                    isActive
+                      ? "bg-white/[0.16] font-extrabold text-white"
+                      : "font-semibold text-[#E3ECE5]"
+                  }`
+                }
+              >
+                {label}
+                {to === "/notifications" && unreadCount > 0 ? (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-secondary px-1.5 text-xs font-extrabold text-primary-hover">
+                    <span aria-hidden="true">{unreadLabel}</span>
+                    <span className="sr-only">{unreadCount} sin leer</span>
+                  </span>
+                ) : null}
+              </NavLink>
+              {isParticipant && to === HOME_PATH ? (
+                <ParticipantEventsMenu pendingCount={pendingCount} />
               ) : null}
-            </NavLink>
+            </Fragment>
           ))}
         </nav>
         <div className="flex-1 min-[920px]:hidden" />
@@ -247,29 +278,32 @@ export function Navbar() {
           className="flex flex-col gap-0.5 border-b border-border bg-card px-4 pt-3 pb-4 text-foreground shadow-[0_12px_24px_rgba(35,38,31,0.10)] min-[920px]:hidden"
         >
           <nav aria-label="Principal" className="flex flex-col gap-0.5">
-            {MEMBER_NAV.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === HOME_PATH}
-                className={({ isActive }) =>
-                  `flex h-12 items-center gap-3 rounded-[10px] px-3 text-base ${
-                    isActive
-                      ? "bg-primary-soft font-extrabold"
-                      : "font-semibold hover:bg-accent"
-                  }`
-                }
-              >
-                <Icon className="size-[22px] text-primary" aria-hidden="true" />
-                <span className="flex-1">{label}</span>
-                {to === "/notifications" && unreadCount > 0 ? (
-                  <span className="flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-primary px-[7px] text-xs font-extrabold text-primary-foreground">
-                    <span aria-hidden="true">{unreadLabel}</span>
-                    <span className="sr-only">{unreadCount} sin leer</span>
-                  </span>
-                ) : null}
-              </NavLink>
-            ))}
+            {mobileNav.map(({ to, label, icon: Icon }) => {
+              const badge = badgeFor(to);
+              return (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={to === HOME_PATH}
+                  className={({ isActive }) =>
+                    `flex h-12 items-center gap-3 rounded-[10px] px-3 text-base ${
+                      isActive
+                        ? "bg-primary-soft font-extrabold"
+                        : "font-semibold hover:bg-accent"
+                    }`
+                  }
+                >
+                  <Icon className="size-[22px] text-primary" aria-hidden="true" />
+                  <span className="flex-1">{label}</span>
+                  {badge ? (
+                    <span className="flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-primary px-[7px] text-xs font-extrabold text-primary-foreground">
+                      <span aria-hidden="true">{badge.label}</span>
+                      <span className="sr-only">{badge.text}</span>
+                    </span>
+                  ) : null}
+                </NavLink>
+              );
+            })}
           </nav>
           <div className="my-2 h-px bg-divider" />
           <NavLink

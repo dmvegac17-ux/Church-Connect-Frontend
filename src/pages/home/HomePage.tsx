@@ -8,7 +8,7 @@ import { DailyVerse } from "../../components/layout/DailyVerse";
 import { Card } from "../../components/layout/Page";
 import { DateBlock } from "../../components/ui/EventBits";
 import { RoleBadge } from "../../components/users/Badges";
-import { MEMBER_QUICK_LINKS } from "../../config/navigation";
+import { MEMBER_QUICK_LINKS, PARTICIPANT_QUICK_LINK } from "../../config/navigation";
 import { useFullList } from "../../hooks/useFullList";
 import {
   eventDateInfo,
@@ -38,6 +38,11 @@ export function HomePage() {
   );
   const nextInfo = nextEvent ? eventDateInfo(nextEvent, now) : null;
   const unread = notifications.items.filter((n) => !n.leida);
+  // El participante suma el acceso a sus invitaciones; el miembro no cambia.
+  const quickLinks =
+    role === "PARTICIPANT"
+      ? [PARTICIPANT_QUICK_LINK, ...MEMBER_QUICK_LINKS]
+      : MEMBER_QUICK_LINKS;
 
   let summary = "Desde aquí puedes consultar los eventos, los ministerios y tus avisos.";
   if (!events.isLoading && !notifications.isLoading) {
@@ -185,7 +190,7 @@ export function HomePage() {
           Accesos rápidos
         </h2>
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,200px),1fr))] gap-3">
-          {MEMBER_QUICK_LINKS.map(({ to, label, description, icon: Icon }) => (
+          {quickLinks.map(({ to, label, description, icon: Icon }) => (
             <li key={to}>
               <Link
                 to={to}

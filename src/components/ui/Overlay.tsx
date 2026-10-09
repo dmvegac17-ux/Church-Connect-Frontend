@@ -1,6 +1,43 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
+} from "react";
+
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Mantiene el foco dentro del diálogo: Tab en el último control vuelve al
+ * primero y Mayús+Tab en el primero salta al último. Va en el `onKeyDown`
+ * del panel.
+ */
+export function trapTabKey(e: ReactKeyboardEvent<HTMLElement>) {
+  if (e.key !== "Tab") {
+    return;
+  }
+  const items = Array.from(
+    e.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE),
+  ).filter((el) => el.getClientRects().length > 0);
+  if (items.length === 0) {
+    e.preventDefault();
+    return;
+  }
+  const first = items[0];
+  const last = items[items.length - 1];
+  const active = document.activeElement;
+  if (e.shiftKey && (active === first || active === e.currentTarget)) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && active === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
 
 /**
  * Cierra con Escape. La captura va en `window` (fase de burbuja), así que un
@@ -92,6 +129,7 @@ export function Drawer({ open, title, onClose, children, footer }: DrawerProps) 
             exit={{ x: 40 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={trapTabKey}
           >
             <div className="flex shrink-0 items-center justify-between gap-3 border-b border-divider py-3 pr-3 pl-5">
               <h2 id={titleId} className="text-lg font-extrabold text-foreground">
@@ -161,6 +199,7 @@ export function Modal({
             exit={{ opacity: 0, scale: 0.97, y: 12 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={trapTabKey}
           >
             <div className="flex shrink-0 items-start justify-between gap-3 border-b border-divider py-3.5 pr-3 pl-5">
               <div className="min-w-0 py-1">
