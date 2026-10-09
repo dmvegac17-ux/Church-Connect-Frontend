@@ -5,7 +5,7 @@ import { ApiError, type ListMeta, type ResponsePayload } from "../types/api";
  * Capa HTTP única de la aplicación. Todos los `services/*` pasan por aquí.
  *
  * Responsabilidades:
- *  - Anteponer la URL base (`http://localhost:8000/api/v1`).
+ *  - Anteponer la URL base (`<VITE_BACKEND_BASE_URL>/api/v1`).
  *  - Adjuntar el header `Authorization: Bearer <token>` cuando hay sesión.
  *  - Desempacar `data` del `ResponsePayload`.
  *  - Ante `success: false` o HTTP != 2xx, lanzar un `ApiError` tipado

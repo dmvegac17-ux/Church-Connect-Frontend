@@ -32,9 +32,9 @@ Scripts:
 
 Toda variable sensible se lee de `.env` (`import.meta.env`):
 
-| Variable | Default | Descripción |
+| Variable | Ejemplo (local) | Descripción |
 |---|---|---|
-| `VITE_BACKEND_BASE_URL` | `http://localhost:8000` | URL base del backend (sin `/api/v1`, sin barra final) |
+| `VITE_BACKEND_BASE_URL` | `http://localhost:8000` | URL base del backend (sin `/api/v1`, sin barra final). Obligatoria: si falta, la app no arranca y registra el error en la consola |
 
 ## Diseño
 
