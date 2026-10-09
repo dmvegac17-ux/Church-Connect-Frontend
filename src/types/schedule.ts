@@ -13,6 +13,8 @@ export interface Schedule {
   /** ISO datetime. */
   hora_fin: string;
   responsable: string;
+  /** Usuario con la invitación activa de la actividad, si la hay. */
+  responsable_id?: string | null;
   descripcion: string | null;
 }
 

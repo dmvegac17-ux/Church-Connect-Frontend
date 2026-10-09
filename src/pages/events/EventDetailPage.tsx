@@ -1,47 +1,24 @@
-import { CalendarClock, CalendarPlus, Pencil, Trash2 } from "lucide-react";
-import { lazy, Suspense, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Calendar, CalendarX, Clock, MapPin, SearchX, Users } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 
-import { useAuth } from "../../auth/useAuth";
 import { ErrorAlert } from "../../components/feedback/ErrorAlert";
 import { FullPageSpinner, Spinner } from "../../components/feedback/Spinner";
-import { useToast } from "../../components/feedback/useToast";
-import { Button } from "../../components/forms/Button";
-import { Card, PageHeader } from "../../components/layout/Page";
+import { buttonClass } from "../../components/forms/Button";
+import { Card, CardHeader } from "../../components/layout/Page";
 import { ScheduleTimeline } from "../../components/schedule/ScheduleTimeline";
+import { DateBlock, EventStatusPill } from "../../components/ui/EventBits";
+import { Breadcrumb, EmptyState, Fact } from "../../components/ui/primitives";
 import { useEvent } from "../../hooks/useEvent";
 import { useSchedules } from "../../hooks/useSchedules";
-import { formatDateTime } from "../../lib/format";
-import { eventService } from "../../services/eventService";
+import { activitiesLabel, eventDateInfo } from "../../lib/eventDates";
 import { ApiError } from "../../types/api";
-import { AddScheduleModal } from "./components/AddScheduleModal";
-import { DeleteEventDialog } from "./components/DeleteEventDialog";
+import { EventLocation } from "./components/EventLocation";
 
-/** Leaflet pesa ~150KB — se carga en un chunk separado, no en el bundle principal. */
-const EventLocationMap = lazy(() =>
-  import("../../components/map/EventLocationMap").then((m) => ({
-    default: m.EventLocationMap,
-  })),
-);
-
+/** Detalle de evento (vista de miembro): solo lectura. */
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const toast = useToast();
-  const { role } = useAuth();
-  const isAdmin = role === "ADMIN";
   const { event, isLoading, error } = useEvent(id);
-  const {
-    schedules,
-    total: totalSchedules,
-    isLoading: loadingSchedules,
-    refetch: refetchSchedules,
-  } = useSchedules(id);
-
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<unknown>(null);
-  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const { schedules, isLoading: loadingSchedules } = useSchedules(id);
 
   if (isLoading) {
     return <FullPageSpinner label="Cargando evento…" />;
@@ -50,20 +27,19 @@ export function EventDetailPage() {
   if (error || !event || !id) {
     const notFound = error instanceof ApiError && error.status === 404;
     return (
-      <div>
-        <PageHeader title="Evento" backTo="/events" />
+      <div className="flex flex-col gap-6">
+        <Breadcrumb to="/events" label="Eventos" />
         {notFound ? (
-          <Card className="text-center">
-            <p className="text-sm text-muted-foreground">
-              El evento que buscas no existe o fue eliminado.
-            </p>
-            <Link
-              to="/events"
-              className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
-            >
-              Volver al listado
-            </Link>
-          </Card>
+          <EmptyState
+            bordered
+            icon={SearchX}
+            title="Este evento no existe o fue eliminado"
+            action={
+              <Link to="/events" className={buttonClass("secondary")}>
+                Volver a Eventos
+              </Link>
+            }
+          />
         ) : (
           <ErrorAlert error={error ?? new Error("No se pudo cargar el evento.")} />
         )}
@@ -71,155 +47,83 @@ export function EventDetailPage() {
     );
   }
 
-  const confirmDelete = async () => {
-    setDeleting(true);
-    setDeleteError(null);
-    try {
-      await eventService.remove(event.id);
-      toast.success(`El evento "${event.titulo}" fue eliminado.`, "Evento eliminado");
-      navigate("/events", { replace: true });
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 404) {
-        navigate("/events", { replace: true });
-        return;
-      }
-      setDeleteError(err);
-      setConfirmOpen(false);
-    } finally {
-      setDeleting(false);
-    }
-  };
+  const info = eventDateInfo(event);
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title={event.titulo}
-        backTo="/events"
-        actions={
-          isAdmin ? (
-            <>
-              <Button
-                variant="secondary"
-                onClick={() => setScheduleModalOpen(true)}
-              >
-                <CalendarPlus className="size-4" aria-hidden="true" />
-                Añadir cronograma
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => navigate(`/events/${event.id}/editar`)}
-              >
-                <Pencil className="size-4" aria-hidden="true" />
-                Editar
-              </Button>
-              <Button variant="danger" onClick={() => setConfirmOpen(true)}>
-                <Trash2 className="size-4" aria-hidden="true" />
-                Eliminar
-              </Button>
-            </>
-          ) : undefined
-        }
-      />
+    <div className="flex flex-col gap-6">
+      <Breadcrumb to="/events" label="Eventos" current={event.titulo} />
 
-      {deleteError ? (
-        <ErrorAlert error={deleteError} onClose={() => setDeleteError(null)} />
-      ) : null}
-
-      <Card className="max-w-2xl space-y-4">
-        <div>
-          <h2 className="text-sm font-medium text-muted-foreground">Descripción</h2>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
-            {event.descripcion}
-          </p>
+      <div className="flex flex-wrap items-center gap-[18px]">
+        <DateBlock info={info} size="lg" />
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <span className="self-start">
+            <EventStatusPill info={info} />
+          </span>
+          <h1 className="text-[28px] leading-tight font-extrabold tracking-[-0.015em] break-words">
+            {event.titulo}
+          </h1>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <h2 className="text-sm font-medium text-muted-foreground">Lugar</h2>
-            <p className="mt-1 text-sm text-foreground">{event.lugar}</p>
-            {event.direccion ? (
-              <p className="text-sm text-muted-foreground">{event.direccion}</p>
-            ) : null}
-          </div>
-          <div>
-            <h2 className="text-sm font-medium text-muted-foreground">Capacidad</h2>
-            <p className="mt-1 text-sm text-foreground">{event.capacidad}</p>
-          </div>
-          <div>
-            <h2 className="text-sm font-medium text-muted-foreground">Inicio</h2>
-            <p className="mt-1 text-sm text-foreground">
-              {formatDateTime(event.fecha_inicio)}
-            </p>
-          </div>
-          <div>
-            <h2 className="text-sm font-medium text-muted-foreground">Fin</h2>
-            <p className="mt-1 text-sm text-foreground">
-              {formatDateTime(event.fecha_fin)}
-            </p>
-          </div>
-        </div>
-        {event.latitud !== null && event.longitud !== null ? (
-          <Suspense
-            fallback={
-              <div className="flex h-56 w-full items-center justify-center rounded-lg border border-border">
-                <Spinner label="Cargando mapa…" />
-              </div>
-            }
-          >
-            <EventLocationMap
-              latitud={event.latitud}
-              longitud={event.longitud}
-              label={event.lugar}
-              className="h-56 w-full"
-            />
-          </Suspense>
-        ) : null}
-      </Card>
-
-      <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
-          <h2 className="flex items-center gap-2 text-base font-medium text-foreground">
-            <CalendarClock className="size-4 text-muted-foreground" aria-hidden="true" />
-            Cronogramas{" "}
-            <span className="text-sm font-normal text-muted-foreground">
-              ({totalSchedules})
-            </span>
-          </h2>
-          <Link
-            to={`/schedules?evento_id=${event.id}`}
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            Ver en Cronogramas
-          </Link>
-        </div>
-
-        {loadingSchedules ? (
-          <div className="p-6 text-center text-sm text-muted-foreground">
-            <Spinner label="Cargando cronogramas…" />
-          </div>
-        ) : schedules.length === 0 ? (
-          <p className="p-6 text-center text-sm text-muted-foreground">
-            Este evento todavía no tiene cronogramas registrados.
-          </p>
-        ) : (
-          <div className="p-4 sm:p-6">
-            <ScheduleTimeline schedules={schedules} />
-          </div>
-        )}
       </div>
 
-      <DeleteEventDialog
-        open={confirmOpen}
-        eventTitle={event.titulo}
-        loading={deleting}
-        onConfirm={confirmDelete}
-        onCancel={() => setConfirmOpen(false)}
-      />
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+        <div className="flex min-w-0 flex-col gap-5">
+          <Card as="section" className="flex flex-col gap-2.5 p-6">
+            <h2 className="text-[17px] font-extrabold">Descripción</h2>
+            <p className="text-base leading-[1.6] text-pretty whitespace-pre-line text-text-strong">
+              {event.descripcion}
+            </p>
+          </Card>
 
-      <AddScheduleModal
-        event={scheduleModalOpen ? event : null}
-        onClose={() => setScheduleModalOpen(false)}
-        onSaved={refetchSchedules}
-      />
+          <Card as="section" className="overflow-hidden">
+            <CardHeader
+              title="Cronograma"
+              aside={
+                <span className="text-sm text-muted-foreground">
+                  {loadingSchedules ? "" : activitiesLabel(schedules.length)}
+                </span>
+              }
+            />
+            {loadingSchedules ? (
+              <div className="p-8 text-center text-muted-foreground">
+                <Spinner label="Cargando cronograma…" />
+              </div>
+            ) : schedules.length === 0 ? (
+              <EmptyState
+                icon={CalendarX}
+                tone="sand"
+                title="Este evento aún no tiene cronograma"
+                description="Cuando los organizadores publiquen las actividades aparecerán aquí."
+              />
+            ) : (
+              <ScheduleTimeline schedules={schedules} />
+            )}
+          </Card>
+        </div>
+
+        <Card as="aside" className="flex flex-col gap-4 p-6">
+          <h2 className="text-[17px] font-extrabold">Detalles</h2>
+          <dl className="flex flex-col gap-3.5">
+            <Fact icon={Calendar} label="Fecha">
+              {info.dateLong}
+            </Fact>
+            <Fact icon={Clock} label="Horario">
+              {info.timeRange}
+            </Fact>
+            <Fact icon={MapPin} label="Lugar">
+              {event.lugar}
+              {event.direccion ? (
+                <span className="block text-sm font-normal text-text-secondary">
+                  {event.direccion}
+                </span>
+              ) : null}
+            </Fact>
+            <Fact icon={Users} label="Capacidad">
+              {event.capacidad} {event.capacidad === 1 ? "persona" : "personas"}
+            </Fact>
+          </dl>
+          <EventLocation event={event} />
+        </Card>
+      </div>
     </div>
   );
 }

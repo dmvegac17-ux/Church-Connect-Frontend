@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F8F7F3;color:#23261F;font-family:'Nunito Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3E6B4F;text-decoration:none}
+a:hover{color:#2F5540;text-decoration:underline}
+button,input,select{font-family:inherit}
+:focus-visible{outline:3px solid #8DB59A;outline-offset:2px}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+<header style="position:sticky;top:0;z-index:30;background:#3E6B4F;color:#fff">
+  <div style="max-width:1200px;margin:0 auto;padding:0 20px;height:64px;display:flex;align-items:center;gap:20px">
+    <button onClick="{{ goHome }}" aria-label="Church Connect, ir a inicio" style="display:flex;align-items:center;gap:10px;background:none;border:0;color:#fff;cursor:pointer;padding:4px;border-radius:10px;flex:none">
+      <span style="width:34px;height:34px;border-radius:50%;background:#fff;color:#3E6B4F;display:grid;place-items:center;font-weight:800;font-size:18px">C</span>
+      <span style="font-weight:800;font-size:17px;letter-spacing:-0.01em">Church Connect</span>
+    </button>
+    <nav aria-label="Principal" style="display:{{ deskNav }};gap:2px;flex:1;min-width:0">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
+        <button onClick="{{ n.onClick }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:15px;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }}" style-hover="background:rgba(255,255,255,0.12);color:#fff">
+          <span style="white-space:nowrap">{{ n.label }}</span>
+          <sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}">
+            <span aria-label="{{ n.badgeAria }}" style="min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#F1EADF;color:#2F5540;font-size:12px;font-weight:800;display:grid;place-items:center">{{ n.badge }}</span>
+          </sc-if>
+        </button>
+      </sc-for>
+    </nav>
+    <div style="flex:1;display:{{ mobSpacer }}"></div>
+
+    <div data-usermenu="1" style="position:relative;flex:none;display:{{ deskNav }}">
+      <button onClick="{{ toggleMenu }}" aria-haspopup="menu" aria-expanded="{{ menuOpen }}" style="display:flex;align-items:center;gap:10px;height:42px;padding:0 10px 0 4px;border:1px solid rgba(255,255,255,0.35);border-radius:22px;background:transparent;color:#fff;cursor:pointer;font-size:15px;font-weight:700" style-hover="background:rgba(255,255,255,0.12)">
+        <span style="width:32px;height:32px;border-radius:50%;background:#F1EADF;color:#2F5540;display:grid;place-items:center;font-size:13px;font-weight:800">RP</span>
+        <span style="white-space:nowrap;display:{{ nameDisplay }}">Regino Puentes Meza</span>
+        <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ menuChevron }}</span>
+      </button>
+      <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+        <div role="menu" style="position:absolute;right:0;top:50px;width:260px;background:#fff;color:#23261F;border:1px solid #E6E1D8;border-radius:14px;box-shadow:0 12px 32px rgba(35,38,31,0.14);padding:8px">
+          <div style="padding:10px 12px 12px;border-bottom:1px solid #EFEAE1;margin-bottom:6px">
+            <div style="font-weight:700;font-size:15px">Regino Puentes Meza</div>
+            <div style="font-size:13px;color:#5F6259">reginopm0897@gmail.com</div>
+          </div>
+          <button role="menuitem" onClick="{{ goPerfil }}" style="width:100%;display:flex;align-items:center;gap:10px;height:42px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:#23261F;font-size:15px;cursor:pointer;text-align:left" style-hover="background:#F4F0E8">
+            <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#3E6B4F">person</span>Mi perfil
+          </button>
+          <button role="menuitem" onClick="{{ logout }}" style="width:100%;display:flex;align-items:center;gap:10px;height:42px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:#A3372A;font-size:15px;cursor:pointer;text-align:left" style-hover="background:#FBEDEA">
+            <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">logout</span>Cerrar sesión
+          </button>
+        </div>
+      </sc-if>
+    </div>
+
+    <button onClick="{{ toggleMob }}" aria-label="Abrir menú" aria-expanded="{{ mobOpen }}" style="display:{{ mobNav }};position:relative;width:44px;height:44px;border:1px solid rgba(255,255,255,0.35);border-radius:12px;background:transparent;color:#fff;cursor:pointer;align-items:center;justify-content:center">
+      <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:24px;line-height:1">{{ mobIcon }}</span>
+      <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ false }}">
+        <span style="position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:#F1EADF;border:2px solid #3E6B4F"></span>
+      </sc-if>
+    </button>
+  </div>
+
+  <sc-if value="{{ mobPanel }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;color:#23261F;border-bottom:1px solid #E6E1D8;box-shadow:0 12px 24px rgba(35,38,31,0.10);padding:12px 16px 16px;display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
+        <button onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:16px;text-align:left;background:{{ n.mBg }};color:#23261F;font-weight:{{ n.weight }}">
+          <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1;color:#3E6B4F">{{ n.icon }}</span>
+          <span style="flex:1">{{ n.label }}</span>
+          <sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}">
+            <span style="min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#3E6B4F;color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center">{{ n.badge }}</span>
+          </sc-if>
+        </button>
+      </sc-for>
+      <div style="height:1px;background:#EFEAE1;margin:8px 0"></div>
+      <button onClick="{{ goPerfil }}" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:16px;text-align:left;background:transparent;color:#23261F">
+        <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1;color:#3E6B4F">person</span>Mi perfil
+      </button>
+      <button onClick="{{ logout }}" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:16px;text-align:left;background:transparent;color:#A3372A">
+        <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">logout</span>Cerrar sesión
+      </button>
+    </div>
+  </sc-if>
+</header>
+
+<main style="flex:1;width:100%;max-width:1120px;margin:0 auto;padding:32px 20px 120px">
+
+<!-- INICIO -->
+<sc-if value="{{ is.inicio }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="Inicio" style="display:flex;flex-direction:column;gap:28px">
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:0;background:#fff;border:1px solid #E6E1D8;border-radius:16px;overflow:hidden">
+      <div style="padding:28px 32px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:14px;color:#5F6259">{{ todayLabel }}</div>
+        <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:800;letter-spacing:-0.015em">{{ greeting }}, Regino</h1>
+        <p style="margin:0;font-size:16px;line-height:1.5;color:#4C5047;text-wrap:pretty">{{ homeSummary }}</p>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;background:#F1EADF;color:#5E4E37;font-size:13px;font-weight:700">Miembro</span>
+        </div>
+      </div>
+      <figure style="margin:0;padding:28px 32px;background:#F4F0E8;display:flex;flex-direction:column;justify-content:center;gap:10px">
+        <blockquote style="margin:0;font-size:18px;line-height:1.5;font-style:italic;color:#2F3A2E;text-wrap:pretty">“En todas estas cosas somos más que vencedores por medio de aquel que nos amó.”</blockquote>
+        <figcaption style="font-size:14px;font-weight:700;color:#3E6B4F">Romanos 8:37</figcaption>
+      </figure>
+    </section>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:20px">
+      <section style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <h2 style="margin:0;font-size:18px;font-weight:800">Próximo evento</h2>
+          <button onClick="{{ goEventos }}" style="border:0;background:none;color:#3E6B4F;font-size:14px;font-weight:700;cursor:pointer;padding:6px 4px;border-radius:8px" style-hover="color:#2F5540;text-decoration:underline">Ver todos</button>
+        </div>
+        <button onClick="{{ nextEv.open }}" style="text-align:left;color:inherit;background:#FBFAF7;border:1px solid #EFEAE1;border-radius:12px;padding:16px;display:flex;gap:16px;cursor:pointer" style-hover="border-color:#B9CDBE;background:#fff">
+          <div style="flex:none;width:60px;border-radius:10px;background:#3E6B4F;color:#fff;text-align:center;padding:8px 0">
+            <div style="font-size:12px;font-weight:800;letter-spacing:0.08em">{{ nextEv.mon }}</div>
+            <div style="font-size:24px;font-weight:800;line-height:1.1">{{ nextEv.day }}</div>
+          </div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:13px;font-weight:700;color:#3E6B4F">{{ nextEv.relLabel }}</div>
+            <div style="font-size:18px;font-weight:800">{{ nextEv.name }}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:#4C5047">
+              <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">schedule</span>{{ nextEv.time }}</span>
+              <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">location_on</span>{{ nextEv.place }}</span>
+            </div>
+          </div>
+          <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1;color:#3E6B4F;align-self:center">chevron_right</span>
+        </button>
+      </section>
+
+      <section style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <h2 style="margin:0;font-size:18px;font-weight:800">Avisos sin leer</h2>
+          <button onClick="{{ goNotifs }}" style="border:0;background:none;color:#3E6B4F;font-size:14px;font-weight:700;cursor:pointer;padding:6px 4px;border-radius:8px" style-hover="color:#2F5540;text-decoration:underline">Ver todos</button>
+        </div>
+        <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ unreadList }}" as="u" hint-placeholder-count="2">
+              <button onClick="{{ u.open }}" style="text-align:left;color:inherit;background:transparent;border:0;border-top:1px solid #EFEAE1;padding:12px 4px;display:flex;gap:12px;align-items:flex-start;cursor:pointer" style-hover="background:#FBFAF7">
+                <span style="flex:none;width:8px;height:8px;border-radius:50%;background:#3E6B4F;margin-top:7px"></span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:15px;font-weight:700">{{ u.title }}</span>
+                  <span style="font-size:13px;color:#5F6259">{{ u.dateLabel }}</span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noUnread }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:12px;padding:16px;border-radius:12px;background:#EEF3EE;color:#2B5A3E;font-size:15px">
+            <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">check_circle</span>
+            Estás al día. No tienes avisos pendientes.
+          </div>
+        </sc-if>
+      </section>
+    </div>
+
+    <section style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:18px;font-weight:800">Accesos rápidos</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:12px">
+        <sc-for list="{{ quick }}" as="q" hint-placeholder-count="5">
+          <button onClick="{{ q.onClick }}" style="text-align:left;color:inherit;background:#fff;border:1px solid #E6E1D8;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;cursor:pointer" style-hover="border-color:#B9CDBE;box-shadow:0 4px 14px rgba(35,38,31,0.06)">
+            <span aria-hidden="true" style="width:40px;height:40px;border-radius:10px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:22px;line-height:1">{{ q.icon }}</span>
+            <span style="font-size:16px;font-weight:800">{{ q.label }}</span>
+            <span style="font-size:14px;line-height:1.45;color:#5F6259">{{ q.desc }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+  </div>
+</sc-if>
+
+<!-- EVENTOS -->
+<sc-if value="{{ is.eventos }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Eventos" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Eventos</h1>
+      <p style="margin:0;font-size:15px;color:#5F6259">Consulta la fecha, la sede y el cronograma de cada evento.</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <div role="group" aria-label="Filtrar eventos" style="display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:#EFEAE1;border-radius:12px">
+        <sc-for list="{{ evTabs }}" as="t" hint-placeholder-count="3">
+          <button onClick="{{ t.onClick }}" aria-pressed="{{ t.pressed }}" style="height:36px;padding:0 14px;border:0;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;background:{{ t.bg }};color:{{ t.color }};box-shadow:{{ t.shadow }}">{{ t.label }} · {{ t.count }}</button>
+        </sc-for>
+      </div>
+      <label style="position:relative;flex:1;max-width:340px;min-width:220px">
+        <span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Buscar eventos</span>
+        <span aria-hidden="true" style="position:absolute;left:12px;top:12px;font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#6B6E65">search</span>
+        <input type="search" value="{{ evQ }}" onChange="{{ onEvQ }}" placeholder="Buscar por nombre o lugar" style="width:100%;height:44px;padding:0 14px 0 40px;border:1px solid #DDD6CA;border-radius:10px;background:#fff;font-size:15px;color:#23261F" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0">
+      </label>
+    </div>
+    <sc-if value="{{ hasEvents }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:16px">
+        <sc-for list="{{ evList }}" as="e" hint-placeholder-count="3">
+          <button onClick="{{ e.open }}" style="text-align:left;color:inherit;background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:20px;display:flex;gap:16px;cursor:pointer" style-hover="border-color:#B9CDBE;box-shadow:0 4px 14px rgba(35,38,31,0.06)">
+            <div style="flex:none;width:60px;border-radius:10px;background:{{ e.dateBg }};color:{{ e.dateColor }};text-align:center;padding:8px 0;align-self:flex-start">
+              <div style="font-size:12px;font-weight:800;letter-spacing:0.08em">{{ e.mon }}</div>
+              <div style="font-size:24px;font-weight:800;line-height:1.1">{{ e.day }}</div>
+            </div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+                <span style="font-size:18px;font-weight:800;line-height:1.3">{{ e.name }}</span>
+                <span style="flex:none;font-size:12px;font-weight:700;padding:3px 8px;border-radius:10px;background:{{ e.stBg }};color:{{ e.stColor }}">{{ e.statusLabel }}</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:#4C5047">
+                <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">schedule</span>{{ e.time }}</span>
+                <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">location_on</span>{{ e.place }}</span>
+              </div>
+              <p style="margin:0;font-size:14px;line-height:1.5;color:#5F6259;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ e.desc }}</p>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px">
+                <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;background:#F4F0E8;color:#4C4335;font-size:13px;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">group</span>Capacidad: {{ e.capacity }}</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;background:{{ e.cronoBg }};color:{{ e.cronoColor }};font-size:13px;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">{{ e.cronoIcon }}</span>{{ e.cronoLabel }}</span>
+              </div>
+            </div>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ noEvents }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px dashed #D3CCBF;border-radius:16px;padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+        <span aria-hidden="true" style="width:48px;height:48px;border-radius:12px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:26px;line-height:1">search_off</span>
+        <div style="font-size:17px;font-weight:800">{{ evEmptyTitle }}</div>
+        <div style="font-size:15px;color:#5F6259">Prueba con otro término o cambia el filtro.</div>
+        <button onClick="{{ clearEv }}" style="margin-top:6px;height:44px;padding:0 18px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Ver todos los eventos</button>
+      </div>
+    </sc-if>
+    <div style="font-size:14px;color:#5F6259">{{ evCountLabel }}</div>
+  </div>
+</sc-if>
+
+<!-- DETALLE EVENTO -->
+<sc-if value="{{ is.evento }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Detalle de evento" style="display:flex;flex-direction:column;gap:24px">
+    <nav aria-label="Ruta" style="display:flex;align-items:center;gap:6px;font-size:14px;color:#5F6259">
+      <button onClick="{{ goEventos }}" style="display:flex;align-items:center;gap:4px;border:0;background:none;color:#3E6B4F;font-size:14px;font-weight:700;cursor:pointer;padding:6px 4px;border-radius:8px" style-hover="text-decoration:underline"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">arrow_back</span>Eventos</button>
+      <span aria-hidden="true">/</span><span>{{ ev.name }}</span>
+    </nav>
+    <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <div style="flex:none;width:68px;border-radius:12px;background:{{ ev.dateBg }};color:{{ ev.dateColor }};text-align:center;padding:10px 0">
+        <div style="font-size:12px;font-weight:800;letter-spacing:0.08em">{{ ev.mon }}</div>
+        <div style="font-size:28px;font-weight:800;line-height:1.1">{{ ev.day }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+        <span style="align-self:flex-start;font-size:12px;font-weight:700;padding:3px 8px;border-radius:10px;background:{{ ev.stBg }};color:{{ ev.stColor }}">{{ ev.statusLabel }}</span>
+        <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">{{ ev.name }}</h1>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:20px;grid-column:span 2;min-width:0">
+        <section style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <h2 style="margin:0;font-size:17px;font-weight:800">Descripción</h2>
+          <p style="margin:0;font-size:16px;line-height:1.6;color:#3A3D35;text-wrap:pretty">{{ ev.desc }}</p>
+        </section>
+        <section style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;overflow:hidden">
+          <div style="padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #EFEAE1">
+            <h2 style="margin:0;font-size:17px;font-weight:800">Cronograma</h2>
+            <span style="font-size:14px;color:#5F6259">{{ ev.nActLabel }}</span>
+          </div>
+          <sc-if value="{{ evHasSched }}" hint-placeholder-val="{{ false }}">
+            <ol style="list-style:none;margin:0;padding:0">
+              <sc-for list="{{ evSched }}" as="s" hint-placeholder-count="3">
+                <li style="display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr);gap:4px 20px;padding:16px 24px;border-top:1px solid #F2EEE7">
+                  <span style="font-size:14px;font-weight:700;color:#3E6B4F">{{ s.time }}</span>
+                  <span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700">{{ s.act }}</span><span style="font-size:14px;color:#5F6259">Responsable: {{ s.who }}</span></span>
+                </li>
+              </sc-for>
+            </ol>
+          </sc-if>
+          <sc-if value="{{ evNoSched }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:36px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+              <span aria-hidden="true" style="width:44px;height:44px;border-radius:12px;background:#F4F0E8;color:#6B5A40;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:24px;line-height:1">event_busy</span>
+              <div style="font-size:16px;font-weight:800">Este evento aún no tiene cronograma</div>
+              <div style="font-size:14px;color:#5F6259;max-width:360px">Cuando los organizadores publiquen las actividades aparecerán aquí.</div>
+            </div>
+          </sc-if>
+        </section>
+      </div>
+      <aside style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <h2 style="margin:0;font-size:17px;font-weight:800">Detalles</h2>
+        <dl style="margin:0;display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ ev.facts }}" as="f" hint-placeholder-count="4">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span aria-hidden="true" style="flex:none;width:36px;height:36px;border-radius:10px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ f.icon }}</span>
+              <div><dt style="font-size:13px;color:#5F6259">{{ f.k }}</dt><dd style="margin:0;font-size:15px;font-weight:700">{{ f.v }}</dd></div>
+            </div>
+          </sc-for>
+        </dl>
+      </aside>
+    </div>
+  </div>
+</sc-if>
+
+<!-- CRONOGRAMAS -->
+<sc-if value="{{ is.cronogramas }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Cronogramas" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Cronogramas</h1>
+      <p style="margin:0;font-size:15px;color:#5F6259">Actividades programadas de cada evento.</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between">
+      <label style="display:flex;flex-direction:column;gap:6px;min-width:260px">
+        <span style="font-size:14px;font-weight:700">Evento</span>
+        <select value="{{ cronoEv }}" onChange="{{ onCronoEv }}" style="height:44px;padding:0 12px;border:1px solid #DDD6CA;border-radius:10px;background:#fff;font-size:15px;color:#23261F;cursor:pointer">
+          <option value="all">Todos los eventos</option>
+          <sc-for list="{{ evOptions }}" as="o" hint-placeholder-count="4">
+            <option value="{{ o.id }}">{{ o.label }}</option>
+          </sc-for>
+        </select>
+      </label>
+      <span style="font-size:14px;color:#5F6259">{{ cronoCountLabel }}</span>
+    </div>
+    <sc-if value="{{ cronoHas }}" hint-placeholder-val="{{ true }}">
+      <section style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;overflow:hidden">
+        <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+          <table style="width:100%;border-collapse:collapse;font-size:15px">
+            <thead>
+              <tr style="background:#FBFAF7">
+                <th scope="col" style="text-align:left;padding:14px 20px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Actividad</th>
+                <th scope="col" style="text-align:left;padding:14px 20px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Evento</th>
+                <th scope="col" style="text-align:left;padding:14px 20px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Horario</th>
+                <th scope="col" style="text-align:left;padding:14px 20px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Responsable</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ cronoRows }}" as="r" hint-placeholder-count="4">
+                <tr style="border-top:1px solid #F2EEE7">
+                  <td style="padding:16px 20px;font-weight:700">{{ r.act }}</td>
+                  <td style="padding:16px 20px"><button onClick="{{ r.openEv }}" style="border:0;background:none;padding:0;color:#3E6B4F;font-size:15px;font-weight:700;cursor:pointer" style-hover="text-decoration:underline">{{ r.evName }}</button><div style="font-size:13px;color:#5F6259">{{ r.evDate }}</div></td>
+                  <td style="padding:16px 20px;color:#3A3D35">{{ r.time }}</td>
+                  <td style="padding:16px 20px;color:#3A3D35">{{ r.who }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </sc-if>
+        <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+          <ul style="list-style:none;margin:0;padding:0">
+            <sc-for list="{{ cronoRows }}" as="r" hint-placeholder-count="3">
+              <li style="padding:16px 20px;border-top:1px solid #F2EEE7;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:14px;font-weight:700;color:#3E6B4F">{{ r.time }}</span>
+                <span style="font-size:16px;font-weight:700">{{ r.act }}</span>
+                <span style="font-size:14px;color:#5F6259">{{ r.evName }} · {{ r.who }}</span>
+              </li>
+            </sc-for>
+          </ul>
+        </sc-if>
+      </section>
+    </sc-if>
+    <sc-if value="{{ cronoEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px dashed #D3CCBF;border-radius:16px;padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+        <span aria-hidden="true" style="width:48px;height:48px;border-radius:12px;background:#F4F0E8;color:#6B5A40;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:26px;line-height:1">event_busy</span>
+        <div style="font-size:17px;font-weight:800">{{ cronoEmptyTitle }}</div>
+        <div style="font-size:15px;color:#5F6259;max-width:380px">Los organizadores aún no han publicado actividades para este evento.</div>
+        <button onClick="{{ openCronoEv }}" style="margin-top:6px;height:44px;padding:0 18px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Ver detalle del evento</button>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<!-- MINISTERIOS -->
+<sc-if value="{{ is.ministerios }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Ministerios" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Ministerios</h1>
+      <p style="margin:0;font-size:15px;color:#5F6259">Conoce los ministerios de la iglesia y a sus integrantes. {{ minCount }} ministerios.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px">
+      <sc-for list="{{ minList }}" as="m" hint-placeholder-count="6">
+        <button onClick="{{ m.open }}" style="text-align:left;color:inherit;background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;cursor:pointer" style-hover="border-color:#B9CDBE;box-shadow:0 4px 14px rgba(35,38,31,0.06)">
+          <span aria-hidden="true" style="width:40px;height:40px;border-radius:10px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:22px;line-height:1">{{ m.icon }}</span>
+          <span style="font-size:17px;font-weight:800">{{ m.name }}</span>
+          <span style="font-size:14px;line-height:1.5;color:#5F6259;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1">{{ m.desc }}</span>
+          <span style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #F2EEE7;font-size:14px">
+            <span style="color:#4C5047">{{ m.membersLabel }}</span>
+            <span style="display:flex;align-items:center;gap:2px;color:#3E6B4F;font-weight:700">Ver detalle<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">chevron_right</span></span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<!-- DETALLE MINISTERIO -->
+<sc-if value="{{ is.ministerio }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Detalle de ministerio" style="display:flex;flex-direction:column;gap:24px">
+    <nav aria-label="Ruta" style="display:flex;align-items:center;gap:6px;font-size:14px;color:#5F6259">
+      <button onClick="{{ goMinisterios }}" style="display:flex;align-items:center;gap:4px;border:0;background:none;color:#3E6B4F;font-size:14px;font-weight:700;cursor:pointer;padding:6px 4px;border-radius:8px" style-hover="text-decoration:underline"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">arrow_back</span>Ministerios</button>
+      <span aria-hidden="true">/</span><span>{{ min.name }}</span>
+    </nav>
+    <div style="display:flex;gap:16px;align-items:center">
+      <span aria-hidden="true" style="width:56px;height:56px;border-radius:14px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:30px;line-height:1">{{ min.icon }}</span>
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">{{ min.name }}</h1>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px;align-items:start">
+      <section style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:10px">
+        <h2 style="margin:0;font-size:17px;font-weight:800">Acerca del ministerio</h2>
+        <p style="margin:0;font-size:16px;line-height:1.6;color:#3A3D35;text-wrap:pretty">{{ min.desc }}</p>
+      </section>
+      <section style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;overflow:hidden">
+        <div style="padding:20px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #EFEAE1">
+          <h2 style="margin:0;font-size:17px;font-weight:800">Integrantes</h2>
+          <span style="font-size:14px;color:#5F6259">{{ min.membersLabel }}</span>
+        </div>
+        <ul style="list-style:none;margin:0;padding:0">
+          <sc-for list="{{ min.members }}" as="p" hint-placeholder-count="4">
+            <li style="display:flex;align-items:center;gap:12px;padding:12px 24px;border-top:1px solid #F2EEE7">
+              <span aria-hidden="true" style="width:36px;height:36px;border-radius:50%;background:#F1EADF;color:#5E4E37;display:grid;place-items:center;font-size:13px;font-weight:800">{{ p.ini }}</span>
+              <span style="flex:1;font-size:15px;font-weight:700">{{ p.name }}</span>
+              <span style="font-size:12px;font-weight:700;padding:3px 8px;border-radius:10px;background:{{ p.roleBg }};color:{{ p.roleColor }}">{{ p.role }}</span>
+            </li>
+          </sc-for>
+        </ul>
+      </section>
+    </div>
+  </div>
+</sc-if>
+
+<!-- NOTIFICACIONES -->
+<sc-if value="{{ is.notificaciones }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Notificaciones" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Notificaciones</h1>
+      <p style="margin:0;font-size:15px;color:#5F6259">{{ notifSummary }}</p>
+    </div>
+    <div role="group" aria-label="Filtrar notificaciones" style="align-self:flex-start;display:flex;gap:4px;padding:4px;background:#EFEAE1;border-radius:12px">
+      <sc-for list="{{ notifTabs }}" as="t" hint-placeholder-count="2">
+        <button onClick="{{ t.onClick }}" aria-pressed="{{ t.pressed }}" style="height:36px;padding:0 14px;border:0;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;background:{{ t.bg }};color:{{ t.color }};box-shadow:{{ t.shadow }}">{{ t.label }} · {{ t.count }}</button>
+      </sc-for>
+    </div>
+    <sc-if value="{{ notifHas }}" hint-placeholder-val="{{ true }}">
+      <ul style="list-style:none;margin:0;padding:0;background:#fff;border:1px solid #E6E1D8;border-radius:16px;overflow:hidden">
+        <sc-for list="{{ notifList }}" as="n" hint-placeholder-count="5">
+          <li style="border-top:1px solid #F2EEE7;display:flex;align-items:stretch;background:{{ n.bg }}">
+            <button onClick="{{ n.open }}" aria-label="{{ n.aria }}" style="flex:1;min-width:0;text-align:left;color:inherit;border:0;padding:16px 20px;display:flex;gap:14px;align-items:flex-start;cursor:pointer;background:{{ n.bg }}" style-hover="background:#F6F3EC">
+              <span aria-hidden="true" style="flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:20px;line-height:1;background:{{ n.iconBg }};color:{{ n.iconColor }}">notifications</span>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                <span style="display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap">
+                  <span style="font-size:15px;font-weight:{{ n.weight }}">{{ n.title }}</span>
+                  <span style="font-size:13px;color:#5F6259;white-space:nowrap">{{ n.dateLabel }}</span>
+                </span>
+                <span style="font-size:14px;color:#5F6259;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ n.preview }}</span>
+              </span>
+              <sc-if value="{{ n.unread }}" hint-placeholder-val="{{ false }}">
+                <span style="flex:none;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#2B5A3E;margin-top:4px"><span style="width:8px;height:8px;border-radius:50%;background:#3E6B4F"></span>Nueva</span>
+              </sc-if>
+            </button>
+            <button onClick="{{ n.del }}" aria-label="{{ n.delAria }}" title="Eliminar notificación" style="flex:none;align-self:center;width:44px;height:44px;margin-right:10px;border:0;border-radius:10px;background:transparent;color:#6B6E65;cursor:pointer;display:grid;place-items:center" style-hover="background:#FBEDEA;color:#A3372A"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">delete</span></button>
+          </li>
+        </sc-for>
+      </ul>
+    </sc-if>
+    <sc-if value="{{ notifEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px dashed #D3CCBF;border-radius:16px;padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+        <span aria-hidden="true" style="width:48px;height:48px;border-radius:12px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:26px;line-height:1">done_all</span>
+        <div style="font-size:17px;font-weight:800">Estás al día</div>
+        <div style="font-size:15px;color:#5F6259">{{ notifEmptyText }}</div>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<!-- DETALLE NOTIFICACIÓN -->
+<sc-if value="{{ is.notificacion }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Detalle de notificación" style="display:flex;flex-direction:column;gap:24px;max-width:760px">
+    <nav aria-label="Ruta" style="display:flex;align-items:center;gap:6px;font-size:14px;color:#5F6259">
+      <button onClick="{{ goNotifs }}" style="display:flex;align-items:center;gap:4px;border:0;background:none;color:#3E6B4F;font-size:14px;font-weight:700;cursor:pointer;padding:6px 4px;border-radius:8px" style-hover="text-decoration:underline"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">arrow_back</span>Notificaciones</button>
+      <button onClick="{{ notif.del }}" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:1px solid #E7C3BC;border-radius:10px;background:#fff;color:#A3372A;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#FBEDEA"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">delete</span>Eliminar</button>
+    </nav>
+    <article style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:20px">
+      <header style="display:flex;gap:16px;align-items:flex-start">
+        <span aria-hidden="true" style="flex:none;width:48px;height:48px;border-radius:50%;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:24px;line-height:1">notifications</span>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <h1 style="margin:0;font-size:22px;font-weight:800;line-height:1.3">{{ notif.title }}</h1>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;color:#5F6259">
+            <span>{{ notif.dateLabel }}</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:12px;background:#F1EADF;color:#5E4E37;font-size:12px;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:14px;line-height:1">done_all</span>Leída</span>
+          </div>
+        </div>
+      </header>
+      <div style="height:1px;background:#EFEAE1"></div>
+      <p style="margin:0;font-size:16px;line-height:1.7;color:#2F322B;white-space:pre-line">{{ notif.body }}</p>
+    </article>
+  </div>
+</sc-if>
+
+<!-- PERFIL -->
+<sc-if value="{{ is.perfil }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Mi perfil" style="display:flex;flex-direction:column;gap:20px;max-width:820px;margin:0 auto;width:100%">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Mi perfil</h1>
+      <p style="margin:0;font-size:15px;color:#5F6259">Consulta y actualiza tus datos personales.</p>
+    </div>
+    <section style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <span aria-hidden="true" style="width:56px;height:56px;border-radius:50%;background:#3E6B4F;color:#fff;display:grid;place-items:center;font-size:20px;font-weight:800">{{ initials }}</span>
+      <div style="flex:1;min-width:180px">
+        <div style="font-size:18px;font-weight:800">{{ fullName }}</div>
+        <div style="font-size:14px;color:#5F6259">{{ saved.correo }}</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <span style="display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:14px;background:#F1EADF;color:#5E4E37;font-size:13px;font-weight:700">Miembro</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;background:#E3EEE5;color:#2B5A3E;font-size:13px;font-weight:700"><span style="width:8px;height:8px;border-radius:50%;background:#2F7D4F"></span>Activo</span>
+      </div>
+    </section>
+
+    <form onSubmit="{{ saveProfile }}" novalidate="true" style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;overflow:hidden">
+      <div style="padding:24px;display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+          <h2 style="margin:0;font-size:17px;font-weight:800">Datos personales</h2>
+          <span style="font-size:13px;color:#5F6259">Todos los campos son obligatorios salvo el teléfono.</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:18px">
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:14px;font-weight:700">Nombre</span>
+            <input maxlength="50" value="{{ fv.nombre.value }}" onChange="{{ fv.nombre.onChange }}" onBlur="{{ fv.nombre.onBlur }}" aria-invalid="{{ fv.nombre.hasErr }}" autocomplete="given-name" style="height:44px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ fv.nombre.border }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0">
+            <sc-if value="{{ fv.nombre.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="display:flex;gap:6px;align-items:center;font-size:13px;color:#A3372A"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">error</span>{{ fv.nombre.err }}</span></sc-if>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:14px;font-weight:700">Apellido</span>
+            <input maxlength="50" value="{{ fv.apellido.value }}" onChange="{{ fv.apellido.onChange }}" onBlur="{{ fv.apellido.onBlur }}" aria-invalid="{{ fv.apellido.hasErr }}" autocomplete="family-name" style="height:44px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ fv.apellido.border }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0">
+            <sc-if value="{{ fv.apellido.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="display:flex;gap:6px;align-items:center;font-size:13px;color:#A3372A"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">error</span>{{ fv.apellido.err }}</span></sc-if>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:14px;font-weight:700">Correo</span>
+            <input type="email" maxlength="100" value="{{ fv.correo.value }}" onChange="{{ fv.correo.onChange }}" onBlur="{{ fv.correo.onBlur }}" aria-invalid="{{ fv.correo.hasErr }}" autocomplete="email" style="height:44px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ fv.correo.border }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0">
+            <sc-if value="{{ fv.correo.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="display:flex;gap:6px;align-items:center;font-size:13px;color:#A3372A"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">error</span>{{ fv.correo.err }}</span></sc-if>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:14px;font-weight:700">Teléfono <span style="font-weight:400;color:#5F6259">(opcional)</span></span>
+            <input type="tel" inputmode="tel" maxlength="16" placeholder="+573001234567" value="{{ fv.telefono.value }}" onChange="{{ fv.telefono.onChange }}" onBlur="{{ fv.telefono.onBlur }}" aria-invalid="{{ fv.telefono.hasErr }}" autocomplete="tel" style="height:44px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ fv.telefono.border }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><sc-if value="{{ fv.telefono.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ fv.telefono.err }}</span></sc-if><span style="font-size:13px;color:#5F6259">Solo números; el indicativo con + es opcional.</span>
+          </label>
+        </div>
+      </div>
+      <div style="padding:16px 24px;background:#FBFAF7;border-top:1px solid #EFEAE1;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:6px;font-size:14px;color:{{ profStatus.color }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">{{ profStatus.icon }}</span>{{ profStatus.text }}</span>
+        <div style="display:flex;gap:10px">
+          <sc-if value="{{ dirty }}" hint-placeholder-val="{{ false }}">
+            <button type="button" onClick="{{ discard }}" style="height:44px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Descartar</button>
+          </sc-if>
+          <button type="submit" disabled="{{ saveBtn.disabled }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border:0;border-radius:10px;font-size:15px;font-weight:700;background:{{ saveBtn.bg }};color:{{ saveBtn.color }};cursor:{{ saveBtn.cursor }}">
+            <sc-if value="{{ saving }}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">progress_activity</span></sc-if>
+            {{ saveBtn.label }}
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <form onSubmit="{{ savePw }}" novalidate="true" style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;overflow:hidden">
+      <div style="padding:24px;display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <h2 style="margin:0;font-size:17px;font-weight:800">Cambiar contraseña</h2>
+          <span style="font-size:14px;color:#5F6259">Solo puedes cambiar tu propia contraseña.</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:18px">
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:14px;font-weight:700">Nueva contraseña</span>
+            <span style="position:relative;display:block">
+              <input type="{{ pw1Type }}" value="{{ pw1 }}" onChange="{{ onPw1 }}" maxlength="20" autocomplete="new-password" style="width:100%;height:44px;padding:0 48px 0 12px;border:1px solid #DDD6CA;border-radius:10px;background:#fff;font-size:15px;color:#23261F" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0">
+              <button type="button" onClick="{{ toggle1 }}" aria-label="{{ eye1Aria }}" style="position:absolute;right:2px;top:2px;width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:#5F6259;cursor:pointer;display:grid;place-items:center"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ eye1 }}</span></button>
+            </span>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:14px;font-weight:700">Confirmar contraseña</span>
+            <span style="position:relative;display:block">
+              <input type="{{ pw2Type }}" value="{{ pw2 }}" onChange="{{ onPw2 }}" maxlength="20" autocomplete="new-password" style="width:100%;height:44px;padding:0 48px 0 12px;border:1px solid #DDD6CA;border-radius:10px;background:#fff;font-size:15px;color:#23261F" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0">
+              <button type="button" onClick="{{ toggle2 }}" aria-label="{{ eye2Aria }}" style="position:absolute;right:2px;top:2px;width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:#5F6259;cursor:pointer;display:grid;place-items:center"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ eye2 }}</span></button>
+            </span>
+          </label>
+        </div>
+        <ul aria-live="polite" style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 24px">
+          <sc-for list="{{ pwRules }}" as="r" hint-placeholder-count="2">
+            <li style="display:flex;align-items:center;gap:6px;font-size:14px;color:{{ r.color }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">{{ r.icon }}</span>{{ r.label }}</li>
+          </sc-for>
+        </ul>
+      </div>
+      <div style="padding:16px 24px;background:#FBFAF7;border-top:1px solid #EFEAE1;display:flex;justify-content:flex-end">
+        <button type="submit" disabled="{{ pwBtn.disabled }}" style="height:44px;padding:0 18px;border:0;border-radius:10px;font-size:15px;font-weight:700;background:{{ pwBtn.bg }};color:{{ pwBtn.color }};cursor:{{ pwBtn.cursor }}">{{ pwBtn.label }}</button>
+      </div>
+    </form>
+  </div>
+</sc-if>
+
+<!-- GUÍA -->
+<sc-if value="{{ is.guia }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Guía de rediseño" style="display:flex;flex-direction:column;gap:48px;max-width:960px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font-size:13px;font-weight:800;letter-spacing:0.08em;color:#3E6B4F">CHURCH CONNECT · REDISEÑO UX/UI</span>
+      <h1 style="margin:0;font-size:34px;font-weight:800;letter-spacing:-0.02em">Guía del rediseño</h1>
+      <p style="margin:0;font-size:16px;line-height:1.6;color:#4C5047;text-wrap:pretty">Diagnóstico de las 7 capturas, sistema visual, flujos y cambios por pantalla. El prototipo navegable aplica todo lo descrito aquí; usa el selector inferior para volver a él.</p>
+    </div>
+
+    <section style="display:flex;flex-direction:column;gap:16px">
+      <h2 style="margin:0;font-size:22px;font-weight:800">1. Diagnóstico</h2>
+      <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;background:#fff;border:1px solid #E6E1D8;border-radius:16px;overflow:hidden">
+        <sc-for list="{{ diag }}" as="d" hint-placeholder-count="10">
+          <li style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;padding:16px 20px;border-top:1px solid #F2EEE7">
+            <span style="font-size:14px;font-weight:800;color:#3E6B4F">{{ d.n }}</span>
+            <span style="display:flex;flex-direction:column;gap:4px"><span style="font-size:15px;font-weight:800">{{ d.t }}</span><span style="font-size:15px;line-height:1.55;color:#4C5047">{{ d.d }}</span></span>
+          </li>
+        </sc-for>
+      </ol>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:16px">
+      <h2 style="margin:0;font-size:22px;font-weight:800">2. Paleta</h2>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#4C5047">Se conserva el verde bosque de la barra, el fondo marfil y los acentos arena. El verde pálido del botón «Guardar» se elimina: parecía deshabilitado. Los grises de texto se oscurecen para cumplir 4.5:1.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:12px">
+        <sc-for list="{{ palette }}" as="c" hint-placeholder-count="12">
+          <div style="background:#fff;border:1px solid #E6E1D8;border-radius:12px;overflow:hidden">
+            <div style="height:64px;background:{{ c.hex }};border-bottom:1px solid #EFEAE1"></div>
+            <div style="padding:10px 12px;display:flex;flex-direction:column;gap:2px">
+              <span style="font-size:14px;font-weight:800">{{ c.name }}</span>
+              <span style="font-size:13px;font-family:ui-monospace,Menlo,monospace;color:#4C5047">{{ c.hex }}</span>
+              <span style="font-size:13px;color:#5F6259">{{ c.role }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:16px">
+      <h2 style="margin:0;font-size:22px;font-weight:800">3. Sistema</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px">
+        <div style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <span style="font-size:13px;font-weight:800;color:#3E6B4F">TIPOGRAFÍA · Nunito Sans</span>
+          <span style="font-size:30px;font-weight:800;letter-spacing:-0.015em">Título 30/800</span>
+          <span style="font-size:22px;font-weight:800">Página 28 · Sección 22/800</span>
+          <span style="font-size:17px;font-weight:800">Tarjeta 17–18/800</span>
+          <span style="font-size:16px">Cuerpo 15–16/400 · interlínea 1.5–1.6</span>
+          <span style="font-size:13px;color:#5F6259">Auxiliar 13/400 (mínimo)</span>
+        </div>
+        <div style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;font-size:15px;line-height:1.5;color:#3A3D35">
+          <span style="font-size:13px;font-weight:800;color:#3E6B4F">ESPACIADO, RADIOS, ELEVACIÓN</span>
+          <span>Escala 4 · 8 · 12 · 16 · 20 · 24 · 32 · 48</span>
+          <span>Radios: 8 controles pequeños · 10 botones y campos · 12–16 tarjetas · píldora en etiquetas</span>
+          <span>Elevación: borde 1px #E6E1D8 en reposo; sombra suave solo en hover y en menús</span>
+          <span>Contenedor único de 1120px para todas las secciones</span>
+          <span>Objetivos táctiles de 44px mínimo</span>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:20px">
+        <span style="font-size:13px;font-weight:800;color:#3E6B4F">BOTONES Y ESTADOS</span>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+          <span style="display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:10px;background:#3E6B4F;color:#fff;font-size:15px;font-weight:700">Primario</span>
+          <span style="display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:10px;background:#2F5540;color:#fff;font-size:15px;font-weight:700">Hover</span>
+          <span style="display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:10px;background:#3E6B4F;color:#fff;font-size:15px;font-weight:700;outline:3px solid #8DB59A;outline-offset:2px">Foco</span>
+          <span style="display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:10px;background:#3E6B4F;color:#fff;font-size:15px;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">progress_activity</span>Guardando…</span>
+          <span style="display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:10px;background:#ECE7DE;color:#7C7E76;font-size:15px;font-weight:700">Deshabilitado</span>
+          <span style="display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:10px;background:#fff;border:1px solid #D3CCBF;color:#23261F;font-size:15px;font-weight:700">Secundario</span>
+          <span style="display:inline-flex;align-items:center;height:44px;padding:0 12px;color:#3E6B4F;font-size:15px;font-weight:700">Enlace</span>
+          <span style="display:inline-flex;align-items:center;height:44px;padding:0 12px;color:#A3372A;font-size:15px;font-weight:700">Destructivo</span>
+        </div>
+        <span style="font-size:13px;font-weight:800;color:#3E6B4F">CAMPOS</span>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px">
+          <span style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Reposo</span><span style="height:44px;border:1px solid #DDD6CA;border-radius:10px;padding:0 12px;display:flex;align-items:center;font-size:15px">Regino</span></span>
+          <span style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Foco</span><span style="height:44px;border:1px solid #3E6B4F;outline:3px solid #CFE0D3;border-radius:10px;padding:0 12px;display:flex;align-items:center;font-size:15px">Regino</span></span>
+          <span style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Error</span><span style="height:44px;border:1px solid #A3372A;border-radius:10px;padding:0 12px;display:flex;align-items:center;font-size:15px;color:#5F6259">regino@</span><span style="display:flex;gap:6px;align-items:center;font-size:13px;color:#A3372A"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">error</span>Escribe un correo válido</span></span>
+        </div>
+        <span style="font-size:13px;font-weight:800;color:#3E6B4F">ETIQUETAS</span>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span style="display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:14px;background:#F1EADF;color:#5E4E37;font-size:13px;font-weight:700">Rol · Miembro</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;background:#E3EEE5;color:#2B5A3E;font-size:13px;font-weight:700"><span style="width:8px;height:8px;border-radius:50%;background:#2F7D4F"></span>Éxito · Activo</span>
+          <span style="display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:14px;background:#FBF0D9;color:#7A5410;font-size:13px;font-weight:700">Aviso</span>
+          <span style="display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:14px;background:#FBE9E5;color:#A3372A;font-size:13px;font-weight:700">Error</span>
+          <span style="display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:14px;background:#E4EEF6;color:#2A5C82;font-size:13px;font-weight:700">Información</span>
+          <span style="display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:14px;background:#EFEAE1;color:#55594F;font-size:13px;font-weight:700">Neutral · Finalizado</span>
+        </div>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:16px">
+      <h2 style="margin:0;font-size:22px;font-weight:800">4. Arquitectura y flujos</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px">
+        <sc-for list="{{ flows }}" as="f" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <span style="font-size:16px;font-weight:800">{{ f.t }}</span>
+            <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ f.steps }}" as="s" hint-placeholder-count="3">
+                <li style="display:flex;gap:10px;font-size:14px;line-height:1.5;color:#3A3D35"><span style="flex:none;width:22px;height:22px;border-radius:50%;background:#EEF3EE;color:#2F5540;font-size:12px;font-weight:800;display:grid;place-items:center">{{ s.n }}</span>{{ s.t }}</li>
+              </sc-for>
+            </ol>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:16px">
+      <h2 style="margin:0;font-size:22px;font-weight:800">5. Cambios por pantalla</h2>
+      <div style="display:flex;flex-direction:column;background:#fff;border:1px solid #E6E1D8;border-radius:16px;overflow:hidden">
+        <sc-for list="{{ perScreen }}" as="p" hint-placeholder-count="7">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:8px 24px;padding:18px 20px;border-top:1px solid #F2EEE7">
+            <button onClick="{{ p.go }}" style="justify-self:start;border:0;background:none;padding:0;color:#3E6B4F;font-size:16px;font-weight:800;cursor:pointer;text-align:left" style-hover="text-decoration:underline">{{ p.t }} →</button>
+            <span style="grid-column:span 3;font-size:15px;line-height:1.55;color:#3A3D35;min-width:0">{{ p.d }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <h2 style="margin:0;font-size:22px;font-weight:800">6. Recomendaciones aparte</h2>
+        <p style="margin:0;font-size:14px;color:#5F6259">Requieren funcionalidad nueva; no están en el prototipo.</p>
+        <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.5;color:#3A3D35">
+          <li>Marcar todas las notificaciones como leídas.</li>
+          <li>Añadir un evento al calendario del teléfono.</li>
+          <li>Inscripción a eventos según la capacidad disponible.</li>
+          <li>Validar el formato del teléfono (hoy acepta letras, p. ej. «1234dfdfd»).</li>
+          <li>Conservar saltos de línea al redactar avisos.</li>
+        </ul>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <h2 style="margin:0;font-size:22px;font-weight:800">7. Validación y límites</h2>
+        <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.5;color:#3A3D35">
+          <li>Contraste de texto revisado contra 4.5:1 en blanco, marfil y verde.</li>
+          <li>Navegación con teclado, foco visible y Esc para cerrar menús.</li>
+          <li>Estados nunca solo por color: icono + texto.</li>
+          <li>Diseño fluido de 360px a escritorio; la tabla pasa a lista en móvil.</li>
+          <li>Sin acceso al código: datos de ejemplo, integrantes y responsables son ilustrativos. No se probó con lector de pantalla.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</sc-if>
+
+</main>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div role="status" aria-live="polite" style="position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:12px;background:#23261F;color:#fff;font-size:15px;box-shadow:0 12px 32px rgba(35,38,31,0.25);max-width:calc(100% - 32px)">
+    <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#9FD0AE">check_circle</span>{{ toast }}<sc-if value="{{ hasUndo }}" hint-placeholder-val="{{ false }}"><button onClick="{{ undo }}" style="margin-left:6px;height:32px;padding:0 10px;border:0;border-radius:8px;background:rgba(255,255,255,0.14);color:#CFE6D5;font-size:14px;font-weight:800;cursor:pointer">Deshacer</button></sc-if>
+  </div>
+</sc-if>
+
+<div style="position:fixed;left:16px;bottom:16px;z-index:40;display:flex;gap:4px;padding:4px;background:#23261F;border-radius:12px;box-shadow:0 8px 24px rgba(35,38,31,0.25)">
+  <button onClick="{{ goProto }}" style="height:36px;padding:0 12px;border:0;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;background:{{ modeProto.bg }};color:{{ modeProto.color }}">Prototipo</button>
+  <button onClick="{{ goGuia }}" style="height:36px;padding:0 12px;border:0;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;background:{{ modeGuia.bg }};color:{{ modeGuia.color }}">Guía de rediseño</button>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const TODAY = '2026-10-08';
+const MONTHS = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEPT','OCT','NOV','DIC'];
+const MLONG = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const EVENTS = [
+  { id:'e1', name:'Vigilia de oración', date:'2026-10-07', time:'04:00 – 07:00 a. m.', place:'Templo central', capacity:90, desc:'Tiempo de oración congregacional antes del amanecer.' },
+  { id:'e2', name:'Regalar flores', date:'2026-10-14', time:'06:00 – 11:00 a. m.', place:'Parques del Río', capacity:80, desc:'Evento que tiene como propósito testificar por medio de flores a los demás.' },
+  { id:'e3', name:'Culto de jóvenes', date:'2026-10-17', time:'07:00 – 09:00 p. m.', place:'Templo central', capacity:120, desc:'Reunión de jóvenes con alabanza, estudio de la Biblia y convivencia.' },
+  { id:'e4', name:'Santa Cena', date:'2026-10-24', time:'10:00 a. m. – 12:30 p. m.', place:'Templo central', capacity:200, desc:'Servicio de comunión para toda la congregación.' },
+];
+const SCHED = [
+  { ev:'e2', act:'Reunión y oración inicial', time:'06:00 – 06:30 a. m.', who:'Oración' },
+  { ev:'e2', act:'Entrega de flores en el parque', time:'06:30 – 10:00 a. m.', who:'Diaconado' },
+  { ev:'e2', act:'Cierre y testimonios', time:'10:00 – 11:00 a. m.', who:'Predicación' },
+  { ev:'e3', act:'Alabanza', time:'07:00 – 07:30 p. m.', who:'Alabanza' },
+  { ev:'e3', act:'Estudio bíblico', time:'07:30 – 08:30 p. m.', who:'Predicación' },
+];
+const MINS = [
+  { id:'m1', name:'Escuela Sabática', icon:'menu_book', desc:'Enfocado en la lectura y estudio de la lección de escuela sabática para adultos.', members:['Ana Rojas','Luis Pardo','Marta Gil','Jorge Peña'] },
+  { id:'m2', name:'Predicación', icon:'record_voice_over', desc:'Encargado de compartir y enseñar la palabra de Dios.', members:['Samuel Díaz','Raúl Ortiz','Elena Cruz'] },
+  { id:'m3', name:'Alabanza', icon:'music_note', desc:'Encargados de dirigir la alabanza mediante el canto durante los cultos y actividades de la iglesia.', members:['Sofía León','Daniel Mora','Clara Ruiz','Iván Soto','Paula Vera'] },
+  { id:'m4', name:'Oración', icon:'volunteer_activism', desc:'Encargados de orar por las peticiones y agradecimientos de la iglesia.', members:['Rosa Medina','Tomás Vidal','Regino Puentes Meza'] },
+  { id:'m5', name:'Diaconado', icon:'handshake', desc:'Encargado de servir y apoyar a la congregación, colaborando en la organización de actividades, atención a los hermanos y cuidado de las instalaciones.', members:['Pedro Lara','Julia Ramos','Andrés Silva','Nora Paz'] },
+  { id:'m6', name:'Infantes', icon:'child_care', desc:'Clase dedicada a niños menores de siete años, enfocada en la enseñanza de la Biblia de forma dinámica para estas edades.', members:['Laura Gómez','Inés Castro'] },
+];
+const NOTIFS = [
+  { id:'n1', title:'Funcionó, gracias a Diosito, yay', body:'Me siento muy feliz porque funcionó, tenemos una prueba funcional.', ts:'2026-09-21T15:53', read:true },
+  { id:'n2', title:'Probando manualmente la plantilla 2.0', body:'Manden porfa pantallazo de lo que les muestre.', ts:'2026-09-21T17:21', read:true },
+  { id:'n3', title:'Probando manualmente la plantilla 3.0', body:'Mándenme pantallazo de lo que les aparezca.\nAtte, Marcela Vega', ts:'2026-09-21T17:32', read:false },
+  { id:'n4', title:'Probando manualmente la plantilla', body:'Quiero que me manden pantallazo de lo que les llegue al correo, gracias.', ts:'2026-09-21T17:12', read:true },
+  { id:'n5', title:'Mira la campanita', body:'Holis, hola, hello, hi.\nAtte, Marcela Vega', ts:'2026-10-08T22:11', read:false },
+];
+const PROFILE = { nombre:'Regino', apellido:'Puentes Meza', correo:'reginopm0897@gmail.com', telefono:'1234dfdfd' };
+const LETTERS = 'A-Za-zÁÉÍÓÚÜÑáéíóúüñ';
+const NAME_RE = new RegExp('^[' + LETTERS + ']+( [' + LETTERS + ']+)*$');
+const cleanName = v => v.replace(new RegExp('[^' + LETTERS + ' ]', 'g'), '').replace(/ {2,}/g, ' ').replace(/^ /, '').slice(0, 50);
+const cleanPhone = v => { const t = v.replace(/[^\d+]/g, ''); return ((t.startsWith('+') ? '+' : '') + t.replace(/\+/g, '')).slice(0, 16); };
+const nameErr = (v, label) => { const t = v.trim(); if (!t) return `Ingresa ${label}.`; if (t.length < 2) return 'Debe tener al menos 2 letras.'; if (!NAME_RE.test(t)) return 'Usa solo letras, sin números ni caracteres especiales.'; return ''; };
+const phoneErr = v => !v ? '' : /^\+?\d{7,15}$/.test(v) ? '' : 'Usa solo números (7 a 15) y, si quieres, el indicativo con + al inicio.';
+const mailErr = v => { const t = v.trim(); if (!t) return 'Ingresa el correo.'; if (t.length > 100) return 'Máximo 100 caracteres.'; return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(t) ? '' : 'Escribe un correo válido, por ejemplo nombre@dominio.com.'; };
+const pd = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const fmtTs = ts => { const d = new Date(ts); let h = d.getHours(); const ap = h >= 12 ? 'p. m.' : 'a. m.'; h = h % 12 || 12; return `${d.getDate()} ${MONTHS[d.getMonth()].toLowerCase()} ${d.getFullYear()}, ${String(h).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} ${ap}`; };
+const ini = n => n.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+const ICON = 'Material Symbols Rounded';
+
+class Component extends DCLogic {
+  state = { screen:'inicio', evId:'e2', minId:'m1', notifId:'n1', evTab:'proximos', evQ:'', cronoEv:'all', notifTab:'todas',
+    menuOpen:false, mobOpen:false, narrow:false, toast:null, notifs:NOTIFS,
+    saved:{...PROFILE}, form:{...PROFILE}, touched:{}, tried:false, saving:false,
+    pw1:'', pw2:'', show1:false, show2:false, pwSaving:false };
+
+  componentDidMount() {
+    this.onR = () => this.setState({ narrow: window.innerWidth < 880, compact: window.innerWidth < 1120 });
+    this.onR(); window.addEventListener('resize', this.onR);
+    this.onDoc = e => { if (this.state.menuOpen && !e.target.closest('[data-usermenu]')) this.setState({ menuOpen:false }); };
+    document.addEventListener('mousedown', this.onDoc);
+    this.onKey = e => { if (e.key === 'Escape') this.setState({ menuOpen:false, mobOpen:false }); };
+    document.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onR);
+    document.removeEventListener('mousedown', this.onDoc);
+    document.removeEventListener('keydown', this.onKey);
+    clearTimeout(this.tt);
+  }
+  go(screen, extra = {}) { this.setState({ screen, menuOpen:false, mobOpen:false, ...extra }); window.scrollTo(0, 0); }
+  showToast(msg, undo = null) { clearTimeout(this.tt); this.undoFn = undo; this.setState({ toast: msg }); this.tt = setTimeout(() => { this.undoFn = null; this.setState({ toast:null }); }, undo ? 6000 : 3200); }
+  delNotif(n) { const prev = this.state.notifs; const wasDetail = this.state.screen === 'notificacion';
+    this.setState(st => ({ notifs: st.notifs.filter(x => x.id !== n.id) })); if (wasDetail) this.go('notificaciones');
+    this.showToast('Notificación eliminada.', () => { this.setState({ notifs: prev }); if (wasDetail) this.go('notificacion', { notifId:n.id }); }); }
+
+  evView(e) {
+    const d = pd(e.date); const past = e.date < TODAY;
+    const n = SCHED.filter(s => s.ev === e.id).length;
+    const diff = Math.round((d - pd(TODAY)) / 86400000);
+    return { ...e, day: String(d.getDate()).padStart(2,'0'), mon: MONTHS[d.getMonth()], past, nAct:n,
+      dateLong: `${DAYS[d.getDay()]}, ${d.getDate()} de ${MLONG[d.getMonth()]} de ${d.getFullYear()}`,
+      relLabel: diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana' : `En ${diff} días · ${DAYS[d.getDay()]}`,
+      statusLabel: past ? 'Finalizado' : 'Próximo', stBg: past ? '#EFEAE1' : '#E3EEE5', stColor: past ? '#55594F' : '#2B5A3E',
+      dateBg: past ? '#EFEAE1' : '#EEF3EE', dateColor: past ? '#55594F' : '#2F5540',
+      cronoLabel: n ? `Cronograma · ${n} actividades` : 'Sin cronograma', cronoBg: n ? '#E3EEE5' : '#F4F0E8',
+      cronoColor: n ? '#2B5A3E' : '#5E5446', cronoIcon: n ? 'event_available' : 'event_busy',
+      nActLabel: n ? `${n} actividades` : '',
+      open: () => this.go('evento', { evId: e.id }) };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const unreadN = s.notifs.filter(n => !n.read).length;
+    const go = (k, x) => () => this.go(k, x);
+    const nav = [
+      { key:'inicio', label:'Inicio', icon:'home', match:['inicio'] },
+      { key:'eventos', label:'Eventos', icon:'calendar_month', match:['eventos','evento'] },
+      { key:'cronogramas', label:'Cronogramas', icon:'list_alt', match:['cronogramas'] },
+      { key:'ministerios', label:'Ministerios', icon:'diversity_3', match:['ministerios','ministerio'] },
+      { key:'notificaciones', label:'Notificaciones', icon:'notifications', match:['notificaciones','notificacion'], badge: unreadN },
+    ];
+    const navItems = nav.map(n => { const on = n.match.includes(s.screen); return { ...n, current: on ? 'page' : undefined,
+      bg: on ? 'rgba(255,255,255,0.16)' : 'transparent', color: on ? '#fff' : '#E4EDE6', weight: on ? 700 : 600,
+      mBg: on ? '#EEF3EE' : 'transparent', hasBadge: !!n.badge, badgeAria: `${n.badge} sin leer`, onClick: go(n.key) }; });
+
+    const is = {}; ['inicio','eventos','evento','cronogramas','ministerios','ministerio','notificaciones','notificacion','perfil','guia'].forEach(k => is[k] = s.screen === k);
+
+    const evAll = EVENTS.map(e => this.evView(e));
+    const upcoming = evAll.filter(e => !e.past);
+    const nextEv = upcoming[0] || evAll[0];
+
+    const td = pd(TODAY); const h = new Date().getHours();
+    const sorted = [...s.notifs].sort((a,b) => b.ts.localeCompare(a.ts));
+    const nv = n => ({ ...n, dateLabel: fmtTs(n.ts), unread: !n.read, preview: n.body.replace(/\n/g,' · '),
+      weight: n.read ? 600 : 800, bg: n.read ? '#fff' : '#F7FAF6', iconBg: n.read ? '#F4F0E8' : '#E3EEE5', iconColor: n.read ? '#6B5A40' : '#2F5540',
+      aria: `${n.read ? '' : 'Nueva. '}${n.title}`,
+      open: () => { this.setState(st => ({ notifs: st.notifs.map(x => x.id === n.id ? { ...x, read:true } : x) })); this.go('notificacion', { notifId:n.id }); },
+      del: () => this.delNotif(n), delAria: `Eliminar ${n.title}` });
+    const unreadList = sorted.filter(n => !n.read).map(nv);
+
+    // events list
+    const q = s.evQ.trim().toLowerCase();
+    const tabF = { proximos: e => !e.past, pasados: e => e.past, todos: () => true };
+    const evList = evAll.filter(tabF[s.evTab]).filter(e => !q || (e.name + ' ' + e.place).toLowerCase().includes(q));
+    const tabBtn = (cur, key, label, count, setKey) => ({ label, count, pressed: cur === key ? 'true' : 'false',
+      bg: cur === key ? '#fff' : 'transparent', color: cur === key ? '#23261F' : '#4C5047', shadow: cur === key ? '0 1px 3px rgba(35,38,31,0.12)' : 'none',
+      onClick: () => this.setState({ [setKey]: key }) });
+    const evTabs = [
+      tabBtn(s.evTab,'proximos','Próximos', upcoming.length,'evTab'),
+      tabBtn(s.evTab,'pasados','Pasados', evAll.length - upcoming.length,'evTab'),
+      tabBtn(s.evTab,'todos','Todos', evAll.length,'evTab'),
+    ];
+
+    // event detail
+    const ev0 = evAll.find(e => e.id === s.evId) || evAll[0];
+    const ev = { ...ev0, facts: [
+      { icon:'calendar_today', k:'Fecha', v: ev0.dateLong },
+      { icon:'schedule', k:'Horario', v: ev0.time },
+      { icon:'location_on', k:'Lugar', v: ev0.place },
+      { icon:'group', k:'Capacidad', v: `${ev0.capacity} personas` } ] };
+    const evSched = SCHED.filter(x => x.ev === ev.id);
+
+    // cronogramas
+    const rows = SCHED.filter(x => s.cronoEv === 'all' || x.ev === s.cronoEv).map(x => { const e = evAll.find(v => v.id === x.ev);
+      return { ...x, evName: e.name, evDate: `${e.day} ${e.mon.toLowerCase()} 2026`, openEv: go('evento', { evId:e.id }) }; });
+    const cronoEvObj = evAll.find(e => e.id === s.cronoEv);
+
+    // ministries
+    const mv = m => ({ ...m, membersLabel: `${m.members.length} integrantes`,
+      open: go('ministerio', { minId:m.id }),
+      members: m.members.map((p, i) => ({ name:p, ini: ini(p), role: i === 0 ? 'Líder' : 'Integrante',
+        roleBg: i === 0 ? '#E3EEE5' : '#F4F0E8', roleColor: i === 0 ? '#2B5A3E' : '#5E5446' })) });
+    const min = mv(MINS.find(m => m.id === s.minId) || MINS[0]);
+
+    // notifications
+    const notifList = sorted.filter(n => s.notifTab === 'todas' || !n.read).map(nv);
+    const notif = s.notifs.length ? nv(s.notifs.find(n => n.id === s.notifId) || s.notifs[0]) : {};
+
+    // profile
+    const f = s.form;
+    const errs = { nombre: nameErr(f.nombre, 'tu nombre'), apellido: nameErr(f.apellido, 'tu apellido'), correo: mailErr(f.correo), telefono: phoneErr(f.telefono) };
+    const fv = {};
+    Object.keys(PROFILE).forEach(k => { const show = (s.touched[k] || s.tried || f[k] !== s.saved[k] || k === 'telefono') && !!errs[k];
+      fv[k] = { value: f[k], err: errs[k], hasErr: show, border: show ? '#A3372A' : '#DDD6CA',
+        onChange: e => { let v = e.target.value; v = k === 'nombre' || k === 'apellido' ? cleanName(v) : k === 'telefono' ? cleanPhone(v) : v.replace(/\s/g, '').slice(0, 100); this.setState(st => ({ form: { ...st.form, [k]: v } })); },
+        onBlur: () => this.setState(st => ({ touched: { ...st.touched, [k]: true } })) }; });
+    const dirty = Object.keys(PROFILE).some(k => f[k] !== s.saved[k]);
+    const anyErr = Object.values(errs).some(Boolean);
+    const saveOn = dirty && !anyErr && !s.saving;
+    const btn = (on, label) => ({ disabled: !on, label, bg: on ? '#3E6B4F' : '#ECE7DE', color: on ? '#fff' : '#7C7E76', cursor: on ? 'pointer' : 'not-allowed' });
+    const profStatus = s.saving ? { icon:'sync', text:'Guardando cambios…', color:'#4C5047' }
+      : (s.tried && anyErr) ? { icon:'error', text:'Revisa los campos marcados.', color:'#A3372A' }
+      : anyErr ? { icon:'info', text:'Completa o corrige los campos marcados para guardar.', color:'#7A5410' }
+      : dirty ? { icon:'edit', text:'Tienes cambios sin guardar.', color:'#7A5410' }
+      : { icon:'check_circle', text:'Tus datos están al día.', color:'#2B5A3E' };
+
+    const len = s.pw1.length; const lenOk = len >= 8 && len <= 20; const match = s.pw2.length > 0 && s.pw1 === s.pw2;
+    const rule = (ok, label, pending) => ({ label, icon: ok ? 'check_circle' : 'radio_button_unchecked', color: ok ? '#2B5A3E' : pending ? '#5F6259' : '#A3372A' });
+    const pwRules = [ rule(lenOk, 'Entre 8 y 20 caracteres', len === 0 || len < 8), rule(match, 'Ambas contraseñas coinciden', s.pw2.length === 0 || !match && s.pw2.length < s.pw1.length) ];
+    const pwOn = lenOk && match && !s.pwSaving;
+
+    const palette = [
+      { name:'Bosque 700', hex:'#3E6B4F', role:'Barra superior, botón primario, enlaces' },
+      { name:'Bosque 800', hex:'#2F5540', role:'Hover y estado presionado' },
+      { name:'Bosque 50', hex:'#EEF3EE', role:'Fondo de iconos, selección' },
+      { name:'Marfil', hex:'#F8F7F3', role:'Fondo de la aplicación' },
+      { name:'Superficie', hex:'#FFFFFF', role:'Tarjetas y formularios' },
+      { name:'Arena 100', hex:'#F1EADF', role:'Etiqueta de rol, chips' },
+      { name:'Arena 50', hex:'#F4F0E8', role:'Paneles secundarios, hover' },
+      { name:'Borde', hex:'#E6E1D8', role:'Bordes y divisores' },
+      { name:'Tinta', hex:'#23261F', role:'Texto principal' },
+      { name:'Tinta 2', hex:'#4C5047', role:'Texto de apoyo' },
+      { name:'Tinta 3', hex:'#5F6259', role:'Auxiliar (≥ 5:1 en blanco)' },
+      { name:'Éxito', hex:'#2F7D4F', role:'Activo, confirmaciones' },
+      { name:'Aviso', hex:'#9A6A12', role:'Cambios sin guardar' },
+      { name:'Error', hex:'#A3372A', role:'Errores, cerrar sesión' },
+      { name:'Info', hex:'#2A5C82', role:'Mensajes informativos' },
+    ];
+    const diag = [
+      ['Navegación escondida','Las secciones solo aparecen al abrir el menú del nombre de usuario o desde las tarjetas de Inicio. No hay forma visible de saber en qué sección estás ni de saltar a otra.'],
+      ['Inicio sin contenido propio','Inicio repite el menú como cinco tarjetas. No muestra lo que el miembro necesita: el próximo evento y los avisos pendientes.'],
+      ['Versículo en la barra','El versículo ocupa el centro de la barra en todas las pantallas y compite con la navegación; en móvil no cabe.'],
+      ['Eventos y cronogramas separados','El cronograma pertenece a un evento, pero se consulta en otra sección y filtrando. Las tarjetas solo dicen «Sin cronograma».'],
+      ['La fecha no destaca','En las tarjetas de evento la fecha tiene el mismo peso que el resto de datos y no se distingue entre próximos y pasados.'],
+      ['Notificaciones planas','Todas llevan la etiqueta «Leída» con igual peso; no hay forma de ver solo las pendientes, el orden no es cronológico y se pierden saltos de línea («aparezcaAtte»).'],
+      ['Anchos inconsistentes','Notificaciones ocupa toda la pantalla, Perfil es más estrecho y el resto usa otro ancho. Las secciones no se sienten parte del mismo producto.'],
+      ['Paginación innecesaria','«Página 1 de 1» con botones deshabilitados aparece incluso con dos registros.'],
+      ['Formulario de perfil ambiguo','El botón verde pálido parece deshabilitado sin explicar por qué; textos auxiliares de 11px con bajo contraste; asteriscos sin leyenda.'],
+      ['Contraste y textos truncados','Encabezados de tabla en mayúsculas sobre beige y descripciones cortadas con «…» sin otra pista de que hay más.'],
+    ].map((d, i) => ({ n: i + 1, t: d[0], d: d[1] }));
+    const flows = [
+      { t:'Consultar el próximo evento', steps:['Inicio muestra el próximo evento con fecha relativa','Clic abre el detalle','El cronograma está dentro del detalle'] },
+      { t:'Leer un aviso', steps:['La barra muestra cuántos avisos hay sin leer','Filtro «No leídas» o acceso desde Inicio','Al abrirlo se marca como leído y el contador baja'] },
+      { t:'Actualizar datos', steps:['Menú del usuario → Mi perfil','Guardar se activa al detectar cambios','Validación por campo y confirmación al guardar'] },
+      { t:'Arquitectura', steps:['Barra: Inicio · Eventos · Cronogramas · Ministerios · Notificaciones','Menú de usuario: Mi perfil · Cerrar sesión','Detalles con ruta de regreso a su lista'] },
+    ].map(f => ({ ...f, steps: f.steps.map((t, i) => ({ n: i + 1, t })) }));
+    const perScreen = [
+      ['Barra superior','inicio','Navegación principal siempre visible con estado activo y contador de avisos. Menú de usuario solo para perfil y sesión. En móvil, un único menú con todo.'],
+      ['Inicio','inicio','Saludo + versículo como bienvenida, próximo evento, avisos sin leer y accesos rápidos más compactos.'],
+      ['Eventos','eventos','Filtros Próximos/Pasados/Todos y búsqueda. Fecha en bloque destacado, estado del evento y del cronograma como etiquetas con icono.'],
+      ['Detalle de evento','evento','Nueva vista: descripción, datos clave y cronograma integrado con estado vacío explicativo.'],
+      ['Cronogramas','cronogramas','Filtro por evento con etiqueta visible, tabla legible, enlace al evento y lista apilada en móvil. Estado vacío con salida.'],
+      ['Ministerios','ministerios','Icono propio por ministerio, número de integrantes y detalle con descripción completa y lista de integrantes.'],
+      ['Notificaciones','notificaciones','Orden cronológico, no leídas resaltadas con punto y texto «Nueva», filtro y contador. El detalle conserva saltos de línea.'],
+      ['Mi perfil','perfil','Estado del formulario explícito, botón Descartar, errores por campo, requisitos de contraseña en vivo y confirmación al guardar.'],
+    ].map(p => ({ t:p[0], d:p[2], go: go(p[1]) }));
+
+    const isGuia = s.screen === 'guia';
+    const homeSummary = unreadN ? `Tu próximo evento es ${nextEv.name} (${nextEv.relLabel.split(' · ')[0].toLowerCase()}) y tienes ${unreadN} ${unreadN === 1 ? 'aviso' : 'avisos'} sin leer.` : `Tu próximo evento es ${nextEv.name}. No tienes avisos pendientes.`;
+
+    return {
+      is, navItems, menuOpen: s.menuOpen, mobOpen: s.mobOpen, narrow: s.narrow, wide: !s.narrow,
+      nameDisplay: s.compact ? 'none' : 'inline', deskNav: s.narrow ? 'none' : 'flex', mobNav: s.narrow ? 'flex' : 'none', mobSpacer: s.narrow ? 'block' : 'none',
+      mobPanel: s.narrow && s.mobOpen, mobIcon: s.mobOpen ? 'close' : 'menu', menuChevron: s.menuOpen ? 'expand_less' : 'expand_more',
+      toggleMenu: () => this.setState(st => ({ menuOpen: !st.menuOpen })), toggleMob: () => this.setState(st => ({ mobOpen: !st.mobOpen })),
+      goHome: go('inicio'), goEventos: go('eventos'), goNotifs: go('notificaciones'), goPerfil: go('perfil'), goMinisterios: go('ministerios'),
+      goGuia: go('guia'), goProto: () => { if (isGuia) this.go('inicio'); },
+      modeProto: { bg: isGuia ? 'transparent' : '#fff', color: isGuia ? '#E4E6DF' : '#23261F' },
+      modeGuia: { bg: isGuia ? '#fff' : 'transparent', color: isGuia ? '#23261F' : '#E4E6DF' },
+      logout: () => { this.setState({ menuOpen:false, mobOpen:false }); this.showToast('Sesión cerrada (simulación del prototipo).'); },
+      hasToast: !!s.toast, toast: s.toast, hasUndo: !!(s.toast && this.undoFn), undo: () => { const f = this.undoFn; this.undoFn = null; clearTimeout(this.tt); this.setState({ toast:null }); f && f(); },
+      todayLabel: `${DAYS[td.getDay()]}, ${td.getDate()} de ${MLONG[td.getMonth()]}`,
+      greeting: h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches', homeSummary,
+      nextEv, hasUnread: unreadN > 0, noUnread: unreadN === 0, unreadList: unreadList.slice(0, 3),
+      quick: [
+        { icon:'calendar_month', label:'Eventos', desc:'Consulta los eventos, su sede y su cronograma.', onClick: go('eventos') },
+        { icon:'list_alt', label:'Cronogramas', desc:'Revisa las actividades programadas de cada evento.', onClick: go('cronogramas') },
+        { icon:'diversity_3', label:'Ministerios', desc:'Conoce los ministerios y sus integrantes.', onClick: go('ministerios') },
+        { icon:'notifications', label:'Notificaciones', desc:'Lee los avisos que te han enviado.', onClick: go('notificaciones') },
+        { icon:'person', label:'Mi perfil', desc:'Revisa y actualiza tus datos personales.', onClick: go('perfil') },
+      ],
+      evTabs, evQ: s.evQ, onEvQ: e => this.setState({ evQ: e.target.value }), evList, hasEvents: evList.length > 0, noEvents: evList.length === 0,
+      evEmptyTitle: q ? `No hay eventos que coincidan con «${s.evQ.trim()}»` : 'No hay eventos en esta vista',
+      clearEv: () => this.setState({ evQ:'', evTab:'todos' }),
+      evCountLabel: `Mostrando ${evList.length} de ${evAll.length} eventos`,
+      ev, evSched, evHasSched: evSched.length > 0, evNoSched: evSched.length === 0,
+      cronoEv: s.cronoEv, onCronoEv: e => this.setState({ cronoEv: e.target.value }),
+      evOptions: evAll.map(e => ({ id: e.id, label: `${e.name} · ${e.day} ${e.mon.toLowerCase()}` })),
+      cronoRows: rows, cronoHas: rows.length > 0, cronoEmpty: rows.length === 0,
+      cronoCountLabel: `${rows.length} ${rows.length === 1 ? 'actividad' : 'actividades'}`,
+      cronoEmptyTitle: cronoEvObj ? `${cronoEvObj.name} aún no tiene cronograma` : 'Todavía no hay cronogramas',
+      openCronoEv: go('evento', { evId: s.cronoEv === 'all' ? 'e2' : s.cronoEv }),
+      minList: MINS.map(mv), minCount: MINS.length, min,
+      notifTabs: [ tabBtn(s.notifTab,'todas','Todas', s.notifs.length,'notifTab'), tabBtn(s.notifTab,'noleidas','No leídas', unreadN,'notifTab') ],
+      notifEmptyText: s.notifs.length ? 'No tienes notificaciones sin leer.' : 'No tienes notificaciones.', notifList, notifHas: notifList.length > 0, notifEmpty: notifList.length === 0, notif,
+      notifSummary: unreadN ? `${unreadN} sin leer de ${s.notifs.length} notificaciones.` : `${s.notifs.length} notificaciones, todas leídas.`,
+      fv, dirty, saving: s.saving, saved: s.saved, profStatus,
+      initials: ini(`${s.saved.nombre} ${s.saved.apellido}`), fullName: `${s.saved.nombre} ${s.saved.apellido}`,
+      saveBtn: btn(saveOn, s.saving ? 'Guardando…' : 'Guardar cambios'),
+      discard: () => this.setState(st => ({ form: { ...st.saved }, touched:{}, tried:false })),
+      saveProfile: e => { e.preventDefault(); if (!saveOn) return;
+        if (anyErr) { this.setState({ tried:true }); return; }
+        this.setState({ saving:true });
+        setTimeout(() => { this.setState(st => ({ saving:false, saved: { ...st.form }, touched:{}, tried:false })); this.showToast('Tus datos se guardaron correctamente.'); }, 900); },
+      pw1: s.pw1, pw2: s.pw2, pw1Type: s.show1 ? 'text' : 'password', pw2Type: s.show2 ? 'text' : 'password',
+      onPw1: e => this.setState({ pw1: e.target.value }), onPw2: e => this.setState({ pw2: e.target.value }),
+      toggle1: () => this.setState(st => ({ show1: !st.show1 })), toggle2: () => this.setState(st => ({ show2: !st.show2 })),
+      eye1: s.show1 ? 'visibility_off' : 'visibility', eye2: s.show2 ? 'visibility_off' : 'visibility',
+      eye1Aria: s.show1 ? 'Ocultar contraseña' : 'Mostrar contraseña', eye2Aria: s.show2 ? 'Ocultar contraseña' : 'Mostrar contraseña',
+      pwRules, pwBtn: btn(pwOn, s.pwSaving ? 'Actualizando…' : 'Actualizar contraseña'),
+      savePw: e => { e.preventDefault(); if (!pwOn) return; this.setState({ pwSaving:true });
+        setTimeout(() => { this.setState({ pwSaving:false, pw1:'', pw2:'', show1:false, show2:false }); this.showToast('Contraseña actualizada.'); }, 900); },
+      palette, diag, flows, perScreen,
+    };
+  }
+}
+</script>
+</body>
+</html>

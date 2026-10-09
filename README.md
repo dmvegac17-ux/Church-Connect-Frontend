@@ -38,18 +38,30 @@ Toda variable sensible se lee de `.env` (`import.meta.env`):
 
 ## Diseño
 
-Paleta de la iglesia (verde + tonos tierra) definida como *design tokens* en
-[`src/index.css`](src/index.css): `:root` (claro) y `.dark` (oscuro, vía la
-variante `dark` de Tailwind v4). Los componentes usan **solo clases semánticas**
-(`bg-primary`, `text-foreground`, `border-border`, `bg-card`,
-`bg-input-background`, `text-destructive`, `ring-ring`…), nunca colores crudos.
-Las pantallas de `/login` y `/register` reproducen el diseño de dos paneles
-(marca a la izquierda, formulario con selector de pestañas a la derecha).
+Rediseño según `docs/PROMPT-Rediseño-frontend.md` y los prototipos `docs/*.dc.html`.
+Los *design tokens* (verde + tonos tierra, contraste AA) viven en
+[`src/index.css`](src/index.css) y la tipografía es **Nunito Sans**. Los
+componentes usan **clases semánticas** (`bg-primary`, `text-muted-foreground`,
+`border-input`, `bg-success-soft`…), no colores crudos.
 
-> Los botones de Google/Facebook y "¿Olvidaste tu contraseña?" son de la maqueta:
-> el backend aún no expone OAuth ni recuperación, así que informan
-> "disponible próximamente". "Recordarme" alterna `localStorage` (persistente)
-> vs `sessionStorage` (solo la pestaña actual).
+Cada perfil tiene su propio layout y sus propias pantallas dentro de la misma app:
+
+| Perfil | Layout | Pantallas |
+|---|---|---|
+| Acceso | `AuthLayout` (dos columnas) | `pages/auth` |
+| Miembro / Participante | `AppShell` + `Navbar` (barra superior) | `pages/home`, `events`, `schedules`, `ministries`, `notifications` |
+| Administrador | `AdminShell` (barra lateral; barra superior < 960px) | `pages/admin/*` |
+
+`router.tsx` elige el layout y la pantalla por rol (`RoleShell` / `ByRole`) sin
+cambiar las rutas. Lo propio de cada perfil (alto de controles, radio de
+tarjetas) se fija con variables CSS en su layout, así los estilos del admin no
+alcanzan a la vista de miembro. Las piezas compartidas están en
+`components/ui` (tabs, estados vacíos, panel lateral, modal, paginación) y
+`components/forms`.
+
+> Pendiente de backend: OAuth (Google/Facebook), recuperación de contraseña y
+> eliminación de notificaciones por parte del miembro. La interfaz lo indica
+> sin simular un resultado.
 
 ## Arquitectura
 

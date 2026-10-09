@@ -26,11 +26,12 @@ export function DeleteMinistryDialog({
       danger
       title="Eliminar ministerio"
       description={
-        `¿Seguro que quieres eliminar "${ministryName}"? ` +
+        `Vas a eliminar «${ministryName}». ` +
         "Los usuarios asignados no se eliminan, pero quedarán sin ministerio. " +
         "Esta acción no se puede deshacer."
       }
-      confirmLabel="Eliminar"
+      confirmLabel="Eliminar ministerio"
+      loadingLabel="Eliminando…"
       loading={loading}
       onConfirm={onConfirm}
       onCancel={onCancel}

@@ -147,7 +147,7 @@ export function AddressAutocomplete({
         <ul
           id={listId}
           role="listbox"
-          className="absolute left-0 right-0 top-full z-30 mt-1 max-h-64 overflow-auto rounded-lg border border-border bg-card py-1 shadow-lg"
+          className="absolute left-0 right-0 top-full z-30 mt-1 max-h-64 overflow-auto rounded-xl border border-border bg-card py-1 shadow-menu"
         >
           {suggestions.map((suggestion, index) => (
             <li
@@ -161,7 +161,7 @@ export function AddressAutocomplete({
                 select(suggestion);
               }}
               onMouseEnter={() => setActiveIndex(index)}
-              className={`flex cursor-pointer items-start gap-2 px-3 py-2 text-sm text-foreground ${
+              className={`flex min-h-11 cursor-pointer items-start gap-2 px-3 py-2.5 text-sm text-foreground ${
                 index === activeIndex ? "bg-primary/10" : ""
               }`}
             >
@@ -173,7 +173,7 @@ export function AddressAutocomplete({
             </li>
           ))}
           {suggestions.length === 0 ? (
-            <li className="px-3 py-2 text-xs text-muted-foreground">
+            <li className="px-3 py-2 text-[13px] text-muted-foreground">
               {loading
                 ? "Buscando direcciones…"
                 : "Sin sugerencias. Puedes dejar la dirección como la escribiste y marcar el punto en el mapa."}

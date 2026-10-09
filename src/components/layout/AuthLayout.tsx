@@ -1,179 +1,80 @@
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import {
-  BookOpen,
-  CalendarDays,
-  Check,
-  MessagesSquare,
-  Music,
-  Users,
-} from "lucide-react";
-import type { ComponentType, PointerEvent, ReactNode } from "react";
+import { BookOpen, Calendar, MessagesSquare, UsersRound } from "lucide-react";
+import type { ComponentType, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import { BrandLogo } from "./BrandLogo";
+import { DailyVerse } from "./DailyVerse";
 
 type IconType = ComponentType<{ className?: string }>;
 
-const FEATURES: { icon: IconType; label: string }[] = [
-  { icon: CalendarDays, label: "Acceso a eventos y horarios" },
-  { icon: Users, label: "Únete a ministerios" },
+const BENEFITS: { icon: IconType; label: string }[] = [
+  { icon: Calendar, label: "Acceso a eventos y horarios" },
+  { icon: UsersRound, label: "Únete a ministerios" },
   { icon: MessagesSquare, label: "Comunidad en línea" },
   { icon: BookOpen, label: "Recursos espirituales" },
 ];
 
-/** Tarjeta "de vidrio" que flota suavemente sobre el panel de marca. */
-function FloatCard({
-  icon: Icon,
-  title,
-  subtitle,
-  className = "",
-  delay = 0,
-}: {
-  icon: IconType;
-  title: string;
-  subtitle: string;
-  className?: string;
-  delay?: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: [0, -9, 0] }}
-      transition={{
-        opacity: { duration: 0.5, delay },
-        y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay },
-      }}
-      className={`flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 p-3 shadow-xl backdrop-blur-md ${className}`}
-    >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/20">
-        <Icon className="size-4" />
-      </span>
-      <div className="min-w-0">
-        <p className="truncate text-xs font-semibold">{title}</p>
-        <p className="truncate text-[11px] text-primary-foreground/75">
-          {subtitle}
-        </p>
-      </div>
-    </motion.div>
-  );
-}
-
-/** Panel de marca a pantalla completa con fondo animado y parallax al puntero. */
+/** Columna de marca: logo, propuesta de valor, beneficios y versículo del día. */
 function BrandPanel() {
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 70, damping: 18 });
-  const sy = useSpring(my, { stiffness: 70, damping: 18 });
-
-  const blobAX = useTransform(sx, (v) => v * 34);
-  const blobAY = useTransform(sy, (v) => v * 34);
-  const blobBX = useTransform(sx, (v) => v * -44);
-  const blobBY = useTransform(sy, (v) => v * -26);
-  const cardsX = useTransform(sx, (v) => v * 18);
-  const cardsY = useTransform(sy, (v) => v * 18);
-
-  const handleMove = (e: PointerEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mx.set((e.clientX - rect.left) / rect.width - 0.5);
-    my.set((e.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const resetMove = () => {
-    mx.set(0);
-    my.set(0);
-  };
-
   return (
-    <div
-      onPointerMove={handleMove}
-      onPointerLeave={resetMove}
-      className="relative isolate hidden overflow-hidden bg-gradient-to-br from-primary via-primary to-chart-2 text-primary-foreground lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:justify-center"
-    >
-      {/* Manchas de luz con parallax */}
-      <motion.div
-        style={{ x: blobAX, y: blobAY }}
-        className="pointer-events-none absolute -left-28 -top-20 size-80 rounded-full bg-white/15 blur-3xl"
-      />
-      <motion.div
-        style={{ x: blobBX, y: blobBY }}
-        className="pointer-events-none absolute -bottom-28 -right-20 size-[26rem] rounded-full bg-chart-3/30 blur-3xl"
-      />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_18%,rgba(255,255,255,0.14),transparent_46%)]" />
-      {/* Retícula sutil */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px)] [background-size:46px_46px]" />
+    <aside className="flex flex-col justify-center gap-7 bg-primary p-[clamp(28px,6vw,72px)] text-primary-foreground">
+      <div className="flex items-center gap-4">
+        <BrandLogo className="size-16" />
+        <span className="text-[28px] font-extrabold tracking-[-0.01em]">
+          Church Connect
+        </span>
+      </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-md flex-col px-12 py-16">
-        <div className="flex items-center gap-4">
-          <BrandLogo className="size-20" />
-          <span className="text-3xl font-semibold tracking-tight">
-            Church Connect
-          </span>
-        </div>
-
-        <h1 className="mt-12 text-3xl font-semibold leading-tight tracking-tight xl:text-4xl">
-          Conectados con tu fe,
-          <br />
-          conectados contigo
+      <div className="flex max-w-[460px] flex-col gap-3.5">
+        <h1 className="text-[clamp(30px,3.6vw,42px)] leading-[1.15] font-extrabold tracking-[-0.02em] text-balance">
+          Conectados con tu fe, conectados contigo
         </h1>
-        <p className="mt-4 max-w-sm text-sm text-primary-foreground/80">
+        <p className="text-[17px] leading-[1.55] text-pretty text-[#E3ECE5]">
           Vive la comunidad de tu iglesia desde un solo lugar: eventos,
           ministerios, anuncios y recursos espirituales.
         </p>
-
-        <ul className="mt-8 space-y-2.5">
-          {FEATURES.map(({ icon: Icon, label }) => (
-            <li key={label} className="flex items-center gap-3 text-sm">
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-white/25">
-                <Check className="size-3.5" aria-hidden="true" />
-              </span>
-              <Icon className="size-4 opacity-80" aria-hidden="true" />
-              <span>{label}</span>
-            </li>
-          ))}
-        </ul>
-
-        <motion.div
-          style={{ x: cardsX, y: cardsY }}
-          className="relative mt-14 h-36"
-        >
-          <FloatCard
-            className="absolute left-0 top-0 w-60"
-            icon={CalendarDays}
-            title="Próximo evento"
-            subtitle="Domingo · Servicio 10:00 a.m."
-          />
-          <FloatCard
-            className="absolute left-20 top-16 w-60"
-            icon={Music}
-            title="Ministerio de alabanza"
-            subtitle="Ensayo jueves 7:00 p.m."
-            delay={0.9}
-          />
-        </motion.div>
       </div>
-    </div>
+
+      <ul className="flex flex-col gap-3">
+        {BENEFITS.map(({ icon: Icon, label }) => (
+          <li key={label} className="flex items-center gap-3 text-base">
+            <span
+              className="flex size-[30px] shrink-0 items-center justify-center rounded-full bg-white/[0.16]"
+              aria-hidden="true"
+            >
+              <Icon className="size-[18px]" />
+            </span>
+            {label}
+          </li>
+        ))}
+      </ul>
+
+      <DailyVerse
+        className="max-w-[460px] border-t border-white/20 pt-5"
+        textClassName="text-[15px] leading-normal text-[#E3ECE5]"
+        referenceClassName="text-sm"
+      />
+    </aside>
   );
 }
 
 function TabSwitcher({ active }: { active: "login" | "register" }) {
   const base =
-    "flex-1 rounded-xl px-4 py-2.5 text-center text-sm font-medium transition";
-  const on = "bg-card text-primary shadow-sm";
-  const off = "text-muted-foreground hover:text-foreground";
+    "flex h-11 items-center justify-center rounded-[10px] text-[15px] font-extrabold transition-colors";
+  const on = "bg-card text-primary-hover shadow-tab";
+  const off = "text-text-secondary hover:text-foreground";
 
   return (
-    <div className="mb-8 flex gap-1 rounded-2xl bg-muted p-1">
+    <nav
+      aria-label="Acceso"
+      className="grid grid-cols-2 gap-1 rounded-[14px] bg-hover-icon p-1"
+    >
       <Link
         to="/login"
         className={`${base} ${active === "login" ? on : off}`}
         aria-current={active === "login" ? "page" : undefined}
       >
-        Iniciar Sesión
+        Iniciar sesión
       </Link>
       <Link
         to="/register"
@@ -182,49 +83,49 @@ function TabSwitcher({ active }: { active: "login" | "register" }) {
       >
         Registrarse
       </Link>
+    </nav>
+  );
+}
+
+/**
+ * Layout de Acceso: dos columnas que se apilan en móvil. `tab` muestra el
+ * selector Iniciar sesión / Registrarse; se omite en la vista de recuperación.
+ */
+export function AuthLayout({
+  tab,
+  children,
+}: {
+  tab?: "login" | "register";
+  children: ReactNode;
+}) {
+  return (
+    <div className="grid min-h-screen grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] bg-card [--control-h:46px] [--field-bg:var(--input-auth)]">
+      <BrandPanel />
+
+      <main className="flex items-center justify-center px-5 py-[clamp(24px,5vw,64px)]">
+        <div className="flex w-full max-w-[460px] flex-col gap-[22px]">
+          {tab ? <TabSwitcher active={tab} /> : null}
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
 
-export function AuthLayout({
-  tab,
-  children,
-  footer,
+/** Título + bajada de cada vista de Acceso. */
+export function AuthHeading({
+  title,
+  description,
 }: {
-  tab: "login" | "register";
-  children: ReactNode;
-  footer?: ReactNode;
+  title: string;
+  description: string;
 }) {
   return (
-    <div className="min-h-screen w-full bg-card lg:grid lg:grid-cols-[1.15fr_1fr] xl:grid-cols-[1.25fr_1fr]">
-      <BrandPanel />
-
-      <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
-        >
-          <div className="mb-8 flex flex-col items-center text-center lg:hidden">
-            <BrandLogo className="size-24 border border-border" />
-            <span className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
-              Church Connect
-            </span>
-            <span className="mt-1 text-sm text-muted-foreground">
-              Conectados con tu fe, conectados contigo
-            </span>
-          </div>
-
-          <TabSwitcher active={tab} />
-          {children}
-
-          {footer ? (
-            <p className="mt-6 text-center text-xs text-muted-foreground">
-              {footer}
-            </p>
-          ) : null}
-        </motion.div>
-      </div>
+    <div className="flex flex-col gap-1">
+      <h2 className="text-2xl font-extrabold text-foreground">{title}</h2>
+      <p className="text-[15px] leading-normal text-muted-foreground">
+        {description}
+      </p>
     </div>
   );
 }

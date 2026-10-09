@@ -4,7 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ErrorAlert } from "../../components/feedback/ErrorAlert";
 import { FullPageSpinner } from "../../components/feedback/Spinner";
 import { useToast } from "../../components/feedback/useToast";
-import { Card, PageHeader } from "../../components/layout/Page";
+import { PageHeader } from "../../components/layout/Page";
+import { Breadcrumb } from "../../components/ui/primitives";
 import { useEvent } from "../../hooks/useEvent";
 import {
   fromDateAndTimeValues,
@@ -110,14 +111,14 @@ export function EventEditPage() {
     }
 
     if (Object.keys(payload).length === 0) {
-      toast.info("No hay cambios por guardar.", "Sin cambios");
+      toast.info("No hay cambios por guardar.");
       return;
     }
 
     setSubmitting(true);
     try {
       const updated = await eventService.update(id, payload);
-      toast.success("Los cambios se guardaron correctamente.", "Evento actualizado");
+      toast.success(`Los cambios de «${updated.titulo}» se guardaron.`);
       navigate(`/events/${updated.id}`, { replace: true });
     } catch (err) {
       if (err instanceof ApiError && err.isValidation) {
@@ -130,25 +131,24 @@ export function EventEditPage() {
   };
 
   return (
-    <div>
-      <PageHeader title={`Editar: ${event.titulo}`} backTo={`/events/${event.id}`} />
+    <div className="flex max-w-[860px] flex-col gap-5">
+      <Breadcrumb
+        to={`/events/${event.id}`}
+        label={event.titulo}
+        current="Editar"
+      />
+      <PageHeader title="Editar evento" />
 
-      <Card className="max-w-2xl">
-        {error ? (
-          <div className="mb-4">
-            <ErrorAlert error={error} onClose={() => setError(null)} />
-          </div>
-        ) : null}
+      {error ? <ErrorAlert error={error} onClose={() => setError(null)} /> : null}
 
-        <EventForm
-          initial={initial}
-          submitting={submitting}
-          submitLabel="Guardar cambios"
-          serverErrors={fieldErrors}
-          onSubmit={handleSubmit}
-          onCancel={() => navigate(`/events/${event.id}`)}
-        />
-      </Card>
+      <EventForm
+        initial={initial}
+        submitting={submitting}
+        submitLabel="Guardar cambios"
+        serverErrors={fieldErrors}
+        onSubmit={handleSubmit}
+        onCancel={() => navigate(`/events/${event.id}`)}
+      />
     </div>
   );
 }
