@@ -141,6 +141,96 @@ async function request<T>(
   };
 }
 
+/** Statuses donde el envío masivo trae un `ResponsePayload` de dominio válido, no un error de transporte. */
+const RAW_STATUSES = new Set([201, 207, 500]);
+
+/** Resultado crudo de `postRaw`: el status HTTP real junto al envelope ya desempacado. */
+export interface RawResult<T> {
+  status: number;
+  data: T | null;
+  errors: string[] | null;
+  meta: Record<string, unknown> | null;
+}
+
+/**
+ * `POST` especial para endpoints cuya respuesta de negocio puede llegar en
+ * `201`, `207` o `500` con un `ResponsePayload` igualmente válido en los
+ * tres casos (ej. envío masivo de notificaciones, donde `500` significa
+ * "cero éxitos" y no un error real de servidor). No lanza `ApiError` para
+ * esos tres statuses si el cuerpo es parseable; para cualquier otro status
+ * (400/401/403/422) o un `500` sin envelope, sigue lanzando `ApiError` como
+ * el resto del cliente.
+ */
+async function postRaw<T>(
+  path: string,
+  body?: unknown,
+  options: RequestOptions = {},
+): Promise<RawResult<T>> {
+  const { query, auth = true, signal } = options;
+
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  };
+
+  if (auth) {
+    const token = getToken();
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+  }
+
+  let response: Response;
+
+  try {
+    response = await fetch(buildUrl(path, query), {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+      signal,
+    });
+  } catch (cause) {
+    if (cause instanceof DOMException && cause.name === "AbortError") {
+      throw cause;
+    }
+    throw new ApiError(
+      "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
+      0,
+    );
+  }
+
+  const text = await response.text();
+  let payload: ResponsePayload<T> | null = null;
+
+  if (text) {
+    try {
+      payload = JSON.parse(text) as ResponsePayload<T>;
+    } catch {
+      payload = null;
+    }
+  }
+
+  if (response.status === 401) {
+    onUnauthorized();
+  }
+
+  if (RAW_STATUSES.has(response.status) && payload) {
+    return {
+      status: response.status,
+      data: payload.data,
+      errors: payload.errors,
+      meta: payload.meta,
+    };
+  }
+
+  const message =
+    payload?.message ??
+    (response.status === 401
+      ? "Tu sesión expiró. Inicia sesión de nuevo."
+      : "Ocurrió un error al procesar la solicitud.");
+  throw new ApiError(message, response.status, payload?.errors ?? [], payload);
+}
+
 export const httpClient = {
   get: <T>(path: string, options?: RequestOptions) =>
     request<T>("GET", path, options),
@@ -152,6 +242,7 @@ export const httpClient = {
     request<T>("PATCH", path, { ...options, body }),
   delete: <T>(path: string, options?: RequestOptions) =>
     request<T>("DELETE", path, options),
+  postRaw,
 };
 
 /** Helper para leer `meta.totalUsers` de forma segura. */

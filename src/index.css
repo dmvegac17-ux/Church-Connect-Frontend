@@ -27,6 +27,9 @@
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: #4a7c59;
+  /* Header: mismo verde en claro y oscuro. */
+  --header: #417052;
+  --header-foreground: #ffffff;
   --chart-1: #4a7c59;
   --chart-2: #6b9a5f;
   --chart-3: #8fb896;
@@ -104,6 +107,8 @@
   --color-input-background: var(--input-background);
   --color-switch-background: var(--switch-background);
   --color-ring: var(--ring);
+  --color-header: var(--header);
+  --color-header-foreground: var(--header-foreground);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
