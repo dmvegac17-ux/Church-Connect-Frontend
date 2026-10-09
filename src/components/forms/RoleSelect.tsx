@@ -1,6 +1,12 @@
 import { useId } from "react";
 
 import { ROLE_LABELS, USER_ROLES, type UserRole } from "../../types/user";
+import {
+  controlClass,
+  FieldError,
+  HINT_CLASS,
+  LABEL_CLASS,
+} from "./fieldStyles";
 
 interface RoleSelectProps {
   label?: string;
@@ -9,6 +15,7 @@ interface RoleSelectProps {
   error?: string;
   disabled?: boolean;
   name?: string;
+  hint?: string;
 }
 
 export function RoleSelect({
@@ -18,13 +25,14 @@ export function RoleSelect({
   error,
   disabled,
   name = "rol",
+  hint,
 }: RoleSelectProps) {
   const autoId = useId();
   const id = `field-${name}-${autoId}`;
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium text-foreground">
+    <div className="flex min-w-0 flex-col gap-1.5">
+      <label htmlFor={id} className={LABEL_CLASS}>
         {label}
       </label>
       <select
@@ -33,12 +41,9 @@ export function RoleSelect({
         value={value}
         disabled={disabled}
         aria-invalid={error ? true : undefined}
+        aria-describedby={hint ? `${id}-hint` : undefined}
         onChange={(e) => onChange(e.target.value as UserRole)}
-        className={`rounded-lg border bg-input-background px-3 py-2.5 text-sm text-foreground outline-none transition focus:ring-2 focus:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-60 ${
-          error
-            ? "border-destructive focus:border-destructive"
-            : "border-border focus:border-ring"
-        }`}
+        className={controlClass(Boolean(error), "h-[var(--control-h)] px-2.5")}
       >
         {USER_ROLES.map((role) => (
           <option key={role} value={role}>
@@ -46,8 +51,11 @@ export function RoleSelect({
           </option>
         ))}
       </select>
-      {error ? (
-        <p className="text-xs font-medium text-destructive">{error}</p>
+      {error ? <FieldError>{error}</FieldError> : null}
+      {hint && !error ? (
+        <p id={`${id}-hint`} className={HINT_CLASS}>
+          {hint}
+        </p>
       ) : null}
     </div>
   );

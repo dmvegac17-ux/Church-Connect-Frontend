@@ -1,245 +1,200 @@
-import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { CalendarX } from "lucide-react";
+import { useMemo } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 
-import { useAuth } from "../../auth/useAuth";
 import { ErrorAlert } from "../../components/feedback/ErrorAlert";
 import { Spinner } from "../../components/feedback/Spinner";
-import { useToast } from "../../components/feedback/useToast";
-import { Button } from "../../components/forms/Button";
+import { buttonClass } from "../../components/forms/Button";
 import { Card, PageHeader } from "../../components/layout/Page";
+import {
+  EmptyState,
+  Pager,
+  TD_CLASS,
+  TH_CLASS,
+} from "../../components/ui/primitives";
 import { useEventOptions } from "../../hooks/useEventOptions";
 import { useSchedules } from "../../hooks/useSchedules";
-import { formatDateTime } from "../../lib/format";
-import { scheduleService } from "../../services/scheduleService";
-import { ApiError } from "../../types/api";
-import type { Schedule } from "../../types/schedule";
-import { DeleteScheduleDialog } from "./components/DeleteScheduleDialog";
+import {
+  activitiesLabel,
+  shortDateLabel,
+  timeRangeLabel,
+} from "../../lib/eventDates";
 import { EventSelect } from "./components/EventSelect";
 
+/** Cronogramas (vista de miembro): actividades por evento, solo lectura. */
 export function SchedulesListPage() {
-  const { role } = useAuth();
-  const isAdmin = role === "ADMIN";
-  const toast = useToast();
-  const navigate = useNavigate();
   const { events } = useEventOptions();
-
   const [searchParams, setSearchParams] = useSearchParams();
   const eventoId = searchParams.get("evento_id") ?? "";
   const setEventoId = (id: string) => {
     setSearchParams(id ? { evento_id: id } : {}, { replace: true });
   };
-  const {
-    schedules,
-    total,
-    isLoading,
-    error,
-    page,
-    pageCount,
-    pageSize,
-    setPage,
-    refetch,
-  } = useSchedules(eventoId || undefined);
+  const { schedules, total, isLoading, error, page, pageCount, pageSize, setPage } =
+    useSchedules(eventoId || undefined);
 
-  const [target, setTarget] = useState<Schedule | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<unknown>(null);
-
-  const eventTitles = useMemo(
-    () => new Map(events.map((e) => [e.id, e.titulo])),
+  const eventsById = useMemo(
+    () => new Map(events.map((e) => [e.id, e])),
     [events],
   );
 
-  const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
-  const rangeEnd = Math.min(page * pageSize, total);
-  const colSpan = isAdmin ? 5 : 4;
+  // Ordenadas por fecha y hora dentro de lo que devuelve el servidor.
+  const rows = useMemo(
+    () =>
+      [...schedules].sort(
+        (a, b) =>
+          new Date(a.hora_inicio).getTime() - new Date(b.hora_inicio).getTime(),
+      ),
+    [schedules],
+  );
 
-  const confirmDelete = async () => {
-    if (!target) {
-      return;
-    }
-    setDeleting(true);
-    setDeleteError(null);
-    try {
-      await scheduleService.remove(target.id);
-      toast.success(
-        `El cronograma "${target.actividad}" fue eliminado.`,
-        "Cronograma eliminado",
-      );
-      setTarget(null);
-      refetch();
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 404) {
-        refetch();
-        setTarget(null);
-      } else {
-        setDeleteError(err);
-      }
-    } finally {
-      setDeleting(false);
-    }
-  };
+  const selectedEvent = eventoId ? eventsById.get(eventoId) : undefined;
 
   return (
-    <div>
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Cronogramas"
-        description={`${total} cronograma${total === 1 ? "" : "s"} registrado${
-          total === 1 ? "" : "s"
-        }.`}
-        actions={
-          isAdmin ? (
-            <Button onClick={() => navigate("/schedules/nuevo")}>
-              <Plus className="size-4" aria-hidden="true" />
-              Nuevo cronograma
-            </Button>
-          ) : undefined
-        }
+        description="Actividades programadas de cada evento."
       />
 
-      {error ? (
-        <div className="mb-4">
-          <ErrorAlert error={error} />
-        </div>
-      ) : null}
+      {error ? <ErrorAlert error={error} /> : null}
 
-      {deleteError ? (
-        <div className="mb-4">
-          <ErrorAlert error={deleteError} onClose={() => setDeleteError(null)} />
-        </div>
-      ) : null}
-
-      <Card className="!p-0">
-        <div className="border-b border-border p-4 sm:max-w-xs">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="w-full min-w-[260px] sm:w-auto">
           <EventSelect
-            label="Filtrar por evento"
             placeholder="Todos los eventos"
-            optional
             value={eventoId}
             onChange={setEventoId}
           />
         </div>
+        {!isLoading ? (
+          <p className="text-sm text-muted-foreground" role="status">
+            {activitiesLabel(total)}
+          </p>
+        ) : null}
+      </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-muted text-xs uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3 font-medium">Actividad</th>
-                <th className="px-4 py-3 font-medium">Evento</th>
-                <th className="px-4 py-3 font-medium">Horario</th>
-                <th className="px-4 py-3 font-medium">Responsable</th>
-                {isAdmin ? (
-                  <th className="px-4 py-3 text-right font-medium">
-                    Acciones
-                  </th>
-                ) : null}
+      {isLoading ? (
+        <Card className="p-10 text-center text-muted-foreground">
+          <Spinner label="Cargando cronogramas…" />
+        </Card>
+      ) : rows.length === 0 ? (
+        <EmptyState
+          bordered
+          icon={CalendarX}
+          tone="sand"
+          title={
+            selectedEvent
+              ? `«${selectedEvent.titulo}» aún no tiene cronograma`
+              : "Todavía no hay actividades programadas"
+          }
+          description={
+            selectedEvent
+              ? "Los organizadores aún no han publicado actividades para este evento."
+              : "Cuando los organizadores publiquen actividades aparecerán aquí."
+          }
+          action={
+            selectedEvent ? (
+              <Link
+                to={`/events/${selectedEvent.id}`}
+                className={buttonClass("secondary")}
+              >
+                Ver detalle del evento
+              </Link>
+            ) : undefined
+          }
+        />
+      ) : (
+        <Card as="section" className="overflow-hidden">
+          <table className="hidden w-full border-collapse text-[15px] md:table">
+            <thead>
+              <tr className="bg-surface-alt">
+                <th scope="col" className={TH_CLASS}>
+                  Actividad
+                </th>
+                <th scope="col" className={TH_CLASS}>
+                  Evento
+                </th>
+                <th scope="col" className={TH_CLASS}>
+                  Horario
+                </th>
+                <th scope="col" className={TH_CLASS}>
+                  Responsable
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
-              {isLoading ? (
-                <tr>
-                  <td
-                    colSpan={colSpan}
-                    className="px-4 py-10 text-center text-muted-foreground"
-                  >
-                    <Spinner label="Cargando cronogramas…" />
-                  </td>
-                </tr>
-              ) : schedules.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={colSpan}
-                    className="px-4 py-10 text-center text-muted-foreground"
-                  >
-                    {eventoId
-                      ? "Este evento no tiene cronogramas registrados."
-                      : "Todavía no hay cronogramas registrados."}
-                  </td>
-                </tr>
-              ) : (
-                schedules.map((s) => (
-                  <tr key={s.id} className="hover:bg-muted/50">
-                    <td className="px-4 py-3 font-medium text-foreground">
-                      {s.actividad}
+            <tbody>
+              {rows.map((s) => {
+                const ev = eventsById.get(s.evento_id);
+                return (
+                  <tr key={s.id} className="border-t border-divider-soft">
+                    <td className={`${TD_CLASS} py-4 font-bold`}>{s.actividad}</td>
+                    <td className={`${TD_CLASS} py-4`}>
+                      {ev ? (
+                        <Link
+                          to={`/events/${ev.id}`}
+                          className="font-bold text-primary hover:underline"
+                        >
+                          {ev.titulo}
+                        </Link>
+                      ) : (
+                        "—"
+                      )}
+                      <div className="text-[13px] text-muted-foreground">
+                        {shortDateLabel(s.hora_inicio)}
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {eventTitles.get(s.evento_id) ?? "—"}
+                    <td className={`${TD_CLASS} py-4 text-text-strong`}>
+                      {timeRangeLabel(s.hora_inicio, s.hora_fin)}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {formatDateTime(s.hora_inicio)} –{" "}
-                      {formatDateTime(s.hora_fin)}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
+                    <td className={`${TD_CLASS} py-4 text-text-strong`}>
                       {s.responsable}
                     </td>
-                    {isAdmin ? (
-                      <td className="px-4 py-3">
-                        <div className="flex justify-end gap-1">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              navigate(`/schedules/${s.id}/editar`)
-                            }
-                            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-primary"
-                            aria-label={`Editar ${s.actividad}`}
-                          >
-                            <Pencil className="size-4" aria-hidden="true" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setTarget(s)}
-                            className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                            aria-label={`Eliminar ${s.actividad}`}
-                          >
-                            <Trash2 className="size-4" aria-hidden="true" />
-                          </button>
-                        </div>
-                      </td>
-                    ) : null}
                   </tr>
-                ))
-              )}
+                );
+              })}
             </tbody>
           </table>
-        </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-4 text-sm text-muted-foreground">
-          <span>
-            {rangeStart}–{rangeEnd} de {total}
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setPage(page - 1)}
-              disabled={page <= 1 || isLoading}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 hover:bg-muted disabled:opacity-40"
-            >
-              <ChevronLeft className="size-4" aria-hidden="true" />
-              Anterior
-            </button>
-            <span>
-              Página {page} de {pageCount}
-            </span>
-            <button
-              type="button"
-              onClick={() => setPage(page + 1)}
-              disabled={page >= pageCount || isLoading}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 hover:bg-muted disabled:opacity-40"
-            >
-              Siguiente
-              <ChevronRight className="size-4" aria-hidden="true" />
-            </button>
-          </div>
-        </div>
-      </Card>
+          <ul className="md:hidden">
+            {rows.map((s) => {
+              const ev = eventsById.get(s.evento_id);
+              return (
+                <li
+                  key={s.id}
+                  className="flex flex-col gap-1 border-t border-divider-soft px-5 py-4 first:border-t-0"
+                >
+                  <span className="text-sm font-bold text-primary">
+                    {shortDateLabel(s.hora_inicio)} ·{" "}
+                    {timeRangeLabel(s.hora_inicio, s.hora_fin)}
+                  </span>
+                  <span className="text-base font-bold">{s.actividad}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {ev ? (
+                      <Link
+                        to={`/events/${ev.id}`}
+                        className="font-bold text-primary hover:underline"
+                      >
+                        {ev.titulo}
+                      </Link>
+                    ) : null}
+                    {ev ? " · " : ""}
+                    {s.responsable}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
 
-      <DeleteScheduleDialog
-        open={target !== null}
-        activityName={target?.actividad ?? ""}
-        loading={deleting}
-        onConfirm={confirmDelete}
-        onCancel={() => setTarget(null)}
-      />
+          <Pager
+            page={page}
+            pageCount={pageCount}
+            total={total}
+            pageSize={pageSize}
+            onChange={setPage}
+            noun="actividades"
+          />
+        </Card>
+      )}
     </div>
   );
 }

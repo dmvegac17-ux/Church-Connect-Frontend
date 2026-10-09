@@ -30,7 +30,7 @@ export function EventLocationMap({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <div className={`isolate overflow-hidden rounded-lg border border-border ${className}`}>
+      <div className={`isolate overflow-hidden rounded-xl border border-border ${className}`}>
         <MapContainer
           center={[latitud, longitud]}
           zoom={15}
@@ -52,10 +52,11 @@ export function EventLocationMap({
         href={googleMapsUrl({ latitud, longitud })}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1 self-start text-xs font-medium text-primary hover:underline"
+        className="inline-flex items-center gap-1 self-start text-sm font-bold text-primary hover:underline"
       >
         Abrir en Google Maps
-        <ExternalLink className="size-3" aria-hidden="true" />
+        <ExternalLink className="size-4" aria-hidden="true" />
+        <span className="sr-only">(se abre en una pestaña nueva)</span>
       </a>
     </div>
   );

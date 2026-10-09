@@ -3,11 +3,19 @@ import { useEffect, useState } from "react";
 import { msUntilNextDay, verseForDate } from "../../lib/dailyVerse";
 
 /**
- * Versículo del día para el header: solo la cita y su referencia, en una
- * línea (se recorta con "…" si no cabe; el texto completo queda en `title`).
- * Cambia solo a medianoche aunque la pestaña siga abierta.
+ * Versículo del día como cita: texto en cursiva y referencia debajo.
+ * Cambia solo a medianoche aunque la pestaña siga abierta. Los colores los
+ * pone quien lo usa (panel verde de Acceso, tarjeta del Inicio).
  */
-export function DailyVerse({ className = "" }: { className?: string }) {
+export function DailyVerse({
+  className = "",
+  textClassName = "",
+  referenceClassName = "",
+}: {
+  className?: string;
+  textClassName?: string;
+  referenceClassName?: string;
+}) {
   const [verse, setVerse] = useState(() => verseForDate());
 
   useEffect(() => {
@@ -19,12 +27,14 @@ export function DailyVerse({ className = "" }: { className?: string }) {
     return () => clearTimeout(timer);
   }, [verse]);
 
-  const full = `${verse.text} — ${verse.reference}`;
-
   return (
-    <p className={`truncate text-center text-sm ${className}`} title={full}>
-      <span className="italic">{verse.text}</span>
-      <span className="font-medium"> — {verse.reference}</span>
-    </p>
+    <figure className={className}>
+      <blockquote className={`italic ${textClassName}`}>
+        “{verse.text.replace(/^[“"]|[”"]$/g, "")}”
+      </blockquote>
+      <figcaption className={`mt-1.5 font-extrabold ${referenceClassName}`}>
+        {verse.reference}
+      </figcaption>
+    </figure>
   );
 }

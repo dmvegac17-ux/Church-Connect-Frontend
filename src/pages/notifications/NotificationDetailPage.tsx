@@ -1,10 +1,12 @@
-import { Bell } from "lucide-react";
+import { Bell, CheckCheck, ShieldAlert, SearchX } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { ErrorAlert } from "../../components/feedback/ErrorAlert";
 import { FullPageSpinner } from "../../components/feedback/Spinner";
-import { Card, PageHeader } from "../../components/layout/Page";
+import { buttonClass } from "../../components/forms/Button";
+import { Card } from "../../components/layout/Page";
+import { Breadcrumb, EmptyState, Pill } from "../../components/ui/primitives";
 import { useNotification } from "../../hooks/useNotification";
 import { formatDateTime } from "../../lib/format";
 import { NOTIFICATIONS_CHANGED_EVENT } from "../../lib/notificationEvents";
@@ -13,13 +15,9 @@ import { notificationService } from "../../services/notificationService";
 import { ApiError } from "../../types/api";
 
 /**
- * Detalle de la propia notificación. El backend ya restringe el `GET` al
- * dueño (ni siquiera ADMIN puede ver la de otro usuario), así que un `403`
- * aquí significa "existe pero no es tuya".
- *
- * Al abrirla se marca como leída automáticamente (el dueño de la
- * notificación puede marcar su propia `leida`, y ADMIN puede marcar
- * cualquiera).
+ * Detalle de la propia notificación (vista de miembro). El backend ya
+ * restringe el `GET` al dueño, así que un `403` aquí significa "existe pero
+ * no es tuya". Al abrirla se marca como leída automáticamente.
  */
 export function NotificationDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -47,7 +45,7 @@ export function NotificationDetailPage() {
       });
   }, [notification, refetch]);
 
-  if (isLoading) {
+  if (isLoading && !notification) {
     return <FullPageSpinner label="Cargando notificación…" />;
   }
 
@@ -55,68 +53,66 @@ export function NotificationDetailPage() {
     const isForbidden = error instanceof ApiError && error.status === 403;
     const isNotFound = error instanceof ApiError && error.status === 404;
 
-    if (isForbidden || isNotFound) {
-      return (
-        <div>
-          <PageHeader title="Notificación" backTo="/notifications" />
-          <Card className="mx-auto max-w-2xl text-center">
-            <p className="text-sm text-muted-foreground">
-              {isForbidden
-                ? "No tienes permisos para ver esta notificación."
-                : "La notificación que buscas no existe o fue eliminada."}
-            </p>
-            <Link
-              to="/notifications"
-              className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
-            >
-              Volver a la bandeja
-            </Link>
-          </Card>
-        </div>
-      );
-    }
-
     return (
-      <div>
-        <PageHeader title="Notificación" backTo="/notifications" />
-        <ErrorAlert
-          error={error ?? new Error("No se pudo cargar la notificación.")}
-        />
+      <div className="flex max-w-[760px] flex-col gap-6">
+        <Breadcrumb to="/notifications" label="Notificaciones" />
+        {isForbidden || isNotFound ? (
+          <EmptyState
+            bordered
+            icon={isForbidden ? ShieldAlert : SearchX}
+            title={
+              isForbidden
+                ? "No tienes permisos para ver esta notificación"
+                : "Esta notificación no existe o fue eliminada"
+            }
+            action={
+              <Link to="/notifications" className={buttonClass("secondary")}>
+                Volver a Notificaciones
+              </Link>
+            }
+          />
+        ) : (
+          <ErrorAlert
+            error={error ?? new Error("No se pudo cargar la notificación.")}
+          />
+        )}
       </div>
     );
   }
 
   return (
-    <div>
-      <PageHeader title="Notificación" backTo="/notifications" />
+    <div className="flex max-w-[760px] flex-col gap-6">
+      <Breadcrumb to="/notifications" label="Notificaciones" />
 
-      <Card className="mx-auto max-w-2xl space-y-6 sm:p-8">
-        <div className="flex items-start gap-4 border-b border-border pb-5">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <Bell className="size-5" aria-hidden="true" />
+      <Card as="article" className="flex flex-col gap-5 p-6 sm:p-7">
+        <header className="flex items-start gap-4">
+          <span
+            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"
+            aria-hidden="true"
+          >
+            <Bell className="size-6" />
           </span>
-          <div className="min-w-0 flex-1">
-            <h1 className="break-words text-lg font-medium text-foreground">
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <h1 className="text-[22px] leading-[1.3] font-extrabold break-words">
               {notification.titulo}
             </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <span>{formatDateTime(notification.fecha_envio)}</span>
-              <span aria-hidden="true">·</span>
-              <span
-                className={`inline-flex rounded-full px-2 py-0.5 font-medium ${
-                  notification.leida
-                    ? "bg-muted text-muted-foreground"
-                    : "bg-primary/15 text-primary"
-                }`}
-              >
-                {notification.leida ? "Leída" : "No leída"}
-              </span>
+              {notification.leida ? (
+                <Pill tone="sand" icon={CheckCheck} className="!h-6 !px-2">
+                  Leída
+                </Pill>
+              ) : (
+                <Pill tone="info" className="!h-6 !px-2">
+                  No leída
+                </Pill>
+              )}
             </div>
           </div>
-        </div>
-
+        </header>
+        <div className="h-px bg-divider" />
         <div
-          className="whitespace-pre-wrap text-[0.95rem] leading-relaxed text-foreground"
+          className="text-base leading-[1.7] break-words whitespace-pre-line text-[#2F322B]"
           dangerouslySetInnerHTML={{
             __html: sanitizeNotificationHtml(notification.mensaje),
           }}

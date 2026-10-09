@@ -1,25 +1,17 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { Navbar } from "./Navbar";
 
-/** Rutas que aprovechan todo el ancho de pantalla en vez del contenedor centrado por defecto. */
-const FULL_WIDTH_ROUTES = new Set(["/notifications"]);
-
-/** Layout de las rutas privadas: navbar con estado de sesión + contenido. */
+/**
+ * Layout de la vista de miembro (roles MEMBER y PARTICIPANT): barra superior
+ * + contenido centrado. Fija aquí los valores propios de este perfil
+ * (controles de 44px, tarjetas de 16px) sin tocar estilos globales.
+ */
 export function AppShell() {
-  const { pathname } = useLocation();
-  const isFullWidth = FULL_WIDTH_ROUTES.has(pathname);
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-screen flex-col bg-background [--card-radius:16px] [--control-h:44px]">
       <Navbar />
-      <main
-        className={
-          isFullWidth
-            ? "px-4 py-8 sm:px-6 lg:px-8"
-            : "mx-auto max-w-5xl px-4 py-8"
-        }
-      >
+      <main className="mx-auto w-full max-w-[1120px] flex-1 px-5 pt-8 pb-[120px]">
         <Outlet />
       </main>
     </div>

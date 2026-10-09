@@ -7,17 +7,28 @@ import {
   type ReactNode,
 } from "react";
 
+import {
+  controlClass,
+  FieldError,
+  HINT_CLASS,
+  LABEL_CLASS,
+  OptionalMark,
+} from "./fieldStyles";
+
 interface PasswordFieldProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "type"> {
   label: string;
   error?: string;
   hint?: string;
   icon?: ReactNode;
+  /** Añade "(opcional)" a la etiqueta. */
+  optional?: boolean;
 }
 
+/** Cada campo lleva su propio botón de mostrar/ocultar. */
 export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
   function PasswordField(
-    { label, error, hint, icon, className = "", ...props },
+    { label, error, hint, icon, optional, className = "", required, ...props },
     ref,
   ) {
     const autoId = useId();
@@ -30,19 +41,15 @@ export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
         : undefined;
 
     return (
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor={id} className="text-sm font-medium text-foreground">
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <label htmlFor={id} className={LABEL_CLASS}>
           {label}
-          {props.required ? (
-            <span className="ml-0.5 text-destructive" aria-hidden="true">
-              *
-            </span>
-          ) : null}
+          {optional ? <OptionalMark /> : null}
         </label>
         <div className="relative">
           {icon ? (
             <span
-              className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground"
+              className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-icon-muted"
               aria-hidden="true"
             >
               {icon}
@@ -53,40 +60,32 @@ export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
             id={id}
             type={visible ? "text" : "password"}
             aria-invalid={error ? true : undefined}
+            aria-required={required || undefined}
             aria-describedby={describedBy}
-            className={`w-full rounded-lg border bg-input-background px-3 py-2.5 pr-10 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-60 ${
-              icon ? "pl-10" : ""
-            } ${
-              error
-                ? "border-destructive focus:border-destructive"
-                : "border-border focus:border-ring"
-            } ${className}`}
+            className={controlClass(
+              Boolean(error),
+              `h-[var(--control-h)] pr-12 ${icon ? "pl-[42px]" : ""} ${className}`,
+            )}
             {...props}
           />
           <button
             type="button"
             onClick={() => setVisible((v) => !v)}
             aria-label={visible ? "Ocultar contraseña" : "Mostrar contraseña"}
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+            aria-pressed={visible}
+            className="absolute inset-y-0.5 right-0.5 flex w-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-hover-icon hover:text-foreground"
           >
             {visible ? (
-              <EyeOff className="size-4" aria-hidden="true" />
+              <EyeOff className="size-5" aria-hidden="true" />
             ) : (
-              <Eye className="size-4" aria-hidden="true" />
+              <Eye className="size-5" aria-hidden="true" />
             )}
           </button>
         </div>
+        {error ? <FieldError id={`${id}-error`}>{error}</FieldError> : null}
         {hint && !error ? (
-          <p id={`${id}-hint`} className="text-xs text-muted-foreground">
+          <p id={`${id}-hint`} className={HINT_CLASS}>
             {hint}
-          </p>
-        ) : null}
-        {error ? (
-          <p
-            id={`${id}-error`}
-            className="text-xs font-medium text-destructive"
-          >
-            {error}
           </p>
         ) : null}
       </div>

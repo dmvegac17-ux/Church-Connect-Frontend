@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:#23261F;font-family:'Nunito Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3E6B4F;text-decoration:none}
+a:hover{color:#2F5540;text-decoration:underline}
+button,input{font-family:inherit}
+:focus-visible{outline:3px solid #8DB59A;outline-offset:2px}
+</style>
+</helmet>
+<div data-screen-label="Acceso" style="min-height:100vh;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))">
+  <aside style="background:#3E6B4F;color:#fff;padding:clamp(28px,6vw,72px);display:flex;flex-direction:column;justify-content:center;gap:28px">
+    <div style="display:flex;align-items:center;gap:16px">
+      <span style="width:64px;height:64px;border-radius:50%;background:#fff;color:#3E6B4F;display:grid;place-items:center;font-weight:800;font-size:30px;flex:none">C</span>
+      <span style="font-size:28px;font-weight:800;letter-spacing:-0.01em">Church Connect</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;max-width:460px">
+      <h1 style="margin:0;font-size:clamp(30px,3.6vw,42px);line-height:1.15;font-weight:800;letter-spacing:-0.02em;text-wrap:balance">Conectados con tu fe, conectados contigo</h1>
+      <p style="margin:0;font-size:17px;line-height:1.55;color:#E3ECE5;text-wrap:pretty">Vive la comunidad de tu iglesia desde un solo lugar: eventos, ministerios, anuncios y recursos espirituales.</p>
+    </div>
+    <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ perks }}" as="p" hint-placeholder-count="4">
+        <li style="display:flex;align-items:center;gap:12px;font-size:16px"><span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.16);display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:18px;line-height:1">{{ p.icon }}</span>{{ p.t }}</li>
+      </sc-for>
+    </ul>
+    <figure style="margin:0;padding-top:20px;border-top:1px solid rgba(255,255,255,0.2);max-width:460px">
+      <blockquote style="margin:0;font-size:15px;font-style:italic;line-height:1.5;color:#E3ECE5">“En todas estas cosas somos más que vencedores por medio de aquel que nos amó.”</blockquote>
+      <figcaption style="margin-top:6px;font-size:14px;font-weight:800">Romanos 8:37</figcaption>
+    </figure>
+  </aside>
+
+  <main style="display:flex;align-items:center;justify-content:center;padding:clamp(24px,5vw,64px) 20px">
+    <div style="width:100%;max-width:460px;display:flex;flex-direction:column;gap:22px">
+
+      <sc-if value="{{ v.tabs }}" hint-placeholder-val="{{ true }}">
+        <div role="tablist" aria-label="Acceso" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:#F1EDE5;border-radius:14px">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+            <button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" style="height:44px;border:0;border-radius:10px;cursor:pointer;font-size:15px;font-weight:800;background:{{ t.bg }};color:{{ t.color }};box-shadow:{{ t.shadow }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ v.login }}" hint-placeholder-val="{{ true }}">
+        <form onSubmit="{{ login }}" novalidate="true" style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:24px;font-weight:800">Bienvenido de nuevo</h2><span style="font-size:15px;color:#5F6259">Ingresa con tu correo y contraseña.</span></div>
+          <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#FBE9E5;color:#862C21;font-size:14px;line-height:1.45"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">error</span>{{ loginErr }}</div>
+          </sc-if>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Correo electrónico</span>
+            <span style="position:relative;display:block"><span aria-hidden="true" style="position:absolute;left:12px;top:12px;font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#6B6E65">mail</span>
+            <input type="email" autocomplete="email" value="{{ lf.correo.value }}" onChange="{{ lf.correo.onChange }}" onBlur="{{ lf.correo.onBlur }}" placeholder="tu@email.com" aria-invalid="{{ lf.correo.hasErr }}" style="width:100%;height:46px;padding:0 12px 0 42px;border-radius:10px;background:#F6F2EC;font-size:15px;color:#23261F;border:1px solid {{ lf.correo.border }}" style-focus="background:#fff;border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"></span>
+            <sc-if value="{{ lf.correo.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ lf.correo.err }}</span></sc-if></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Contraseña</span>
+            <span style="position:relative;display:block"><span aria-hidden="true" style="position:absolute;left:12px;top:12px;font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#6B6E65">lock</span>
+            <input type="{{ pw.type }}" autocomplete="current-password" value="{{ lf.pass.value }}" onChange="{{ lf.pass.onChange }}" onBlur="{{ lf.pass.onBlur }}" aria-invalid="{{ lf.pass.hasErr }}" style="width:100%;height:46px;padding:0 48px 0 42px;border-radius:10px;background:#F6F2EC;font-size:15px;color:#23261F;border:1px solid {{ lf.pass.border }}" style-focus="background:#fff;border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0">
+            <button type="button" onClick="{{ pw.toggle }}" aria-label="{{ pw.aria }}" style="position:absolute;right:3px;top:3px;width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:#5F6259;cursor:pointer;display:grid;place-items:center"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ pw.icon }}</span></button></span>
+            <sc-if value="{{ lf.pass.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ lf.pass.err }}</span></sc-if></label>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <button type="button" role="checkbox" aria-checked="{{ rememberAria }}" onClick="{{ toggleRemember }}" style="display:flex;align-items:center;gap:8px;border:0;background:none;padding:4px 0;cursor:pointer;font-size:15px;color:#23261F"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1;color:{{ rememberColor }}">{{ rememberIcon }}</span>Recordarme</button>
+            <button type="button" onClick="{{ goForgot }}" style="border:0;background:none;padding:4px 0;color:#3E6B4F;font-size:15px;font-weight:700;cursor:pointer" style-hover="text-decoration:underline">¿Olvidaste tu contraseña?</button>
+          </div>
+          <button type="submit" disabled="{{ busy }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border:0;border-radius:12px;background:#3E6B4F;color:#fff;font-size:16px;font-weight:800;cursor:pointer" style-hover="background:#2F5540">{{ loginLabel }}</button>
+          <div style="display:flex;align-items:center;gap:12px;color:#5F6259;font-size:14px"><span style="flex:1;height:1px;background:#E6E1D8"></span>o continúa con<span style="flex:1;height:1px;background:#E6E1D8"></span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <button type="button" onClick="{{ social }}" style="height:46px;border:1px solid #D3CCBF;border-radius:12px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F8F7F3">Google</button>
+            <button type="button" onClick="{{ social }}" style="height:46px;border:1px solid #D3CCBF;border-radius:12px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F8F7F3">Facebook</button>
+          </div>
+          <div style="padding:10px 12px;border-radius:10px;background:#F8F7F3;border:1px dashed #D3CCBF;font-size:13px;line-height:1.5;color:#4C5047">Prototipo · admin: <strong>dimaveca18@gmail.com</strong> · miembro: <strong>reginopm0897@gmail.com</strong> · contraseña: <strong>12345678</strong></div>
+        </form>
+      </sc-if>
+
+      <sc-if value="{{ v.register }}" hint-placeholder-val="{{ false }}">
+        <form onSubmit="{{ register }}" novalidate="true" style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:24px;font-weight:800">Crea tu cuenta</h2><span style="font-size:15px;color:#5F6259">Todos los campos son obligatorios salvo el teléfono.</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:14px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Nombre</span><input autocomplete="given-name" value="{{ rf.nombre.value }}" onChange="{{ rf.nombre.onChange }}" onBlur="{{ rf.nombre.onBlur }}" placeholder="Juan" style="height:46px;padding:0 12px;border-radius:10px;background:#F6F2EC;font-size:15px;color:#23261F;border:1px solid {{ rf.nombre.border }}" style-focus="background:#fff;border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><sc-if value="{{ rf.nombre.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ rf.nombre.err }}</span></sc-if></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Apellido</span><input autocomplete="family-name" value="{{ rf.apellido.value }}" onChange="{{ rf.apellido.onChange }}" onBlur="{{ rf.apellido.onBlur }}" placeholder="Pérez" style="height:46px;padding:0 12px;border-radius:10px;background:#F6F2EC;font-size:15px;color:#23261F;border:1px solid {{ rf.apellido.border }}" style-focus="background:#fff;border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><sc-if value="{{ rf.apellido.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ rf.apellido.err }}</span></sc-if></label>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Correo electrónico</span><input type="email" autocomplete="email" value="{{ rf.correo.value }}" onChange="{{ rf.correo.onChange }}" onBlur="{{ rf.correo.onBlur }}" placeholder="tu@email.com" style="height:46px;padding:0 12px;border-radius:10px;background:#F6F2EC;font-size:15px;color:#23261F;border:1px solid {{ rf.correo.border }}" style-focus="background:#fff;border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><sc-if value="{{ rf.correo.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ rf.correo.err }}</span></sc-if></label>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Teléfono <span style="font-weight:400;color:#5F6259">(opcional)</span></span><input type="tel" autocomplete="tel" value="{{ rf.tel.value }}" onChange="{{ rf.tel.onChange }}" placeholder="(123) 456-7890" style="height:46px;padding:0 12px;border:1px solid #DDD6CA;border-radius:10px;background:#F6F2EC;font-size:15px;color:#23261F" style-focus="background:#fff;border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"></label>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:14px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Contraseña</span><span style="position:relative;display:block"><input type="{{ pw.type }}" autocomplete="new-password" maxlength="20" value="{{ rf.pass.value }}" onChange="{{ rf.pass.onChange }}" onBlur="{{ rf.pass.onBlur }}" style="width:100%;height:46px;padding:0 46px 0 12px;border-radius:10px;background:#F6F2EC;font-size:15px;color:#23261F;border:1px solid {{ rf.pass.border }}" style-focus="background:#fff;border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><button type="button" onClick="{{ pw.toggle }}" aria-label="{{ pw.aria }}" style="position:absolute;right:3px;top:3px;width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:#5F6259;cursor:pointer;display:grid;place-items:center"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ pw.icon }}</span></button></span></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Confirmar contraseña</span><span style="position:relative;display:block"><input type="{{ pw2.type }}" autocomplete="new-password" maxlength="20" value="{{ rf.pass2.value }}" onChange="{{ rf.pass2.onChange }}" onBlur="{{ rf.pass2.onBlur }}" style="width:100%;height:46px;padding:0 46px 0 12px;border-radius:10px;background:#F6F2EC;font-size:15px;color:#23261F;border:1px solid {{ rf.pass2.border }}" style-focus="background:#fff;border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><button type="button" onClick="{{ pw2.toggle }}" aria-label="{{ pw2.aria }}" style="position:absolute;right:3px;top:3px;width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:#5F6259;cursor:pointer;display:grid;place-items:center"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ pw2.icon }}</span></button></span></label>
+          </div>
+          <ul aria-live="polite" style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 20px">
+            <sc-for list="{{ rules }}" as="r" hint-placeholder-count="2"><li style="display:flex;align-items:center;gap:6px;font-size:14px;color:{{ r.color }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">{{ r.icon }}</span>{{ r.label }}</li></sc-for>
+          </ul>
+          <button type="button" role="checkbox" aria-checked="{{ termsAria }}" onClick="{{ toggleTerms }}" style="display:flex;align-items:flex-start;gap:8px;border:0;background:none;padding:2px 0;cursor:pointer;font-size:15px;color:#23261F;text-align:left;line-height:1.4"><span aria-hidden="true" style="flex:none;font-family:'Material Symbols Rounded';font-size:22px;line-height:1;color:{{ termsColor }}">{{ termsIcon }}</span>Acepto los términos y condiciones y la política de privacidad</button>
+          <sc-if value="{{ termsErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A;margin-top:-8px">Debes aceptar los términos para crear tu cuenta.</span></sc-if>
+          <button type="submit" disabled="{{ busy }}" style="height:48px;border:0;border-radius:12px;background:#3E6B4F;color:#fff;font-size:16px;font-weight:800;cursor:pointer" style-hover="background:#2F5540">{{ registerLabel }}</button>
+          <p style="margin:0;text-align:center;font-size:13px;color:#5F6259">Al registrarte, aceptas recibir comunicaciones de nuestra iglesia</p>
+        </form>
+      </sc-if>
+
+      <sc-if value="{{ v.forgot }}" hint-placeholder-val="{{ false }}">
+        <form onSubmit="{{ sendReset }}" novalidate="true" style="display:flex;flex-direction:column;gap:16px">
+          <button type="button" onClick="{{ goLogin }}" style="align-self:flex-start;display:flex;align-items:center;gap:4px;border:0;background:none;color:#3E6B4F;font-size:14px;font-weight:700;cursor:pointer;padding:4px 0"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">arrow_back</span>Volver a iniciar sesión</button>
+          <div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:24px;font-weight:800">Recupera tu contraseña</h2><span style="font-size:15px;color:#5F6259;line-height:1.5">Escribe el correo de tu cuenta y te enviaremos un enlace para crear una nueva.</span></div>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Correo electrónico</span><input type="email" value="{{ lf.correo.value }}" onChange="{{ lf.correo.onChange }}" onBlur="{{ lf.correo.onBlur }}" placeholder="tu@email.com" style="height:46px;padding:0 12px;border-radius:10px;background:#F6F2EC;font-size:15px;color:#23261F;border:1px solid {{ lf.correo.border }}" style-focus="background:#fff;border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><sc-if value="{{ lf.correo.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ lf.correo.err }}</span></sc-if></label>
+          <button type="submit" disabled="{{ busy }}" style="height:48px;border:0;border-radius:12px;background:#3E6B4F;color:#fff;font-size:16px;font-weight:800;cursor:pointer" style-hover="background:#2F5540">{{ resetLabel }}</button>
+        </form>
+      </sc-if>
+
+      <sc-if value="{{ v.done }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:24px 0">
+          <span aria-hidden="true" style="width:60px;height:60px;border-radius:50%;background:#E3EEE5;color:#2F7D4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:32px;line-height:1">{{ done.icon }}</span>
+          <h2 style="margin:0;font-size:24px;font-weight:800">{{ done.title }}</h2>
+          <p style="margin:0;font-size:15px;line-height:1.55;color:#4C5047;max-width:360px">{{ done.body }}</p>
+          <a href="{{ done.href }}" style="margin-top:6px;display:inline-flex;align-items:center;height:48px;padding:0 22px;border-radius:12px;background:#3E6B4F;color:#fff;font-size:16px;font-weight:800;text-decoration:none">{{ done.cta }}</a>
+          <button type="button" onClick="{{ goLogin }}" style="border:0;background:none;color:#3E6B4F;font-size:14px;font-weight:700;cursor:pointer;padding:6px">Volver al inicio de sesión</button>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const EMAIL = /^\S+@\S+\.\S+$/;
+const ACCOUNTS = { 'dimaveca18@gmail.com':'admin', 'reginopm0897@gmail.com':'miembro' };
+const MEMBER = 'Church Connect Miembro.dc.html', ADMIN = 'Church Connect Admin.dc.html';
+class Component extends DCLogic {
+  state = { view:'login', l:{ correo:'', pass:'' }, r:{ nombre:'', apellido:'', correo:'', tel:'', pass:'', pass2:'' }, touched:{}, tried:false, showPw:false, remember:true, terms:false, busy:false, loginErr:'', done:null };
+  componentWillUnmount() { clearTimeout(this.t); }
+  setView(view) { this.setState({ view, touched:{}, tried:false, loginErr:'', showPw:false, busy:false }); }
+  fields(obj, errs, prefix) { const s = this.state, out = {};
+    Object.keys(obj).forEach(k => { const show = !!errs[k] && (s.tried || s.touched[prefix + k]);
+      out[k] = { value:obj[k], err:errs[k] || '', hasErr:show, border: show ? '#A3372A' : '#DDD6CA',
+        onChange: e => { const v = e.target.value; this.setState(st => ({ [prefix]: { ...st[prefix], [k]:v }, loginErr:'' })); },
+        onBlur: () => this.setState(st => ({ touched:{ ...st.touched, [prefix + k]:true } })) }; });
+    return out; }
+  renderVals() {
+    const s = this.state, l = s.l, r = s.r;
+    const lErr = {}; if (!l.correo.trim()) lErr.correo = 'Ingresa tu correo.'; else if (!EMAIL.test(l.correo)) lErr.correo = 'Escribe un correo válido.';
+    if (s.view === 'login' && !l.pass) lErr.pass = 'Ingresa tu contraseña.';
+    const rErr = {}; if (!r.nombre.trim()) rErr.nombre = 'Ingresa tu nombre.'; if (!r.apellido.trim()) rErr.apellido = 'Ingresa tu apellido.';
+    if (!r.correo.trim()) rErr.correo = 'Ingresa tu correo.'; else if (!EMAIL.test(r.correo)) rErr.correo = 'Escribe un correo válido.'; else if (ACCOUNTS[r.correo.toLowerCase()]) rErr.correo = 'Ya existe una cuenta con este correo. Inicia sesión.';
+    const lenOk = r.pass.length >= 8 && r.pass.length <= 20, match = !!r.pass2 && r.pass === r.pass2;
+    if (!lenOk) rErr.pass = 'x'; if (!match) rErr.pass2 = 'x';
+    const rule = (ok, label, pending) => ({ label, icon: ok ? 'check_circle' : 'radio_button_unchecked', color: ok ? '#2B5A3E' : (pending && !s.tried) ? '#5F6259' : '#A3372A' });
+    const tab = (k, label) => { const on = s.view === k; return { label, sel: on ? 'true' : 'false', bg: on ? '#fff' : 'transparent', color: on ? '#2F5540' : '#4C5047', shadow: on ? '0 1px 3px rgba(35,38,31,0.12)' : 'none', onClick: () => this.setView(k) }; };
+    const fail = errs => Object.keys(errs).length && (this.setState({ tried:true }), true);
+    return {
+      v: { tabs: s.view === 'login' || s.view === 'register', login: s.view === 'login', register: s.view === 'register', forgot: s.view === 'forgot', done: s.view === 'done' },
+      tabs: [ tab('login','Iniciar sesión'), tab('register','Registrarse') ],
+      perks: [ { icon:'calendar_month', t:'Acceso a eventos y horarios' }, { icon:'diversity_3', t:'Únete a ministerios' }, { icon:'forum', t:'Comunidad en línea' }, { icon:'menu_book', t:'Recursos espirituales' } ],
+      lf: this.fields(l, lErr, 'l'), rf: this.fields(r, rErr, 'r'),
+      pw: { type: s.showPw ? 'text' : 'password', icon: s.showPw ? 'visibility_off' : 'visibility', aria: s.showPw ? 'Ocultar contraseña' : 'Mostrar contraseña', toggle: () => this.setState(st => ({ showPw:!st.showPw })) },
+      pw2: { type: s.showPw2 ? 'text' : 'password', icon: s.showPw2 ? 'visibility_off' : 'visibility', aria: s.showPw2 ? 'Ocultar confirmación' : 'Mostrar confirmación', toggle: () => this.setState(st => ({ showPw2:!st.showPw2 })) },
+      rules: [ rule(lenOk, 'Entre 8 y 20 caracteres', !r.pass), rule(match, 'Las contraseñas coinciden', !r.pass2) ],
+      rememberIcon: s.remember ? 'check_box' : 'check_box_outline_blank', rememberColor: s.remember ? '#3E6B4F' : '#8A8C83', rememberAria: s.remember ? 'true' : 'false', toggleRemember: () => this.setState(st => ({ remember:!st.remember })),
+      termsIcon: s.terms ? 'check_box' : 'check_box_outline_blank', termsColor: s.terms ? '#3E6B4F' : (s.tried && !s.terms ? '#A3372A' : '#8A8C83'), termsAria: s.terms ? 'true' : 'false', termsErr: s.tried && !s.terms, toggleTerms: () => this.setState(st => ({ terms:!st.terms })),
+      busy: s.busy, loginErr: s.loginErr,
+      loginLabel: s.busy ? 'Ingresando…' : 'Iniciar sesión', registerLabel: s.busy ? 'Creando cuenta…' : 'Crear cuenta', resetLabel: s.busy ? 'Enviando…' : 'Enviar enlace',
+      goForgot: () => this.setView('forgot'), goLogin: () => this.setView('login'),
+      social: () => this.setState({ loginErr:'El acceso con redes sociales no está disponible en este prototipo.' }),
+      login: e => { e.preventDefault(); if (s.busy || fail(lErr)) return; this.setState({ busy:true });
+        this.t = setTimeout(() => { const role = ACCOUNTS[l.correo.toLowerCase()];
+          if (!role || l.pass !== '12345678') { this.setState({ busy:false, loginErr:'El correo o la contraseña no son correctos. Revisa los datos e inténtalo de nuevo.' }); return; }
+          window.location.href = encodeURI(role === 'admin' ? ADMIN : MEMBER); }, 600); },
+      register: e => { e.preventDefault(); if (s.busy) return; if (Object.keys(rErr).length || !s.terms) { this.setState({ tried:true }); return; } this.setState({ busy:true });
+        this.t = setTimeout(() => { window.location.href = encodeURI(MEMBER); }, 700); },
+      sendReset: e => { e.preventDefault(); if (s.busy || (lErr.correo && (this.setState({ tried:true }), true))) return; this.setState({ busy:true });
+        this.t = setTimeout(() => this.setState({ busy:false, view:'done', done:{ icon:'mark_email_read', title:'Revisa tu correo', body:`Si ${l.correo.trim()} tiene una cuenta, recibirás un enlace para crear una nueva contraseña.`, cta:'Volver a iniciar sesión', href:'' } }), 800); },
+      done: s.done || {},
+    };
+  }
+}
+</script>
+</body>
+</html>

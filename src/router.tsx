@@ -1,9 +1,20 @@
+import type { ReactNode } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { ProtectedRoute } from "./auth/ProtectedRoute";
+import { useAuth } from "./auth/useAuth";
+import { AdminShell } from "./components/layout/AdminShell";
 import { AppShell } from "./components/layout/AppShell";
 import { ForbiddenPage } from "./pages/ForbiddenPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { AdminHomePage } from "./pages/admin/AdminHomePage";
+import { AdminEventDetailPage } from "./pages/admin/events/AdminEventDetailPage";
+import { AdminEventsPage } from "./pages/admin/events/AdminEventsPage";
+import { AdminMinistriesPage } from "./pages/admin/ministries/AdminMinistriesPage";
+import { AdminMinistryDetailPage } from "./pages/admin/ministries/AdminMinistryDetailPage";
+import { AdminNotificationsPage } from "./pages/admin/notifications/AdminNotificationsPage";
+import { AdminSchedulesPage } from "./pages/admin/schedules/AdminSchedulesPage";
+import { AdminUsersPage } from "./pages/admin/users/AdminUsersPage";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 import { EventCreatePage } from "./pages/events/EventCreatePage";
@@ -12,20 +23,35 @@ import { EventEditPage } from "./pages/events/EventEditPage";
 import { EventsListPage } from "./pages/events/EventsListPage";
 import { HomePage } from "./pages/home/HomePage";
 import { MinistriesListPage } from "./pages/ministries/MinistriesListPage";
-import { MinistryCreatePage } from "./pages/ministries/MinistryCreatePage";
 import { MinistryDetailPage } from "./pages/ministries/MinistryDetailPage";
-import { MinistryEditPage } from "./pages/ministries/MinistryEditPage";
 import { NotificationDetailPage } from "./pages/notifications/NotificationDetailPage";
-import { NotificationEditPage } from "./pages/notifications/NotificationEditPage";
 import { NotificationsListPage } from "./pages/notifications/NotificationsListPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
-import { ScheduleCreatePage } from "./pages/schedules/ScheduleCreatePage";
-import { ScheduleEditPage } from "./pages/schedules/ScheduleEditPage";
 import { SchedulesListPage } from "./pages/schedules/SchedulesListPage";
-import { UserCreatePage } from "./pages/users/UserCreatePage";
 import { UserDetailPage } from "./pages/users/UserDetailPage";
-import { UserEditPage } from "./pages/users/UserEditPage";
-import { UsersListPage } from "./pages/users/UsersListPage";
+
+/**
+ * Cada perfil tiene su propio layout: el panel de administración (barra
+ * lateral) para ADMIN y la vista de miembro (barra superior) para el resto.
+ */
+function RoleShell() {
+  const { role } = useAuth();
+  return role === "ADMIN" ? <AdminShell /> : <AppShell />;
+}
+
+/**
+ * Misma ruta, pantalla distinta según el perfil. Es solo presentación: la
+ * autorización real la aplica el backend y `ProtectedRoute` en las rutas
+ * exclusivas de ADMIN.
+ */
+function ByRole({ admin, member }: { admin: ReactNode; member: ReactNode }) {
+  const { role } = useAuth();
+  return <>{role === "ADMIN" ? admin : member}</>;
+}
+
+function AdminOnly({ children }: { children: ReactNode }) {
+  return <ProtectedRoute requiredRole="ADMIN">{children}</ProtectedRoute>;
+}
 
 export function AppRoutes() {
   return (
@@ -34,125 +60,182 @@ export function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Privadas (con layout) */}
+      {/* Privadas (con el layout del perfil) */}
       <Route
         element={
           <ProtectedRoute>
-            <AppShell />
+            <RoleShell />
           </ProtectedRoute>
         }
       >
-        {/* Inicio: pantalla de bienvenida tras iniciar sesión. */}
-        <Route path="/" element={<HomePage />} />
+        {/* Inicio: el que corresponda al rol. */}
+        <Route
+          path="/"
+          element={<ByRole admin={<AdminHomePage />} member={<HomePage />} />}
+        />
 
         <Route path="/profile" element={<ProfilePage />} />
 
+        {/* Usuarios: solo ADMIN. Crear y editar abren el panel lateral sobre
+            el listado, conservando sus rutas. */}
         <Route
           path="/users"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <UsersListPage />
-            </ProtectedRoute>
+            <AdminOnly>
+              <AdminUsersPage />
+            </AdminOnly>
           }
         />
         <Route
           path="/users/new"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <UserCreatePage />
-            </ProtectedRoute>
+            <AdminOnly>
+              <AdminUsersPage mode="create" />
+            </AdminOnly>
           }
         />
         <Route
           path="/users/:id"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
+            <AdminOnly>
               <UserDetailPage />
-            </ProtectedRoute>
+            </AdminOnly>
           }
         />
         <Route
           path="/users/:id/edit"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <UserEditPage />
-            </ProtectedRoute>
+            <AdminOnly>
+              <AdminUsersPage mode="edit" />
+            </AdminOnly>
           }
         />
 
         {/* Eventos: lectura para cualquier sesión; escritura solo ADMIN.
             La ruta literal "nuevo" va antes de ":id". */}
-        <Route path="/events" element={<EventsListPage />} />
+        <Route
+          path="/events"
+          element={
+            <ByRole admin={<AdminEventsPage />} member={<EventsListPage />} />
+          }
+        />
         <Route
           path="/events/nuevo"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
+            <AdminOnly>
               <EventCreatePage />
-            </ProtectedRoute>
+            </AdminOnly>
           }
         />
-        <Route path="/events/:id" element={<EventDetailPage />} />
+        <Route
+          path="/events/:id"
+          element={
+            <ByRole
+              admin={<AdminEventDetailPage />}
+              member={<EventDetailPage />}
+            />
+          }
+        />
         <Route
           path="/events/:id/editar"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
+            <AdminOnly>
               <EventEditPage />
-            </ProtectedRoute>
+            </AdminOnly>
           }
         />
 
         {/* Ministerios: lectura para cualquier sesión; escritura solo ADMIN.
             La ruta literal "nuevo" va antes de ":id". */}
-        <Route path="/ministries" element={<MinistriesListPage />} />
+        <Route
+          path="/ministries"
+          element={
+            <ByRole
+              admin={<AdminMinistriesPage />}
+              member={<MinistriesListPage />}
+            />
+          }
+        />
         <Route
           path="/ministries/nuevo"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <MinistryCreatePage />
-            </ProtectedRoute>
+            <AdminOnly>
+              <AdminMinistriesPage mode="create" />
+            </AdminOnly>
           }
         />
-        <Route path="/ministries/:id" element={<MinistryDetailPage />} />
+        <Route
+          path="/ministries/:id"
+          element={
+            <ByRole
+              admin={<AdminMinistryDetailPage />}
+              member={<MinistryDetailPage />}
+            />
+          }
+        />
         <Route
           path="/ministries/:id/editar"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <MinistryEditPage />
-            </ProtectedRoute>
+            <AdminOnly>
+              <AdminMinistryDetailPage mode="edit" />
+            </AdminOnly>
           }
         />
 
         {/* Cronogramas: lectura para cualquier sesión; escritura solo ADMIN.
-            La ruta literal "nuevo" va antes de ":id". */}
-        <Route path="/schedules" element={<SchedulesListPage />} />
+            Crear y editar abren el modal de cronograma sobre el listado. */}
+        <Route
+          path="/schedules"
+          element={
+            <ByRole
+              admin={<AdminSchedulesPage />}
+              member={<SchedulesListPage />}
+            />
+          }
+        />
         <Route
           path="/schedules/nuevo"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <ScheduleCreatePage />
-            </ProtectedRoute>
+            <AdminOnly>
+              <AdminSchedulesPage mode="create" />
+            </AdminOnly>
           }
         />
         <Route
           path="/schedules/:id/editar"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <ScheduleEditPage />
-            </ProtectedRoute>
+            <AdminOnly>
+              <AdminSchedulesPage mode="edit" />
+            </AdminOnly>
           }
         />
 
-        {/* Notificaciones: lectura de la propia bandeja para cualquier sesión;
-            envío/edición/eliminación solo ADMIN. El envío se hace desde un
-            popup (ComposeNotificationModal) en vez de una ruta propia. */}
-        <Route path="/notifications" element={<NotificationsListPage />} />
-        <Route path="/notifications/:id" element={<NotificationDetailPage />} />
+        {/* Notificaciones: cada sesión ve su propia bandeja; envío, edición
+            y eliminación solo ADMIN. */}
+        <Route
+          path="/notifications"
+          element={
+            <ByRole
+              admin={<AdminNotificationsPage />}
+              member={<NotificationsListPage />}
+            />
+          }
+        />
+        <Route
+          path="/notifications/:id"
+          element={
+            <ByRole
+              admin={<AdminNotificationsPage />}
+              member={<NotificationDetailPage />}
+            />
+          }
+        />
         <Route
           path="/notifications/:id/editar"
           element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <NotificationEditPage />
-            </ProtectedRoute>
+            <AdminOnly>
+              <AdminNotificationsPage mode="edit" />
+            </AdminOnly>
           }
         />
 

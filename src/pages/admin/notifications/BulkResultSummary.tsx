@@ -12,17 +12,17 @@ const STATUS_META: Record<
   { box: string; icon: ReactNode; title: string }
 > = {
   201: {
-    box: "border-primary/30 bg-primary/10 text-primary",
+    box: "bg-success-soft text-success-foreground",
     icon: <CheckCircle2 className="size-5 shrink-0" aria-hidden="true" />,
     title: "Envío completado",
   },
   207: {
-    box: "border-border bg-muted text-foreground",
+    box: "bg-warning-soft text-warning-foreground",
     icon: <AlertTriangle className="size-5 shrink-0" aria-hidden="true" />,
     title: "Envío parcial",
   },
   500: {
-    box: "border-destructive/30 bg-destructive/10 text-destructive",
+    box: "bg-destructive-soft text-destructive-hover",
     icon: <XCircle className="size-5 shrink-0" aria-hidden="true" />,
     title: "El envío falló",
   },
@@ -37,11 +37,11 @@ export function BulkResultSummary({ result }: BulkResultSummaryProps) {
     <div
       role="status"
       aria-live="polite"
-      className={`flex gap-3 rounded-xl border p-4 text-sm ${box}`}
+      className={`flex gap-2.5 rounded-xl px-3.5 py-3 text-sm ${box}`}
     >
       {icon}
       <div className="min-w-0 flex-1">
-        <p className="font-medium">{title}</p>
+        <p className="font-extrabold">{title}</p>
         <p className="mt-0.5">
           {meta.exitosas} de {meta.total} notificaciones enviadas
           {meta.fallidas > 0 ? `, ${meta.fallidas} fallaron` : ""}.

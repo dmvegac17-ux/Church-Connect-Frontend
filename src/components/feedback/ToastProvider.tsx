@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
+import { CircleAlert, CircleCheck, Info, X } from "lucide-react";
 import {
   useCallback,
   useMemo,
@@ -9,7 +9,6 @@ import {
 } from "react";
 
 import {
-  DEFAULT_TOAST_TITLES,
   ToastContext,
   type ToastContextValue,
   type ToastInput,
@@ -18,40 +17,27 @@ import {
 
 interface ActiveToast {
   id: number;
-  title: string;
+  title?: string;
   message: string;
   variant: ToastVariant;
-  duration: number;
+  actionLabel?: string;
+  onAction?: () => void;
 }
 
+/** Iconos claros sobre el fondo oscuro del toast (contraste AA). */
 const ICONS: Record<ToastVariant, ReactNode> = {
-  success: <CheckCircle2 className="size-5" aria-hidden="true" />,
-  error: <AlertCircle className="size-5" aria-hidden="true" />,
-  info: <Info className="size-5" aria-hidden="true" />,
-};
-
-const STYLES: Record<
-  ToastVariant,
-  { accent: string; iconWrap: string; title: string }
-> = {
-  success: {
-    accent: "border-l-primary",
-    iconWrap: "bg-primary/15 text-primary",
-    title: "text-primary",
-  },
-  error: {
-    accent: "border-l-destructive",
-    iconWrap: "bg-destructive/10 text-destructive",
-    title: "text-destructive",
-  },
-  info: {
-    accent: "border-l-accent",
-    iconWrap: "bg-muted text-muted-foreground",
-    title: "text-foreground",
-  },
+  success: (
+    <CircleCheck className="size-5 shrink-0 text-[#9FD0AE]" aria-hidden="true" />
+  ),
+  error: (
+    <CircleAlert className="size-5 shrink-0 text-[#F3C9C0]" aria-hidden="true" />
+  ),
+  info: <Info className="size-5 shrink-0 text-[#CFE6D5]" aria-hidden="true" />,
 };
 
 const DEDUPE_WINDOW_MS = 500;
+const DEFAULT_DURATION_MS = 5000;
+const ACTION_DURATION_MS = 6000;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ActiveToast[]>([]);
@@ -63,7 +49,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const notify = useCallback(
-    ({ title, message, variant = "info", duration = 4500 }: ToastInput) => {
+    ({
+      title,
+      message,
+      variant = "info",
+      duration,
+      actionLabel,
+      onAction,
+    }: ToastInput) => {
       const key = `${variant}|${title ?? ""}|${message}`;
       const now = Date.now();
 
@@ -81,17 +74,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       const id = ++counter.current;
       setToasts((prev) => [
         ...prev,
-        {
-          id,
-          title: title ?? DEFAULT_TOAST_TITLES[variant],
-          message,
-          variant,
-          duration,
-        },
+        { id, title, message, variant, actionLabel, onAction },
       ]);
 
-      if (duration > 0) {
-        window.setTimeout(() => dismiss(id), duration);
+      const visibleFor =
+        duration ?? (actionLabel ? ACTION_DURATION_MS : DEFAULT_DURATION_MS);
+      if (visibleFor > 0) {
+        window.setTimeout(() => dismiss(id), visibleFor);
       }
     },
     [dismiss],
@@ -111,48 +100,48 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div
-        aria-live="polite"
-        className="pointer-events-none fixed inset-x-4 top-4 z-50 flex flex-col items-end gap-2 sm:inset-x-auto sm:right-4"
-      >
+      <div className="pointer-events-none fixed inset-x-4 bottom-6 z-[90] flex flex-col items-center gap-2">
         <AnimatePresence initial={false}>
-          {toasts.map((toast) => {
-            const style = STYLES[toast.variant];
-            return (
-              <motion.div
-                key={toast.id}
-                layout
-                initial={{ opacity: 0, x: 32, scale: 0.97 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 32, scale: 0.97 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
-                className={`pointer-events-auto flex w-full items-start gap-3 rounded-xl border border-l-4 border-border bg-card p-4 shadow-lg sm:w-96 ${style.accent}`}
-                role={toast.variant === "error" ? "alert" : "status"}
-              >
-                <span
-                  className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full ${style.iconWrap}`}
-                >
-                  {ICONS[toast.variant]}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-sm font-semibold ${style.title}`}>
-                    {toast.title}
-                  </p>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    {toast.message}
-                  </p>
-                </div>
+          {toasts.map((toast) => (
+            <motion.div
+              key={toast.id}
+              layout
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="pointer-events-auto flex max-w-full items-center gap-2.5 rounded-xl bg-foreground py-2 pr-2 pl-4 text-[15px] text-white shadow-toast sm:max-w-xl"
+              role={toast.variant === "error" ? "alert" : "status"}
+            >
+              {ICONS[toast.variant]}
+              <span className="min-w-0 flex-1 py-1.5 leading-snug">
+                {toast.title ? (
+                  <span className="sr-only">{toast.title}: </span>
+                ) : null}
+                {toast.message}
+              </span>
+              {toast.actionLabel && toast.onAction ? (
                 <button
                   type="button"
-                  onClick={() => dismiss(toast.id)}
-                  aria-label="Cerrar notificación"
-                  className="-m-1 shrink-0 rounded p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  onClick={() => {
+                    toast.onAction?.();
+                    dismiss(toast.id);
+                  }}
+                  className="h-9 shrink-0 rounded-lg px-2.5 text-sm font-extrabold whitespace-nowrap text-[#CFE6D5] hover:bg-white/10"
                 >
-                  <X className="size-4" aria-hidden="true" />
+                  {toast.actionLabel}
                 </button>
-              </motion.div>
-            );
-          })}
+              ) : null}
+              <button
+                type="button"
+                onClick={() => dismiss(toast.id)}
+                aria-label="Cerrar aviso"
+                className="flex size-9 shrink-0 items-center justify-center rounded-lg text-white/80 hover:bg-white/10 hover:text-white"
+              >
+                <X className="size-[18px]" aria-hidden="true" />
+              </button>
+            </motion.div>
+          ))}
         </AnimatePresence>
       </div>
     </ToastContext.Provider>

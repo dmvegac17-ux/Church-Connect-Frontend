@@ -85,7 +85,7 @@ export function EventLocationPicker({
     : DEFAULT_CENTER;
 
   return (
-    <div className={`isolate overflow-hidden rounded-lg border border-border ${className}`}>
+    <div className={`isolate overflow-hidden rounded-xl border border-border ${className}`}>
       <MapContainer
         center={center}
         zoom={hasPosition ? 15 : 6}
