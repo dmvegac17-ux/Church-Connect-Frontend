@@ -1,8 +1,13 @@
+import { forwardRef, useId, type TextareaHTMLAttributes } from "react";
+
 import {
-  forwardRef,
-  useId,
-  type TextareaHTMLAttributes,
-} from "react";
+  controlClass,
+  FieldCounter,
+  FieldError,
+  HINT_CLASS,
+  LABEL_CLASS,
+  OptionalMark,
+} from "./fieldStyles";
 
 interface TextAreaProps
   extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "id"> {
@@ -11,11 +16,22 @@ interface TextAreaProps
   hint?: string;
   /** Oculta el contador de caracteres aunque se pase `maxLength`. */
   hideCounter?: boolean;
+  /** Añade "(opcional)" a la etiqueta. */
+  optional?: boolean;
 }
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   function TextArea(
-    { label, error, hint, hideCounter, className = "", ...props },
+    {
+      label,
+      error,
+      hint,
+      hideCounter,
+      optional,
+      className = "",
+      required,
+      ...props
+    },
     ref,
   ) {
     const autoId = useId();
@@ -25,54 +41,40 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       : hint
         ? `${id}-hint`
         : undefined;
-    const showCounter =
-      !hideCounter && typeof props.maxLength === "number";
+    const showCounter = !hideCounter && typeof props.maxLength === "number";
     const currentLength =
       typeof props.value === "string" ? props.value.length : 0;
-    const nearLimit =
-      showCounter && currentLength >= (props.maxLength as number) * 0.9;
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex min-w-0 flex-col gap-1.5">
         <div className="flex items-baseline justify-between gap-2">
-          <label htmlFor={id} className="text-sm font-medium text-foreground">
+          <label htmlFor={id} className={LABEL_CLASS}>
             {label}
-            {props.required ? (
-              <span className="ml-0.5 text-destructive" aria-hidden="true">
-                *
-              </span>
-            ) : null}
+            {optional ? <OptionalMark /> : null}
           </label>
           {showCounter ? (
-            <span
-              className={`text-xs tabular-nums ${
-                nearLimit ? "text-destructive" : "text-muted-foreground"
-              }`}
-            >
-              {currentLength}/{props.maxLength}
-            </span>
+            <FieldCounter
+              current={currentLength}
+              max={props.maxLength as number}
+            />
           ) : null}
         </div>
         <textarea
           ref={ref}
           id={id}
           aria-invalid={error ? true : undefined}
+          aria-required={required || undefined}
           aria-describedby={describedBy}
-          className={`w-full rounded-lg border bg-input-background px-3 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-60 ${
-            error
-              ? "border-destructive focus:border-destructive"
-              : "border-border focus:border-ring"
-          } ${className}`}
+          className={controlClass(
+            Boolean(error),
+            `py-2.5 leading-normal ${className}`,
+          )}
           {...props}
         />
+        {error ? <FieldError id={`${id}-error`}>{error}</FieldError> : null}
         {hint && !error ? (
-          <p id={`${id}-hint`} className="text-xs text-muted-foreground">
+          <p id={`${id}-hint`} className={HINT_CLASS}>
             {hint}
-          </p>
-        ) : null}
-        {error ? (
-          <p id={`${id}-error`} className="text-xs font-medium text-destructive">
-            {error}
           </p>
         ) : null}
       </div>

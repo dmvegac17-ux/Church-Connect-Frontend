@@ -3,13 +3,16 @@ import { createContext } from "react";
 export type ToastVariant = "success" | "error" | "info";
 
 export interface ToastInput {
-  /** Título corto en negrita. Si se omite se usa uno por defecto según el tipo. */
+  /** Texto adicional solo para lectores de pantalla (el diseño muestra una línea). */
   title?: string;
-  /** Cuerpo del mensaje. */
+  /** Mensaje visible. */
   message: string;
   variant?: ToastVariant;
-  /** Milisegundos visibles. `0` = permanece hasta cerrarlo. */
+  /** Milisegundos visibles. `0` = permanece hasta cerrarlo. Por defecto 5 s (6 s con acción). */
   duration?: number;
+  /** Acción opcional dentro del toast (p. ej. "Deshacer", "Crear cronograma"). */
+  actionLabel?: string;
+  onAction?: () => void;
 }
 
 export interface ToastContextValue {
@@ -20,9 +23,3 @@ export interface ToastContextValue {
 }
 
 export const ToastContext = createContext<ToastContextValue | null>(null);
-
-export const DEFAULT_TOAST_TITLES: Record<ToastVariant, string> = {
-  success: "Operación exitosa",
-  error: "Ocurrió un error",
-  info: "Información",
-};

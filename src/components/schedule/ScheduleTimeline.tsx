@@ -1,59 +1,64 @@
-import { formatTime } from "../../lib/format";
+import { timeRangeLabel } from "../../lib/eventDates";
+import { formatDurationMinutes } from "../../lib/format";
 import type { Schedule } from "../../types/schedule";
 
 interface ScheduleTimelineProps {
   schedules: Schedule[];
+  /** Muestra la duración bajo el horario (vista de administración). */
+  showDuration?: boolean;
 }
 
 /**
- * Línea de tiempo de las actividades de un cronograma. Horizontal en
- * pantallas ≥ `sm` (línea conectora sobre los puntos), vertical en móvil
- * (línea conectora a la izquierda), para que el usuario final pueda ver la
- * secuencia sin solapamiento de texto ni scroll horizontal de página.
+ * Cronograma de un evento como lista ordenada por hora: horario a la
+ * izquierda, actividad y responsable a la derecha. En pantallas estrechas
+ * las dos columnas se apilan, sin scroll horizontal.
  */
-export function ScheduleTimeline({ schedules }: ScheduleTimelineProps) {
+export function ScheduleTimeline({
+  schedules,
+  showDuration = false,
+}: ScheduleTimelineProps) {
   const sorted = [...schedules].sort(
-    (a, b) => new Date(a.hora_inicio).getTime() - new Date(b.hora_inicio).getTime(),
+    (a, b) =>
+      new Date(a.hora_inicio).getTime() - new Date(b.hora_inicio).getTime(),
   );
 
   return (
-    <div className="flex flex-col gap-6 sm:flex-row sm:gap-4 sm:overflow-x-auto sm:pb-2">
-      {sorted.map((s, index) => (
-        <div
-          key={s.id}
-          className="relative flex gap-3 sm:min-w-[220px] sm:flex-1 sm:flex-col sm:gap-0"
-        >
-          <div className="flex flex-col items-center sm:w-full sm:flex-row">
-            <span
-              className="size-3 shrink-0 rounded-full border-2 border-primary bg-card"
-              aria-hidden="true"
-            />
-            {index < sorted.length - 1 ? (
-              <span
-                className="mt-1 w-px flex-1 bg-border sm:ml-1 sm:mt-0 sm:h-px sm:w-full sm:flex-1"
-                aria-hidden="true"
-              />
-            ) : null}
-          </div>
-
-          <div className="min-w-0 flex-1 pb-2 sm:pt-3">
-            <p className="text-xs font-medium text-primary">
-              {formatTime(s.hora_inicio)} – {formatTime(s.hora_fin)}
-            </p>
-            <p className="mt-0.5 break-words font-medium text-foreground">
-              {s.actividad}
-            </p>
-            {s.descripcion ? (
-              <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">
-                {s.descripcion}
-              </p>
-            ) : null}
-            <span className="mt-1.5 inline-flex max-w-full items-center truncate rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-              {s.responsable}
+    <ol>
+      {sorted.map((s) => {
+        const minutes =
+          (new Date(s.hora_fin).getTime() - new Date(s.hora_inicio).getTime()) /
+          60000;
+        return (
+          <li
+            key={s.id}
+            className="grid grid-cols-1 gap-x-5 gap-y-1 border-t border-divider-soft px-5 py-4 first:border-t-0 sm:grid-cols-[minmax(120px,170px)_minmax(0,1fr)]"
+          >
+            <span className="flex flex-col">
+              <span className="text-sm font-bold text-primary">
+                {timeRangeLabel(s.hora_inicio, s.hora_fin)}
+              </span>
+              {showDuration && minutes > 0 ? (
+                <span className="text-xs text-muted-foreground">
+                  {formatDurationMinutes(minutes)}
+                </span>
+              ) : null}
             </span>
-          </div>
-        </div>
-      ))}
-    </div>
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="text-[15px] font-bold break-words text-foreground">
+                {s.actividad}
+              </span>
+              {s.descripcion ? (
+                <span className="text-sm text-text-secondary">
+                  {s.descripcion}
+                </span>
+              ) : null}
+              <span className="text-sm text-muted-foreground">
+                Responsable: {s.responsable}
+              </span>
+            </span>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

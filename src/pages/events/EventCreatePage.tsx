@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import { ErrorAlert } from "../../components/feedback/ErrorAlert";
 import { useToast } from "../../components/feedback/useToast";
-import { Card, PageHeader } from "../../components/layout/Page";
+import { PageHeader } from "../../components/layout/Page";
+import { Breadcrumb } from "../../components/ui/primitives";
 import { fromDateAndTimeValues } from "../../lib/format";
 import { parseValidationErrors } from "../../lib/formErrors";
 import { eventService } from "../../services/eventService";
@@ -40,7 +41,13 @@ export function EventCreatePage() {
     setSubmitting(true);
     try {
       const created = await eventService.create(payload);
-      toast.success(`El evento "${created.titulo}" fue creado.`, "Evento creado");
+      toast.notify({
+        variant: "success",
+        message: `Evento «${created.titulo}» creado.`,
+        actionLabel: "Crear cronograma",
+        onAction: () =>
+          navigate(`/events/${created.id}`, { state: { openSchedule: true } }),
+      });
       navigate(`/events/${created.id}`, { replace: true });
     } catch (err) {
       if (err instanceof ApiError && err.isValidation) {
@@ -53,24 +60,22 @@ export function EventCreatePage() {
   };
 
   return (
-    <div>
-      <PageHeader title="Nuevo evento" backTo="/events" />
+    <div className="flex max-w-[860px] flex-col gap-5">
+      <Breadcrumb to="/events" label="Eventos" current="Nuevo evento" />
+      <PageHeader
+        title="Nuevo evento"
+        description="Completa la información, la fecha y el lugar. Después podrás crear su cronograma."
+      />
 
-      <Card className="max-w-2xl">
-        {error ? (
-          <div className="mb-4">
-            <ErrorAlert error={error} onClose={() => setError(null)} />
-          </div>
-        ) : null}
+      {error ? <ErrorAlert error={error} onClose={() => setError(null)} /> : null}
 
-        <EventForm
-          submitting={submitting}
-          submitLabel="Crear evento"
-          serverErrors={fieldErrors}
-          onSubmit={handleSubmit}
-          onCancel={() => navigate("/events")}
-        />
-      </Card>
+      <EventForm
+        submitting={submitting}
+        submitLabel="Crear evento"
+        serverErrors={fieldErrors}
+        onSubmit={handleSubmit}
+        onCancel={() => navigate("/events")}
+      />
     </div>
   );
 }

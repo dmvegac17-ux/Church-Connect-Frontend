@@ -1,6 +1,8 @@
 import { Ban, Bold, ChevronDown, Highlighter } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
+import { FieldError } from "./fieldStyles";
+
 const FONTS: { label: string; value: string }[] = [
   { label: "Predeterminada", value: "" },
   { label: "Arial", value: "Arial, sans-serif" },
@@ -119,28 +121,23 @@ export function RichTextEditor({
           : "flex flex-col gap-1.5"
       }
     >
-      <label htmlFor={id} className="text-sm font-medium text-foreground">
+      <label htmlFor={id} className="text-sm font-bold text-foreground">
         {label}
-        {required ? (
-          <span className="ml-0.5 text-destructive" aria-hidden="true">
-            *
-          </span>
-        ) : null}
       </label>
 
       <div
-        className={`overflow-hidden rounded-lg border bg-input-background transition focus-within:ring-2 focus-within:ring-ring/30 ${
+        className={`overflow-hidden rounded-[10px] border bg-card transition-colors focus-within:outline-[3px] focus-within:outline-primary-soft-border ${
           fill ? "flex min-h-0 flex-1 flex-col" : ""
         } ${
-          error ? "border-destructive" : "border-border focus-within:border-ring"
+          error ? "border-destructive" : "border-input focus-within:border-primary"
         }`}
       >
-        <div className="flex shrink-0 flex-wrap items-center gap-1 border-b border-border bg-muted/50 px-2 py-1.5">
+        <div className="flex shrink-0 flex-wrap items-center gap-1 border-b border-divider bg-surface-alt px-2 py-1.5">
           <button
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => exec("bold")}
-            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="rounded-lg p-2 text-text-secondary hover:bg-hover-icon hover:text-foreground"
             aria-label="Negrilla"
             title="Negrilla"
           >
@@ -154,7 +151,7 @@ export function RichTextEditor({
               onClick={() => setHighlightMenuOpen((v) => !v)}
               aria-haspopup="true"
               aria-expanded={highlightMenuOpen}
-              className="flex items-center gap-0.5 rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="flex items-center gap-0.5 rounded-lg p-2 text-text-secondary hover:bg-hover-icon hover:text-foreground"
               aria-label="Resaltar"
               title="Resaltar"
             >
@@ -211,7 +208,7 @@ export function RichTextEditor({
 
         <div className={fill ? "relative min-h-0 flex-1" : "relative"}>
           {isEmpty ? (
-            <span className="pointer-events-none absolute left-3 top-2.5 text-sm text-muted-foreground">
+            <span className="pointer-events-none absolute left-3 top-2.5 text-[15px] text-muted-foreground">
               Escribe el mensaje…
             </span>
           ) : null}
@@ -226,14 +223,14 @@ export function RichTextEditor({
             onInput={emitChange}
             className={
               fill
-                ? "h-full overflow-y-auto px-3 py-2.5 text-sm text-foreground outline-none"
-                : "min-h-48 max-h-[26rem] overflow-y-auto px-3 py-2.5 text-sm text-foreground outline-none"
+                ? "h-full overflow-y-auto px-3 py-2.5 text-[15px] leading-relaxed text-foreground outline-none"
+                : "min-h-48 max-h-[26rem] overflow-y-auto px-3 py-2.5 text-[15px] leading-relaxed text-foreground outline-none"
             }
           />
         </div>
       </div>
 
-      {error ? <p className="text-xs font-medium text-destructive">{error}</p> : null}
+      {error ? <FieldError>{error}</FieldError> : null}
     </div>
   );
 }

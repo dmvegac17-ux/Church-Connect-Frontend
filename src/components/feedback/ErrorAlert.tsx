@@ -1,22 +1,26 @@
-import { AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
+import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { ApiError } from "../../types/api";
 
-type Variant = "error" | "success" | "info";
+type Variant = "error" | "success" | "info" | "warning";
 
 const STYLES: Record<Variant, { box: string; icon: ReactNode }> = {
   error: {
-    box: "border-destructive/30 bg-destructive/10 text-destructive",
-    icon: <AlertTriangle className="size-5 shrink-0" aria-hidden="true" />,
+    box: "bg-destructive-soft text-destructive-hover",
+    icon: <CircleAlert className="size-5 shrink-0" aria-hidden="true" />,
   },
   success: {
-    box: "border-primary/30 bg-primary/10 text-primary",
-    icon: <CheckCircle2 className="size-5 shrink-0" aria-hidden="true" />,
+    box: "bg-success-soft text-success-foreground",
+    icon: <CircleCheck className="size-5 shrink-0" aria-hidden="true" />,
   },
   info: {
-    box: "border-border bg-muted text-muted-foreground",
+    box: "bg-info-soft text-info-foreground",
     icon: <Info className="size-5 shrink-0" aria-hidden="true" />,
+  },
+  warning: {
+    box: "bg-warning-soft text-warning-foreground",
+    icon: <TriangleAlert className="size-5 shrink-0" aria-hidden="true" />,
   },
 };
 
@@ -41,11 +45,11 @@ export function Alert({
   return (
     <div
       role={variant === "error" ? "alert" : "status"}
-      className={`flex gap-3 rounded-lg border p-3 text-sm ${style.box}`}
+      className={`flex items-start gap-2.5 rounded-xl px-3.5 py-3 text-sm leading-snug ${style.box}`}
     >
       {style.icon}
       <div className="min-w-0 flex-1">
-        {title ? <p className="font-medium">{title}</p> : null}
+        {title ? <p className="font-extrabold">{title}</p> : null}
         <p className={title ? "mt-0.5" : ""}>{message}</p>
         {details && details.length > 0 ? (
           <ul className="mt-1 list-disc space-y-0.5 pl-5">
@@ -60,7 +64,7 @@ export function Alert({
           type="button"
           onClick={onClose}
           aria-label="Cerrar aviso"
-          className="shrink-0 rounded p-0.5 hover:bg-black/5"
+          className="-m-1.5 flex size-8 shrink-0 items-center justify-center rounded-lg hover:bg-black/5"
         >
           <X className="size-4" aria-hidden="true" />
         </button>
