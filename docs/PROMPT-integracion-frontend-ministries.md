@@ -26,7 +26,7 @@ Dos niveles de acceso:
 
 | Concepto | Valor |
 |---|---|
-| Base URL (dev) | `http://localhost:8000` (configurable vía `VITE_API_URL`) |
+| Base URL (dev) | `http://localhost:8000` (configurable vía `VITE_BACKEND_BASE_URL`) |
 | Prefijo global | `/api/v1` |
 | Prefijo del módulo | `/ministries` |
 | Auth | `Authorization: Bearer <access_token>` en **todos** los endpoints (no hay endpoints públicos) |

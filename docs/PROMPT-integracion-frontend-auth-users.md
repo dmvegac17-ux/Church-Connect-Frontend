@@ -24,7 +24,7 @@ consumiendo la API REST del backend, respetando el control de acceso por roles y
 
 | Concepto | Valor |
 |---|---|
-| Base URL (dev) | `http://localhost:8000` (configurable vía `VITE_API_URL`) |
+| Base URL (dev) | `http://localhost:8000` (configurable vía `VITE_BACKEND_BASE_URL`) |
 | Prefijo global | `/api/v1` |
 | Formato | JSON en request y response |
 | Auth | `Authorization: Bearer <access_token>` en endpoints protegidos |
@@ -164,7 +164,7 @@ tipado con `message` + `errors` para mostrarlo en la UI.
 ```
 src/
 ├── config/
-│   └── env.ts                 # VITE_API_URL, constantes
+│   └── env.ts                 # VITE_BACKEND_BASE_URL, constantes
 ├── lib/
 │   └── httpClient.ts          # fetch wrapper: base URL, headers, Bearer, desempaqueta ResponsePayload, maneja errores
 ├── types/
@@ -265,7 +265,7 @@ export interface UpdateUserDTO {
 - Accesibilidad básica en formularios (labels, `aria-invalid`, foco en el primer error).
 - No almacenar la contraseña en estado global ni en logs.
 - Tipado estricto (`strict: true`); sin `any` en la capa de servicios.
-- Variables sensibles vía `.env` (`VITE_API_URL`), nunca hardcodeadas.
+- Variables sensibles vía `.env` (`VITE_BACKEND_BASE_URL`), nunca hardcodeadas.
 
 ## 10. Criterios de aceptación (resumen verificable)
 
