@@ -2,7 +2,7 @@ import { useToast } from "../feedback/useToast";
 
 function GoogleIcon() {
   return (
-    <svg className="size-4" viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="size-[18px]" viewBox="0 0 24 24" aria-hidden="true">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"
@@ -25,7 +25,7 @@ function GoogleIcon() {
 
 function FacebookIcon() {
   return (
-    <svg className="size-4" viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="size-[18px]" viewBox="0 0 24 24" aria-hidden="true">
       <path
         fill="#1877F2"
         d="M24 12a12 12 0 1 0-13.88 11.85v-8.38H7.08V12h3.04V9.36c0-3 1.79-4.67 4.53-4.67 1.31 0 2.68.24 2.68.24v2.95h-1.51c-1.49 0-1.95.92-1.95 1.87V12h3.32l-.53 3.47h-2.79v8.38A12 12 0 0 0 24 12Z"
@@ -42,32 +42,29 @@ export function SocialButtons() {
   const toast = useToast();
 
   const soon = (provider: string) =>
-    toast.notify({
-      variant: "info",
-      title: "Función no disponible",
-      message: `El inicio de sesión con ${provider} estará disponible próximamente.`,
-    });
+    toast.info(
+      `El inicio de sesión con ${provider} estará disponible próximamente.`,
+    );
+
+  const button =
+    "inline-flex h-[46px] items-center justify-center gap-2 rounded-xl border border-button-border bg-card text-[15px] font-bold text-foreground transition-colors hover:bg-background";
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-3 text-sm text-muted-foreground">
         <span className="h-px flex-1 bg-border" />
-        O continúa con
+        o continúa con
         <span className="h-px flex-1 bg-border" />
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          type="button"
-          onClick={() => soon("Google")}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted"
-        >
+      <div className="grid grid-cols-2 gap-2.5">
+        <button type="button" onClick={() => soon("Google")} className={button}>
           <GoogleIcon />
           Google
         </button>
         <button
           type="button"
           onClick={() => soon("Facebook")}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted"
+          className={button}
         >
           <FacebookIcon />
           Facebook

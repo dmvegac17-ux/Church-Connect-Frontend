@@ -12,6 +12,11 @@ const BASE = "/notificaciones";
 export interface PageParams {
   limit?: number;
   offset?: number;
+  /**
+   * `propias` (por defecto): solo las del usuario autenticado.
+   * `todas`: las de todos los usuarios; el backend solo lo permite a ADMIN (`403` si no).
+   */
+  alcance?: "propias" | "todas";
   signal?: AbortSignal;
 }
 
@@ -25,10 +30,11 @@ export interface Paginated<T> {
 async function list({
   limit = 10,
   offset = 0,
+  alcance,
   signal,
 }: PageParams = {}): Promise<Paginated<Notification>> {
   const { data, meta } = await httpClient.get<Notification[]>(BASE, {
-    query: { limit, offset },
+    query: { limit, offset, alcance },
     signal,
   });
   return {

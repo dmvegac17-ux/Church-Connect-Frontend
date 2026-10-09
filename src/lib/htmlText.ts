@@ -4,3 +4,11 @@ export function htmlToPlainText(html: string): string {
   div.innerHTML = html;
   return (div.textContent ?? "").replace(/\s+/g, " ").trim();
 }
+
+/**
+ * Vista previa en una línea: como `htmlToPlainText`, pero separando los
+ * bloques (saltos de línea, párrafos) para que no se peguen las palabras.
+ */
+export function htmlToPreview(html: string): string {
+  return htmlToPlainText(html.replace(/<(br|\/div|\/p)[^>]*>/gi, " $&"));
+}

@@ -168,7 +168,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       token,
-      role: claims?.rol ?? null,
+      // El perfil manda sobre el JWT: el backend autoriza con el rol actual
+      // del usuario, que pudo cambiar después de emitirse el token (p. ej.
+      // un miembro que pasa a participante al recibir una invitación).
+      role: claims ? (user?.rol ?? claims.rol) : null,
       isAuthenticated: token !== null && claims !== null,
       isLoading,
       login,
