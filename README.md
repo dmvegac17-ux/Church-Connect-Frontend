@@ -15,7 +15,7 @@ de acceso por roles (`ADMIN`, `PARTICIPANT`, `MEMBER`).
 
 ```bash
 npm install
-cp .env.example .env   # ajusta VITE_API_URL si el backend no está en :8000
+cp .env.example .env   # ajusta VITE_BACKEND_BASE_URL si el backend no está en :8000
 npm run dev            # http://localhost:5173
 ```
 
@@ -32,9 +32,9 @@ Scripts:
 
 Toda variable sensible se lee de `.env` (`import.meta.env`):
 
-| Variable | Default | Descripción |
+| Variable | Ejemplo (local) | Descripción |
 |---|---|---|
-| `VITE_API_URL` | `http://localhost:8000` | URL base del backend (sin `/api/v1`, sin barra final) |
+| `VITE_BACKEND_BASE_URL` | `http://localhost:8000` | URL base del backend (sin `/api/v1`, sin barra final). Obligatoria: si falta, la app no arranca y registra el error en la consola |
 
 ## Diseño
 
@@ -55,7 +55,7 @@ Las pantallas de `/login` y `/register` reproducen el diseño de dos paneles
 
 ```
 src/
-├── config/env.ts          Constantes y lectura de VITE_API_URL
+├── config/env.ts          Constantes y lectura de VITE_BACKEND_BASE_URL
 ├── lib/
 │   ├── httpClient.ts       fetch wrapper: base URL, Bearer, desempaca ResponsePayload, ApiError
 │   ├── formErrors.ts       Mapea errores 422 ("body.campo: msg") a cada input
