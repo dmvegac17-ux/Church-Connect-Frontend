@@ -358,7 +358,110 @@ async function postRaw<T>(
   throw new ApiError(message, response.status, payload?.errors ?? [], payload);
 }
 
+export interface UploadOptions {
+  /** Avance de la subida, de 0 a 1 (solo el envío del cuerpo). */
+  onProgress?: (fraction: number) => void;
+  signal?: AbortSignal;
+}
+
+/**
+ * Envía un `multipart/form-data` (formularios con archivos). Usa
+ * `XMLHttpRequest` porque `fetch` no informa el progreso de la subida; el
+ * resto (token, envelope, errores, `401`) se trata igual que en `request`.
+ */
+function sendForm<T>(
+  method: "POST" | "PUT",
+  path: string,
+  form: FormData,
+  { onProgress, signal }: UploadOptions = {},
+): Promise<ApiResult<T>> {
+  return new Promise<ApiResult<T>>((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(abortError());
+      return;
+    }
+
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, buildUrl(path));
+    xhr.setRequestHeader("Accept", "application/json");
+    const token = getToken();
+    if (token) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    }
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && e.total > 0) {
+        onProgress?.(e.loaded / e.total);
+      }
+    };
+
+    const onAbort = () => xhr.abort();
+    signal?.addEventListener("abort", onAbort, { once: true });
+    const cleanup = () => signal?.removeEventListener("abort", onAbort);
+
+    xhr.onabort = () => {
+      cleanup();
+      reject(abortError());
+    };
+    xhr.onerror = () => {
+      cleanup();
+      reject(
+        new ApiError(
+          "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
+          0,
+        ),
+      );
+    };
+    xhr.onload = () => {
+      cleanup();
+      let payload: ResponsePayload<T> | null = null;
+      try {
+        payload = xhr.responseText
+          ? (JSON.parse(xhr.responseText) as ResponsePayload<T>)
+          : null;
+      } catch {
+        payload = null;
+      }
+
+      if (xhr.status === 401) {
+        onUnauthorized();
+      }
+
+      const ok = xhr.status >= 200 && xhr.status < 300;
+      if (!(payload?.success ?? ok)) {
+        reject(
+          new ApiError(
+            payload?.message ??
+              (xhr.status === 401
+                ? "Tu sesión expiró. Inicia sesión de nuevo."
+                : "Ocurrió un error al procesar la solicitud."),
+            xhr.status,
+            payload?.errors ?? [],
+            payload,
+          ),
+        );
+        return;
+      }
+
+      onProgress?.(1);
+      resolve({
+        data: (payload ? payload.data : null) as T,
+        meta: payload?.meta ?? null,
+      });
+    };
+
+    xhr.send(form);
+  });
+}
+
 export const httpClient = {
+  /** Formularios con archivos (`multipart/form-data`) con progreso de subida. */
+  sendForm: <T>(
+    method: "POST" | "PUT",
+    path: string,
+    form: FormData,
+    options?: UploadOptions,
+  ) => mutate(() => sendForm<T>(method, path, form, options)),
   get: <T>(path: string, options?: RequestOptions) => cachedGet<T>(path, options),
   post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
     mutate(() => request<T>("POST", path, { ...options, body })),
