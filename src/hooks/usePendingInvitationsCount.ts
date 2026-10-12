@@ -8,8 +8,8 @@ const POLL_MS = 60_000;
 
 /**
  * Invitaciones propias pendientes de respuesta, para el contador del menú.
- * `GET /participante/invitaciones` exige el rol participante: pasar
- * `enabled: false` para cualquier otro rol y no disparar un 403.
+ * Vale para cualquier usuario: el miembro y el administrador pueden ser
+ * asignados a una actividad.
  */
 export function usePendingInvitationsCount(enabled: boolean): number {
   const [count, setCount] = useState(0);

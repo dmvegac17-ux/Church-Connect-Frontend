@@ -7,7 +7,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
-    include: ["src/**/*.test.{ts,tsx}"],
+    include: ["src/test/**/*.test.{ts,tsx}"],
     env: {
       // Valor ficticio: los servicios se simulan, nunca se llama a la red.
       VITE_BACKEND_BASE_URL: "http://backend.test",

@@ -12,6 +12,7 @@ const ALLOWED_TAGS = [
   "i",
   "em",
   "u",
+  "s",
   "span",
   "font",
   "br",

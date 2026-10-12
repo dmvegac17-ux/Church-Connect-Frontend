@@ -1,3 +1,4 @@
+import { useRefreshSignal } from "../lib/refresh";
 import { useCallback, useEffect, useState } from "react";
 
 import { eventService } from "../services/eventService";
@@ -46,6 +47,7 @@ export function useEventOptions(): UseEventOptionsResult {
   }, [reloadKey]);
 
   const refetch = useCallback(() => setReloadKey((k) => k + 1), []);
+  useRefreshSignal(refetch);
 
   return { events, isLoading, error, refetch };
 }

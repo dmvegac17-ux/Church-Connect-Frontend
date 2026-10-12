@@ -48,6 +48,7 @@ export function ProfilePage() {
   return (
     <div className="mx-auto flex w-full max-w-[820px] flex-col gap-5">
       <PageHeader
+        refresh={false}
         title="Mi perfil"
         description="Consulta y actualiza tus datos personales."
       />
@@ -275,29 +276,43 @@ function ProfileDetailsForm({
 
 function PasswordForm({ userId }: { userId: string }) {
   const toast = useToast();
+  const [actual, setActual] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [confirmar, setConfirmar] = useState("");
   const [error, setError] = useState<unknown>(null);
+  // El servidor rechazó la contraseña actual: el aviso va en ese campo.
+  const [actualError, setActualError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const valid = passwordPairValid(contrasena, confirmar);
+  const same = actual !== "" && actual === contrasena;
+  const valid =
+    actual !== "" && !same && passwordPairValid(contrasena, confirmar);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+    setActualError(null);
     if (!valid) {
       return;
     }
 
     setSubmitting(true);
     try {
-      // El PUT lleva únicamente `contrasena` (contrato 6.6 / requisito 5).
-      await userService.update(userId, { contrasena });
+      // La sesión abierta no basta: el servidor exige la contraseña actual.
+      await userService.update(userId, {
+        contrasena,
+        contrasena_actual: actual,
+      });
+      setActual("");
       setContrasena("");
       setConfirmar("");
       toast.success("Tu contraseña se cambió correctamente.");
     } catch (err) {
-      setError(err);
+      if (err instanceof ApiError && /contraseña actual/i.test(err.message)) {
+        setActualError(err.message);
+      } else {
+        setError(err);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -310,15 +325,34 @@ function PasswordForm({ userId }: { userId: string }) {
           <div className="flex flex-col gap-1">
             <h2 className="text-[17px] font-extrabold">Cambiar contraseña</h2>
             <p className="text-sm text-muted-foreground">
-              Solo puedes cambiar tu propia contraseña.
+              Para confirmar que eres tú, escribe primero tu contraseña
+              actual.
             </p>
           </div>
           {error ? (
             <ErrorAlert error={error} onClose={() => setError(null)} />
           ) : null}
+          {/* El ancho va en el contenedor: en el input dejaría el ojo fuera. */}
+          <div className="sm:max-w-[calc(50%-9px)]">
+            <PasswordField
+              label="Contraseña actual"
+              name="contrasena_actual"
+              autoComplete="current-password"
+              maxLength={128}
+              value={actual}
+              error={actualError ?? undefined}
+              onChange={(e) => {
+                setActual(e.target.value);
+                setActualError(null);
+              }}
+            />
+          </div>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-[18px]">
             <PasswordField
               label="Nueva contraseña"
+              error={
+                same ? "Debe ser distinta de tu contraseña actual." : undefined
+              }
               name="contrasena"
               autoComplete="new-password"
               maxLength={PASSWORD_MAX_LENGTH}

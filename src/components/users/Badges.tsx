@@ -3,13 +3,18 @@ import { Pill, type PillTone } from "../ui/primitives";
 
 const ROLE_TONES: Record<UserRole, PillTone> = {
   ADMIN: "success",
-  PARTICIPANT: "info",
   MEMBER: "sand",
 };
 
-export function RoleBadge({ role }: { role: UserRole }) {
+export function RoleBadge({
+  role,
+  className = "!text-[13px]",
+}: {
+  role: UserRole;
+  className?: string;
+}) {
   return (
-    <Pill tone={ROLE_TONES[role]} className="!text-[13px]">
+    <Pill tone={ROLE_TONES[role]} className={className}>
       {ROLE_LABELS[role]}
     </Pill>
   );

@@ -1,4 +1,10 @@
-import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  Mail,
+  TriangleAlert,
+} from "lucide-react";
 import {
   lazy,
   Suspense,
@@ -11,6 +17,11 @@ import {
 import { ConfirmDialog } from "../../../components/feedback/ConfirmDialog";
 import { Spinner } from "../../../components/feedback/Spinner";
 import { Button } from "../../../components/forms/Button";
+import { Checkbox } from "../../../components/forms/Checkbox";
+import {
+  DateTimeRangePicker,
+  type DateTimeField,
+} from "../../../components/forms/DateTimeRangePicker";
 import { FieldError } from "../../../components/forms/fieldStyles";
 import { TextArea } from "../../../components/forms/TextArea";
 import { TextField } from "../../../components/forms/TextField";
@@ -23,8 +34,34 @@ import {
   googleMapsUrl,
   type AddressSuggestion,
 } from "../../../lib/geocoding";
-import { compactErrors, focusFirstError } from "../../../lib/validators";
-import { TimeSelect } from "../../schedules/components/TimeSelect";
+import type { Occupancy } from "../../../lib/capacity";
+import {
+  isoToWall,
+  joinWall,
+  nowWall,
+  shortMoment,
+  timeText,
+} from "../../../lib/dateTimeRange";
+import { textChanged } from "../../../lib/eventChanges";
+import {
+  adjustmentsOf,
+  overlapping,
+  planActivities,
+  shiftText,
+  unresolved,
+  type ActivityAdjustment,
+  type OutsideDecision,
+} from "../../../lib/eventReschedule";
+import {
+  CANCELLATION_DAYS_MAX,
+  cancellationDaysError,
+  cancellationDeadline,
+  daysUntilEventDate,
+  todayDateValue,
+} from "../../../lib/eventLimits";
+import { formatDateTime, fromDateAndTimeValues } from "../../../lib/format";
+import { EVENT_CAPACITY_MAX, compactErrors, focusFirstError } from "../../../lib/validators";
+import type { Schedule } from "../../../types/schedule";
 
 /** Leaflet pesa ~150KB — se carga en un chunk separado, no en el bundle principal. */
 const EventLocationPicker = lazy(() =>
@@ -36,7 +73,7 @@ const EventLocationPicker = lazy(() =>
 export interface EventFormValues {
   titulo: string;
   descripcion: string;
-  /** `<input type="date">` (`YYYY-MM-DD`) + `TimeSelect` (`HH:mm`), hora local del navegador. */
+  /** Fecha (`YYYY-MM-DD`) y hora 24 h (`HH:mm`), en hora de Colombia. */
   fechaInicio: string;
   horaInicio: string;
   fechaFin: string;
@@ -48,17 +85,31 @@ export interface EventFormValues {
   longitud: string;
   /** Como string de input; se convierte a número al enviar. */
   capacidad: string;
+  /** Fecha límite para inscribirse (`YYYY-MM-DD`); vacío = hasta el inicio. */
+  limiteInscripcion: string;
+  /** Días antes del inicio en que se cierra la cancelación; vacío = sin límite. */
+  diasCancelacion: string;
 }
+
+const CAPACITY_DIGITS = String(EVENT_CAPACITY_MAX).length;
+
+const NOTICE_CLASS =
+  "flex items-start gap-2 rounded-[10px] border border-info-border bg-info-soft px-3 py-2.5 text-sm leading-snug text-info-foreground";
 
 interface EventFormProps {
   /** Valores iniciales (editar). Vacío para crear. */
   initial?: EventFormValues;
   submitting: boolean;
   submitLabel: string;
-  onSubmit: (values: EventFormValues) => void;
+  /** `activities`: ajustes del cronograma que acompañan un cambio de horario. */
+  onSubmit: (values: EventFormValues, activities: ActivityAdjustment[]) => void;
   onCancel: () => void;
   /** Errores por campo provenientes del backend (422 / 400). */
   serverErrors?: Record<string, string>;
+  /** Al editar: lugares ya ocupados. El aforo no puede quedar por debajo. */
+  occupancy?: Occupancy;
+  /** Al editar: actividades del cronograma, para avisar si quedan fuera del horario. */
+  schedules?: Schedule[];
 }
 
 const EMPTY: EventFormValues = {
@@ -73,6 +124,8 @@ const EMPTY: EventFormValues = {
   latitud: "",
   longitud: "",
   capacidad: "",
+  limiteInscripcion: "",
+  diasCancelacion: "",
 };
 
 const TITULO_MAX = 150;
@@ -91,13 +144,17 @@ type ErrorKey =
   | "lugar"
   | "direccion"
   | "latitud"
-  | "longitud";
+  | "longitud"
+  | "fecha_limite_inscripcion"
+  | "dias_limite_cancelacion";
 
-function addMinute(hhmm: string): string {
-  const [h, m] = hhmm.split(":").map(Number);
-  const total = Math.min(h * 60 + m + 1, 23 * 60 + 59);
-  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
-}
+/** Clave de error de cada control del selector de fecha y hora. */
+const RANGE_KEYS: Record<DateTimeField, ErrorKey> = {
+  startDate: "fecha_inicio",
+  startTime: "hora_inicio",
+  endDate: "fecha_fin",
+  endTime: "hora_fin",
+};
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -115,6 +172,8 @@ export function EventForm({
   onSubmit,
   onCancel,
   serverErrors = {},
+  occupancy,
+  schedules = [],
 }: EventFormProps) {
   const isEdit = initial !== undefined;
   const base = initial ?? EMPTY;
@@ -130,54 +189,75 @@ export function EventForm({
   } | null>(null);
   const geocodeRequestId = useRef(0);
   const fields = useTouched<ErrorKey>();
+  // Cronograma frente a un cambio de horario del evento.
+  const [moveWithEvent, setMoveWithEvent] = useState(true);
+  const [decisions, setDecisions] = useState<
+    Record<string, OutsideDecision | undefined>
+  >({});
 
   const set = (name: keyof EventFormValues, value: string) =>
     setValues((prev) => ({ ...prev, [name]: value }));
 
-  const sameDay =
-    values.fechaInicio !== "" && values.fechaInicio === values.fechaFin;
-
-  /* ── Reglas de fecha y hora ─────────────────────────────────────────── */
-
-  const setFechaInicio = (date: string) =>
-    setValues((prev) => {
-      // La fecha de fin no puede ser anterior a la de inicio.
-      const fechaFin = !prev.fechaFin || prev.fechaFin < date ? date : prev.fechaFin;
-      const clearEnd =
-        fechaFin === date && prev.horaFin && prev.horaInicio && prev.horaFin <= prev.horaInicio;
-      return {
-        ...prev,
-        fechaInicio: date,
-        fechaFin,
-        horaFin: clearEnd ? "" : prev.horaFin,
-      };
-    });
-
-  const setFechaFin = (date: string) =>
-    setValues((prev) => ({
-      ...prev,
-      fechaFin: date,
-      horaFin:
-        date === prev.fechaInicio && prev.horaFin && prev.horaInicio && prev.horaFin <= prev.horaInicio
-          ? ""
-          : prev.horaFin,
-    }));
-
-  const setHoraInicio = (time: string) =>
-    setValues((prev) => ({
-      ...prev,
-      horaInicio: time,
-      // El mismo día, el fin debe ser posterior: si ya no lo es, se borra.
-      horaFin:
-        prev.fechaInicio !== "" &&
-        prev.fechaInicio === prev.fechaFin &&
-        prev.horaFin &&
-        prev.horaFin <= time
-          ? ""
-          : prev.horaFin,
-    }));
-
   /* ── Validación (derivada de los valores) ───────────────────────────── */
+
+  // Los límites se eligen entre hoy y el día del evento. Igual que en el
+  // backend, solo se revisa lo que se está cambiando: un evento cuya fecha
+  // límite ya pasó se puede seguir editando sin tener que tocarla.
+  const today = todayDateValue();
+  const now = nowWall();
+  const daysAvailable = values.fechaInicio
+    ? daysUntilEventDate(values.fechaInicio)
+    : null;
+  // El evento solo se programa de hoy en adelante; uno en curso conserva su fecha.
+  const startTouched =
+    !isEdit ||
+    values.fechaInicio !== base.fechaInicio ||
+    values.horaInicio !== base.horaInicio;
+  const deadlineTouched =
+    !isEdit || values.limiteInscripcion !== base.limiteInscripcion;
+  // Mover el evento cambia cuántos días quedan: los días tienen que caber.
+  const daysTouched =
+    !isEdit ||
+    values.diasCancelacion.trim() !== base.diasCancelacion.trim() ||
+    values.fechaInicio !== base.fechaInicio;
+
+  // Hasta cuándo se podrá cancelar con los días escritos, para confirmarlo.
+  const cancellationDays = Number(values.diasCancelacion);
+  const daysRange =
+    daysAvailable === null
+      ? "Días de anticipación al inicio del evento."
+      : daysAvailable === 0
+        ? "El evento es hoy: ya no quedan días de anticipación."
+        : `Entre 0 y ${Math.min(daysAvailable, CANCELLATION_DAYS_MAX)}: los días que faltan para el evento.`;
+  const cancellationHint =
+    !values.diasCancelacion.trim() || cancellationDays === 0
+      ? `Sin días, se puede cancelar hasta que el evento empiece. ${daysRange}`
+      : values.fechaInicio &&
+          values.horaInicio &&
+          !cancellationDaysError(values.diasCancelacion, daysAvailable)
+        ? `Se podrá cancelar hasta el ${formatDateTime(
+            cancellationDeadline(
+              fromDateAndTimeValues(values.fechaInicio, values.horaInicio),
+              cancellationDays,
+            ).toISOString(),
+          )}.`
+        : daysRange;
+
+  // Solo la fecha, el horario, el lugar y la dirección avisan a los inscritos
+  // al guardar; un retoque de texto (mayúsculas, tildes, una errata) no.
+  const datesChanged =
+    isEdit &&
+    (values.fechaInicio !== base.fechaInicio ||
+      values.horaInicio !== base.horaInicio ||
+      values.fechaFin !== base.fechaFin ||
+      values.horaFin !== base.horaFin);
+  const placeChanged = isEdit && textChanged(base.lugar, values.lugar);
+  const addressChanged = isEdit && textChanged(base.direccion, values.direccion);
+  const registered = occupancy?.publico ?? 0;
+  const noticeFor = (what: string) =>
+    registered === 1
+      ? `Hay 1 persona inscrita. Al guardar se le avisará por correo del cambio de ${what}.`
+      : `Hay ${registered} personas inscritas. Al guardar se les avisará por correo del cambio de ${what}.`;
 
   const capacidadNum = Number(values.capacidad);
   const hasLat = values.latitud.trim() !== "";
@@ -190,17 +270,65 @@ export function EventForm({
     new Date(`${values.fechaFin}T${values.horaFin}`) <=
       new Date(`${values.fechaInicio}T${values.horaInicio}`);
 
+  // Cómo queda el cronograma con el horario nuevo. Las actividades pueden
+  // moverse con el evento; las que aun así queden fuera se deciden una por
+  // una. Nada se elimina ni se mueve sin que se vea aquí antes de guardar.
+  const rangeReady =
+    isEdit &&
+    datesChanged &&
+    Boolean(values.fechaInicio && values.horaInicio && values.fechaFin && values.horaFin) &&
+    !endBeforeStart;
+  const oldStartIso = rangeReady
+    ? fromDateAndTimeValues(base.fechaInicio, base.horaInicio)
+    : "";
+  const newStartIso = rangeReady
+    ? fromDateAndTimeValues(values.fechaInicio, values.horaInicio)
+    : "";
+  const plan = rangeReady
+    ? planActivities(
+        schedules,
+        oldStartIso,
+        newStartIso,
+        fromDateAndTimeValues(values.fechaFin, values.horaFin),
+        moveWithEvent,
+        decisions,
+      )
+    : [];
+  const shift = rangeReady ? shiftText(oldStartIso, newStartIso) : "";
+  const affected = plan.filter((item) => item.outside || item.moved);
+  const pendingDecisions = unresolved(plan).length;
+  const clash = pendingDecisions === 0 ? overlapping(plan) : null;
+  const momentRange = (startIso: string, endIso: string) =>
+    `${shortMoment(isoToWall(startIso))} – ${timeText(isoToWall(endIso).split("T")[1])}`;
+
   const clientErrors: Partial<Record<ErrorKey, string>> = {
     titulo: values.titulo.trim() ? undefined : "Escribe el título del evento.",
     descripcion: values.descripcion.trim()
       ? undefined
       : "Escribe una descripción.",
-    capacidad:
-      values.capacidad.trim() && Number.isInteger(capacidadNum) && capacidadNum > 0
-        ? undefined
-        : "Ingresa un número entero mayor a 0.",
-    fecha_inicio: values.fechaInicio ? undefined : "Elige la fecha de inicio.",
-    hora_inicio: values.horaInicio ? undefined : "Elige la hora de inicio.",
+    capacidad: !(
+      values.capacidad.trim() &&
+      Number.isInteger(capacidadNum) &&
+      capacidadNum > 0
+    )
+      ? "Ingresa un número entero mayor a 0."
+      : capacidadNum > EVENT_CAPACITY_MAX
+        ? `El máximo es ${EVENT_CAPACITY_MAX.toLocaleString("es-CO")}.`
+        : occupancy && capacidadNum < occupancy.ocupados
+        ? `Hay ${occupancy.ocupados} lugares ocupados. El aforo no puede ser menor.`
+        : undefined,
+    fecha_inicio: !values.fechaInicio
+      ? "Elige la fecha de inicio."
+      : startTouched && values.fechaInicio < now.slice(0, 10)
+        ? "No puede ser anterior a hoy."
+        : undefined,
+    hora_inicio: !values.horaInicio
+      ? "Elige la hora de inicio."
+      : startTouched &&
+          values.fechaInicio === now.slice(0, 10) &&
+          joinWall(values.fechaInicio, values.horaInicio) < now
+        ? "Esa hora ya pasó."
+        : undefined,
     fecha_fin: !values.fechaFin
       ? "Elige la fecha de fin."
       : values.fechaInicio && values.fechaFin < values.fechaInicio
@@ -212,6 +340,17 @@ export function EventForm({
         ? "Debe ser posterior a la hora de inicio."
         : undefined,
     lugar: values.lugar.trim() ? undefined : "Escribe el nombre del lugar.",
+    fecha_limite_inscripcion: !values.limiteInscripcion
+      ? undefined
+      : values.fechaInicio && values.limiteInscripcion > values.fechaInicio
+        ? "No puede ser posterior al inicio del evento."
+        : deadlineTouched && values.limiteInscripcion < today
+          ? "No puede ser anterior a hoy."
+          : undefined,
+    dias_limite_cancelacion: cancellationDaysError(
+      values.diasCancelacion,
+      daysTouched ? daysAvailable : null,
+    ),
     latitud:
       hasLat && (Number.isNaN(Number(values.latitud)) || Math.abs(Number(values.latitud)) > 90)
         ? "La latitud va de -90 a 90."
@@ -235,7 +374,8 @@ export function EventForm({
   });
   const errorCount = Object.keys(compactErrors(clientErrors)).length;
   const dirty = JSON.stringify(values) !== JSON.stringify(base);
-  const canSubmit = errorCount === 0 && (dirty || !isEdit);
+  const canSubmit =
+    errorCount === 0 && (dirty || !isEdit) && pendingDecisions === 0 && !clash;
 
   const shown = (key: ErrorKey) => fields.visible(errors, key) ?? serverFor(key);
   const change = (name: keyof EventFormValues, key: ErrorKey, value: string) => {
@@ -325,7 +465,7 @@ export function EventForm({
       requestAnimationFrame(() => focusFirstError(formRef.current));
       return;
     }
-    onSubmit(values);
+    onSubmit(values, adjustmentsOf(plan));
   };
 
   const requestCancel = () => {
@@ -335,11 +475,6 @@ export function EventForm({
       onCancel();
     }
   };
-
-  const endTimeHint =
-    sameDay && values.horaInicio
-      ? "Termina el mismo día: solo se habilitan horas posteriores al inicio."
-      : undefined;
 
   return (
     <form
@@ -377,71 +512,213 @@ export function EventForm({
             type="number"
             inputMode="numeric"
             min={1}
+            max={EVENT_CAPACITY_MAX}
             step={1}
             required
             value={values.capacidad}
-            onChange={(e) => change("capacidad", "capacidad", e.target.value)}
+            onChange={(e) => {
+              // Solo dígitos, y no más de los que tiene el máximo.
+              change(
+                "capacidad",
+                "capacidad",
+                e.target.value.replace(/\D/g, "").slice(0, CAPACITY_DIGITS),
+              );
+              // El tope y el mínimo por lugares ocupados se avisan mientras
+              // se escribe, sin esperar a salir del campo.
+              fields.touch("capacidad");
+            }}
             onBlur={() => fields.touch("capacidad")}
             error={shown("capacidad")}
-            hint="Número de personas."
           />
+          {/* Siempre visible, también con error: dice de dónde sale el mínimo. */}
+          <p className="mt-1.5 text-[13px] text-muted-foreground">
+            {occupancy
+              ? `${occupancy.ocupados} lugares ocupados: ${occupancy.participantes} participantes y ${occupancy.publico} inscritos.`
+              : "Incluye participantes y público inscrito."}
+          </p>
         </div>
       </Section>
 
       <Section title="Fecha y hora">
+        <DateTimeRangePicker
+          value={{
+            startDate: values.fechaInicio,
+            startTime: values.horaInicio,
+            endDate: values.fechaFin,
+            endTime: values.horaFin,
+          }}
+          // Desde ahora: no se programa en el pasado. Un evento en curso
+          // conserva el inicio que ya tenía mientras no se toque.
+          min={now}
+          errors={{
+            startDate: shown("fecha_inicio"),
+            startTime: shown("hora_inicio"),
+            endDate: shown("fecha_fin"),
+            endTime: shown("hora_fin"),
+          }}
+          onChange={(next, field) => {
+            setValues((prev) => ({
+              ...prev,
+              fechaInicio: next.startDate,
+              horaInicio: next.startTime,
+              fechaFin: next.endDate,
+              horaFin: next.endTime,
+            }));
+            fields.touch(RANGE_KEYS[field]);
+            if (field === "startDate") {
+              // Mover el evento puede dejar fuera de rango los límites de
+              // inscripción: si pasa, se dice junto a ellos sin esperar.
+              fields.touch("fecha_limite_inscripcion");
+              fields.touch("dias_limite_cancelacion");
+            }
+            if (serverErrors[RANGE_KEYS[field]]) {
+              setDismissedServer((prev) => new Set(prev).add(RANGE_KEYS[field]));
+            }
+          }}
+        />
+        {plan.length > 0 && (shift || affected.length > 0) ? (
+          <div className="flex flex-col gap-3 rounded-[10px] border border-warning-border bg-warning-soft px-3.5 py-3 text-sm leading-snug text-warning-foreground">
+            <p className="flex items-start gap-2 font-bold">
+              <TriangleAlert className="mt-0.5 size-[18px] shrink-0" aria-hidden="true" />
+              El cronograma tiene {plan.length === 1 ? "1 actividad" : `${plan.length} actividades`}:
+              revisa cómo quedan con el horario nuevo.
+            </p>
+            {shift ? (
+              <Checkbox
+                name="mover_actividades"
+                checked={moveWithEvent}
+                onChange={(e) => setMoveWithEvent(e.target.checked)}
+                label={`Mover las actividades con el evento (${shift})`}
+              />
+            ) : null}
+            {affected.length > 0 ? (
+              <ul className="flex flex-col gap-2">
+                {affected.map((item) => (
+                  <li
+                    key={item.schedule.id}
+                    className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 rounded-lg bg-card px-3 py-2 text-foreground"
+                  >
+                    <span className="flex min-w-0 flex-col">
+                      <span className="font-bold break-words">{item.schedule.actividad}</span>
+                      <span className="text-[13px] text-text-secondary">
+                        {momentRange(item.schedule.hora_inicio, item.schedule.hora_fin)}
+                        {item.removed ? (
+                          <strong className="text-destructive"> → se eliminará</strong>
+                        ) : item.moved ? (
+                          <>
+                            {" → "}
+                            <strong className="text-foreground">
+                              {momentRange(item.start, item.end)}
+                            </strong>
+                          </>
+                        ) : null}
+                      </span>
+                    </span>
+                    {item.outside ? (
+                      <select
+                        aria-label={`Qué hacer con ${item.schedule.actividad}`}
+                        aria-invalid={item.decision ? undefined : true}
+                        value={item.decision ?? ""}
+                        onChange={(e) =>
+                          setDecisions((prev) => ({
+                            ...prev,
+                            [item.schedule.id]: (e.target.value || undefined) as
+                              | OutsideDecision
+                              | undefined,
+                          }))
+                        }
+                        className={`h-10 rounded-lg border bg-card px-2 text-sm text-foreground ${
+                          item.decision ? "border-input" : "border-destructive"
+                        }`}
+                      >
+                        <option value="">Queda fuera: elige qué hacer…</option>
+                        <option value="fit">Ajustar al horario del evento</option>
+                        <option value="remove">Eliminar la actividad</option>
+                      </select>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {pendingDecisions > 0 ? (
+              <FieldError>
+                {pendingDecisions === 1
+                  ? "Falta decidir qué hacer con 1 actividad que queda fuera del evento."
+                  : `Falta decidir qué hacer con ${pendingDecisions} actividades que quedan fuera del evento.`}
+              </FieldError>
+            ) : clash ? (
+              <FieldError>
+                Con estos ajustes, «{clash[0].schedule.actividad}» y «
+                {clash[1].schedule.actividad}» se cruzan. Elimina una o ajusta sus
+                horarios en el cronograma antes de cambiar el evento.
+              </FieldError>
+            ) : null}
+            {affected.some((item) => item.moved || item.removed) ? (
+              <p>
+                Se guarda todo junto con el evento. A quien ya confirmó una actividad
+                que cambia de horario se le pedirá reconfirmar; si se elimina, se le
+                avisa.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+        {datesChanged && registered > 0 ? (
+          <p role="status" className={NOTICE_CLASS}>
+            <Mail className="mt-0.5 size-[18px] shrink-0" aria-hidden="true" />
+            {noticeFor("fecha")}
+          </p>
+        ) : null}
+      </Section>
+
+      <Section title="Inscripciones">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <TextField
-            label="Fecha de inicio"
-            name="fecha_inicio"
+            label="Fecha límite para inscribirse"
+            optional
+            name="fecha_limite_inscripcion"
             type="date"
-            required
-            value={values.fechaInicio}
+            // Entre hoy y el día del evento.
+            min={today}
+            max={values.fechaInicio || undefined}
+            value={values.limiteInscripcion}
             onChange={(e) => {
-              setFechaInicio(e.target.value);
-              fields.touch("fecha_inicio");
+              change("limiteInscripcion", "fecha_limite_inscripcion", e.target.value);
+              fields.touch("fecha_limite_inscripcion");
             }}
-            onBlur={() => fields.touch("fecha_inicio")}
-            error={shown("fecha_inicio")}
-          />
-          <TimeSelect
-            label="Hora de inicio"
-            name="hora_inicio"
-            value={values.horaInicio}
-            onChange={(v) => {
-              setHoraInicio(v);
-              fields.touch("hora_inicio");
-            }}
-            error={shown("hora_inicio")}
-          />
-          <TextField
-            label="Fecha de fin"
-            name="fecha_fin"
-            type="date"
-            required
-            min={values.fechaInicio || undefined}
-            value={values.fechaFin}
-            onChange={(e) => {
-              setFechaFin(e.target.value);
-              fields.touch("fecha_fin");
-            }}
-            onBlur={() => fields.touch("fecha_fin")}
-            error={shown("fecha_fin")}
-          />
-          <TimeSelect
-            label="Hora de fin"
-            name="hora_fin"
-            value={values.horaFin}
-            onChange={(v) => {
-              set("horaFin", v);
-              fields.touch("hora_fin");
-            }}
-            error={shown("hora_fin")}
-            hint={endTimeHint}
-            minTime={
-              sameDay && values.horaInicio ? addMinute(values.horaInicio) : undefined
+            onBlur={() => fields.touch("fecha_limite_inscripcion")}
+            error={shown("fecha_limite_inscripcion")}
+            hint={
+              values.limiteInscripcion
+                ? "El público podrá inscribirse hasta el final de ese día."
+                : "Entre hoy y el día del evento. Sin fecha, se inscribe hasta que empiece."
             }
           />
+          <TextField
+            label="Días límite para cancelar"
+            optional
+            name="dias_limite_cancelacion"
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder="Ej. 2"
+            hideCounter
+            value={values.diasCancelacion}
+            onChange={(e) => {
+              change(
+                "diasCancelacion",
+                "dias_limite_cancelacion",
+                e.target.value.replace(/\D/g, "").slice(0, 3),
+              );
+              fields.touch("dias_limite_cancelacion");
+            }}
+            onBlur={() => fields.touch("dias_limite_cancelacion")}
+            error={shown("dias_limite_cancelacion")}
+            hint={cancellationHint}
+          />
         </div>
+        <p className="text-[13px] text-muted-foreground">
+          Estos límites son para el público. Un administrador puede inscribir o
+          retirar a alguien hasta que el evento empiece.
+        </p>
       </Section>
 
       <Section title="Lugar y mapa">
@@ -456,6 +733,12 @@ export function EventForm({
           error={shown("lugar")}
           hint="Nombre del lugar (p. ej. «Salón social»)."
         />
+        {placeChanged && registered > 0 ? (
+          <p role="status" className={NOTICE_CLASS}>
+            <Mail className="mt-0.5 size-[18px] shrink-0" aria-hidden="true" />
+            {noticeFor("lugar")}
+          </p>
+        ) : null}
 
         <AddressAutocomplete
           label="Dirección (opcional)"
@@ -473,6 +756,12 @@ export function EventForm({
           error={shown("direccion")}
           hint="Escribe la dirección y elige una sugerencia para marcarla en el mapa."
         />
+        {addressChanged && registered > 0 ? (
+          <p role="status" className={NOTICE_CLASS}>
+            <Mail className="mt-0.5 size-[18px] shrink-0" aria-hidden="true" />
+            {noticeFor("dirección")}
+          </p>
+        ) : null}
 
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center justify-between gap-2">

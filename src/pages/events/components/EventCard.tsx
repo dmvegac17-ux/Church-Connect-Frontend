@@ -1,4 +1,4 @@
-import { Clock, MapPin, Users } from "lucide-react";
+import { Clock, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import {
@@ -6,7 +6,10 @@ import {
   EventStatusPill,
   ScheduleCountPill,
 } from "../../../components/ui/EventBits";
-import { Pill } from "../../../components/ui/primitives";
+import {
+  CapacityCardBar,
+  CapacityChip,
+} from "../../../components/registrations/CapacityBits";
 import { eventDateInfo } from "../../../lib/eventDates";
 import type { Event } from "../../../types/event";
 
@@ -43,11 +46,10 @@ export function EventCard({ event }: { event: Event }) {
           {event.descripcion?.trim() || "Sin descripción."}
         </span>
         <span className="mt-0.5 flex flex-wrap gap-2">
-          <Pill tone="sand" icon={Users} className="!h-7 !text-[13px]">
-            Capacidad: {event.capacidad}
-          </Pill>
+          <CapacityChip event={event} />
           <ScheduleCountPill count={event.total_actividades} prefix />
         </span>
+        <CapacityCardBar event={event} />
       </span>
     </Link>
   );

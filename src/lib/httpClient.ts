@@ -11,6 +11,7 @@ import { ApiError, type ListMeta, type ResponsePayload } from "../types/api";
  *  - Ante `success: false` o HTTP != 2xx, lanzar un `ApiError` tipado
  *    con `message` + `errors` para mostrarlo en la UI.
  *  - Notificar a la capa de sesión cuando el backend responde `401`.
+ *  - Reutilizar las lecturas recientes (ver «Caché de lecturas» más abajo).
  */
 
 type TokenProvider = () => string | null;
@@ -60,6 +61,122 @@ function buildUrl(
   }
 
   return url.toString();
+}
+
+/* ── Caché de lecturas ───────────────────────────────────────────────────
+ *
+ * Varias pantallas piden lo mismo (eventos, usuarios, notificaciones…) y la
+ * barra de navegación repite consultas que la página también hace. Para no
+ * ir al backend cada vez:
+ *
+ *  - Un `GET` idéntico que ya está en curso se comparte: una sola petición.
+ *  - Su respuesta se reutiliza durante `CACHE_TTL_MS`.
+ *  - Cualquier escritura (`POST`, `PUT`, `PATCH`, `DELETE`) vacía la caché,
+ *    así que después de guardar algo siempre se lee del servidor.
+ *
+ * La clave incluye el token: lo que ve un usuario nunca se sirve a otro.
+ * Los errores no se guardan.
+ */
+
+/** Menor que el sondeo más frecuente (30 s): cada sondeo llega al servidor. */
+export const CACHE_TTL_MS = 25_000;
+/** Tope de entradas: al superarlo se descartan las más antiguas. */
+const CACHE_MAX_ENTRIES = 200;
+
+interface CacheEntry {
+  promise: Promise<ApiResult<unknown>>;
+  /** Momento en que llegó la respuesta; `null` mientras está en curso. */
+  settledAt: number | null;
+}
+
+const cache = new Map<string, CacheEntry>();
+
+/** Vacía la caché de lecturas (también al cerrar o cambiar de sesión). */
+export function clearHttpCache(): void {
+  cache.clear();
+}
+
+function abortError(): DOMException {
+  return new DOMException("La petición fue cancelada.", "AbortError");
+}
+
+/**
+ * Entrega el resultado compartido respetando la cancelación de quien lo
+ * pidió: abortar deja de esperar, pero no corta la petición que otros
+ * componentes (o el siguiente montaje) todavía pueden aprovechar.
+ */
+function withSignal<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (!signal) {
+    return promise;
+  }
+  if (signal.aborted) {
+    return Promise.reject(abortError());
+  }
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(abortError());
+    signal.addEventListener("abort", onAbort, { once: true });
+    promise.then(resolve, reject).finally(() => {
+      signal.removeEventListener("abort", onAbort);
+    });
+  });
+}
+
+function cachedGet<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<ApiResult<T>> {
+  const { signal, ...shared } = options;
+  const auth = shared.auth ?? true;
+  const key = `${auth ? (getToken() ?? "") : ""}|${buildUrl(path, shared.query)}`;
+  const now = Date.now();
+
+  const hit = cache.get(key);
+  if (hit && (hit.settledAt === null || now - hit.settledAt < CACHE_TTL_MS)) {
+    return withSignal(hit.promise as Promise<ApiResult<T>>, signal);
+  }
+
+  const entry: CacheEntry = {
+    // Sin `signal`: la petición compartida no depende de un solo componente.
+    promise: request<T>("GET", path, shared),
+    settledAt: null,
+  };
+  // Reinsertar la clave la deja como la más reciente.
+  cache.delete(key);
+  cache.set(key, entry);
+  if (cache.size > CACHE_MAX_ENTRIES) {
+    const oldest = cache.keys().next().value;
+    if (oldest !== undefined) {
+      cache.delete(oldest);
+    }
+  }
+
+  entry.promise.then(
+    () => {
+      entry.settledAt = Date.now();
+    },
+    () => {
+      // Un error no se reutiliza: el siguiente intento va al servidor.
+      if (cache.get(key) === entry) {
+        cache.delete(key);
+      }
+    },
+  );
+
+  return withSignal(entry.promise as Promise<ApiResult<T>>, signal);
+}
+
+/**
+ * Toda escritura invalida las lecturas guardadas, antes y después: lo que
+ * se lea a partir de aquí refleja el cambio, haya terminado bien o con un
+ * error que también cambió el estado en el servidor.
+ */
+async function mutate<R>(run: () => Promise<R>): Promise<R> {
+  clearHttpCache();
+  try {
+    return await run();
+  } finally {
+    clearHttpCache();
+  }
 }
 
 async function request<T>(
@@ -117,6 +234,16 @@ async function request<T>(
 
   if (response.status === 401) {
     onUnauthorized();
+  }
+
+  // Documentos legales por aceptar: el backend niega todo lo demás. Se avisa
+  // para que la aplicación muestre el paso de aceptación.
+  if (
+    response.status === 403 &&
+    (payload?.data as { codigo?: string } | null | undefined)?.codigo ===
+      "aceptacion_pendiente"
+  ) {
+    window.dispatchEvent(new Event("legal:acceptance-pending"));
   }
 
   const success = payload?.success ?? response.ok;
@@ -232,17 +359,17 @@ async function postRaw<T>(
 }
 
 export const httpClient = {
-  get: <T>(path: string, options?: RequestOptions) =>
-    request<T>("GET", path, options),
+  get: <T>(path: string, options?: RequestOptions) => cachedGet<T>(path, options),
   post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
-    request<T>("POST", path, { ...options, body }),
+    mutate(() => request<T>("POST", path, { ...options, body })),
   put: <T>(path: string, body?: unknown, options?: RequestOptions) =>
-    request<T>("PUT", path, { ...options, body }),
+    mutate(() => request<T>("PUT", path, { ...options, body })),
   patch: <T>(path: string, body?: unknown, options?: RequestOptions) =>
-    request<T>("PATCH", path, { ...options, body }),
+    mutate(() => request<T>("PATCH", path, { ...options, body })),
   delete: <T>(path: string, options?: RequestOptions) =>
-    request<T>("DELETE", path, options),
-  postRaw,
+    mutate(() => request<T>("DELETE", path, options)),
+  postRaw: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+    mutate(() => postRaw<T>(path, body, options)),
 };
 
 /** Helper para leer `meta.totalUsers` de forma segura. */
