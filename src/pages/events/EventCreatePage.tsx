@@ -6,6 +6,7 @@ import { useToast } from "../../components/feedback/useToast";
 import { PageHeader } from "../../components/layout/Page";
 import { Breadcrumb } from "../../components/ui/primitives";
 import { fromDateAndTimeValues } from "../../lib/format";
+import { registrationDeadlineIso } from "../../lib/eventLimits";
 import { parseValidationErrors } from "../../lib/formErrors";
 import { eventService } from "../../services/eventService";
 import { ApiError } from "../../types/api";
@@ -26,6 +27,8 @@ export function EventCreatePage() {
     const latitud = values.latitud.trim();
     const longitud = values.longitud.trim();
 
+    const fechaInicio = fromDateAndTimeValues(values.fechaInicio, values.horaInicio);
+
     const payload: CreateEventDTO = {
       titulo: values.titulo.trim(),
       descripcion: values.descripcion.trim(),
@@ -33,9 +36,15 @@ export function EventCreatePage() {
       direccion: values.direccion.trim() || null,
       latitud: latitud ? Number(latitud) : null,
       longitud: longitud ? Number(longitud) : null,
-      fecha_inicio: fromDateAndTimeValues(values.fechaInicio, values.horaInicio),
+      fecha_inicio: fechaInicio,
       fecha_fin: fromDateAndTimeValues(values.fechaFin, values.horaFin),
       capacidad: Number(values.capacidad),
+      fecha_limite_inscripcion: values.limiteInscripcion
+        ? registrationDeadlineIso(values.limiteInscripcion, fechaInicio)
+        : null,
+      dias_limite_cancelacion: values.diasCancelacion.trim()
+        ? Number(values.diasCancelacion)
+        : null,
     };
 
     setSubmitting(true);
@@ -63,6 +72,7 @@ export function EventCreatePage() {
     <div className="flex max-w-[860px] flex-col gap-5">
       <Breadcrumb to="/events" label="Eventos" current="Nuevo evento" />
       <PageHeader
+        refresh={false}
         title="Nuevo evento"
         description="Completa la información, la fecha y el lugar. Después podrás crear su cronograma."
       />

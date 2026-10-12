@@ -13,7 +13,8 @@ export type ResponseStatus =
   | "reasignada"
   | "revocada";
 
-export type DeliveryStatus = "en_cola" | "enviada" | "error";
+/** `autoasignada`: el administrador se asignó a sí mismo; no hubo correo. */
+export type DeliveryStatus = "en_cola" | "enviada" | "error" | "autoasignada";
 
 interface EventRef {
   id: string;
@@ -50,6 +51,14 @@ export interface Invitation {
   fecha_respuesta: string | null;
   fecha_revocacion: string | null;
   motivo_rechazo: string | null;
+  /** Se asignó a sí mismo: nadie lo invitó ni hay plazo de respuesta. */
+  autoasignada: boolean;
+  /** Estaba confirmada y la actividad cambió: `pendiente` hasta reconfirmar. */
+  por_reconfirmar: boolean;
+  /** Lo que había confirmado; lo nuevo es `actividad`. */
+  cambio: {
+    antes: { actividad: string; hora_inicio: string; hora_fin: string };
+  } | null;
   evento: EventRef;
   actividad: ActivityRef & { lugar: string; descripcion: string | null };
   /** Quién hizo la invitación y su ministerio. */
@@ -86,6 +95,8 @@ export interface Participation {
   intentos_envio: number;
   ultimo_error_envio: string | null;
   estado_respuesta: ResponseStatus;
+  /** `pendiente` porque la actividad cambió después de confirmada. */
+  por_reconfirmar: boolean;
   /** Estado que tenía antes de pasar a `reasignada`. */
   estado_previo: ResponseStatus | null;
   fecha_respuesta: string | null;
@@ -118,6 +129,8 @@ export interface ReassignmentInfo {
   evento: EventRef;
   asignado_actual: PersonRef;
   motivo_liberacion: "rechazo" | "sin_respuesta" | "cancelada" | "aceptada";
+  /** La asignación vigente es propia del administrador que se la dio. */
+  autoasignada: boolean;
   motivo_rechazo: string | null;
   dias_hasta_evento: number;
   dias_para_confirmar_max: number;
@@ -130,11 +143,16 @@ export interface EligibleParticipant {
   rol: UserRole;
   /** Tiene otra actividad activa que se cruza en horario (no lo excluye). */
   cruce_horario: boolean;
+  /** Está inscrito como público en el evento: la inscripción se reemplazará. */
+  inscrito: boolean;
+  /** Ya participa en otra actividad del evento: no ocupa un lugar más. */
+  participa: boolean;
 }
 
 export interface ReplacementDTO {
   participante_id: string;
-  dias_para_confirmar: number;
+  /** Se omite cuando el administrador se asigna a sí mismo. */
+  dias_para_confirmar?: number;
 }
 
 export interface ReplacementResult {

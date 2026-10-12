@@ -1,4 +1,4 @@
-import type { JwtClaims } from "../types/user";
+import { toUserRole, type JwtClaims } from "../types/user";
 
 function base64UrlDecode(segment: string): string {
   const normalized = segment.replace(/-/g, "+").replace(/_/g, "/");
@@ -31,7 +31,7 @@ export function decodeJwt(token: string): JwtClaims | null {
       return null;
     }
 
-    return claims as JwtClaims;
+    return { ...(claims as JwtClaims), rol: toUserRole(claims.rol) };
   } catch {
     return null;
   }

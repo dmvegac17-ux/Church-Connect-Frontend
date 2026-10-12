@@ -14,10 +14,14 @@ import { AdminMinistriesPage } from "./pages/admin/ministries/AdminMinistriesPag
 import { AdminMinistryDetailPage } from "./pages/admin/ministries/AdminMinistryDetailPage";
 import { AdminNotificationsPage } from "./pages/admin/notifications/AdminNotificationsPage";
 import { AdminParticipationsPage } from "./pages/admin/participations/AdminParticipationsPage";
+import { AdminRegistrationsPage } from "./pages/admin/registrations/AdminRegistrationsPage";
 import { AdminSchedulesPage } from "./pages/admin/schedules/AdminSchedulesPage";
 import { AdminUsersPage } from "./pages/admin/users/AdminUsersPage";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
+import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
+import { AdminLegalPage } from "./pages/admin/legal/AdminLegalPage";
+import { LegalDocumentPage } from "./pages/legal/LegalDocumentPage";
 import { EventCreatePage } from "./pages/events/EventCreatePage";
 import { EventDetailPage } from "./pages/events/EventDetailPage";
 import { EventEditPage } from "./pages/events/EventEditPage";
@@ -29,6 +33,7 @@ import { NotificationDetailPage } from "./pages/notifications/NotificationDetail
 import { NotificationsListPage } from "./pages/notifications/NotificationsListPage";
 import { ParticipationsPage } from "./pages/participations/ParticipationsPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
+import { MyRegistrationsPage } from "./pages/registrations/MyRegistrationsPage";
 import { SchedulesListPage } from "./pages/schedules/SchedulesListPage";
 import { UserDetailPage } from "./pages/users/UserDetailPage";
 
@@ -61,6 +66,11 @@ export function AppRoutes() {
       {/* Públicas */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      {/* A esta llega el enlace del correo para restablecer la contraseña. */}
+      <Route path="/restablecer-contrasena" element={<ResetPasswordPage />} />
+      {/* Documentos legales: se leen sin iniciar sesión. */}
+      <Route path="/terminos" element={<LegalDocumentPage tipo="terminos" />} />
+      <Route path="/privacidad" element={<LegalDocumentPage tipo="privacidad" />} />
 
       {/* Privadas (con el layout del perfil) */}
       <Route
@@ -85,6 +95,14 @@ export function AppRoutes() {
           element={
             <AdminOnly>
               <AdminUsersPage />
+            </AdminOnly>
+          }
+        />
+        <Route
+          path="/legal-documents"
+          element={
+            <AdminOnly>
+              <AdminLegalPage />
             </AdminOnly>
           }
         />
@@ -241,18 +259,47 @@ export function AppRoutes() {
           }
         />
 
-        {/* Participaciones: el administrador supervisa; el participante
-            confirma las suyas. El miembro no tiene esta vista. */}
+        {/* Participaciones: el administrador supervisa las de todos; el
+            miembro confirma las suyas. */}
         <Route
           path="/participations"
           element={
             <ByRole
               admin={<AdminParticipationsPage />}
-              member={
-                <ProtectedRoute requiredRole="PARTICIPANT">
-                  <ParticipationsPage />
-                </ProtectedRoute>
-              }
+              member={<ParticipationsPage />}
+            />
+          }
+        />
+        {/* El administrador también puede ser asignado a una actividad:
+            aquí responde sus propias invitaciones. */}
+        <Route
+          path="/my-participations"
+          element={
+            <AdminOnly>
+              <ParticipationsPage variant="admin" />
+            </AdminOnly>
+          }
+        />
+
+        {/* El administrador también puede inscribirse como público: aquí ve
+            sus propias inscripciones. */}
+        <Route
+          path="/my-registrations"
+          element={
+            <AdminOnly>
+              <MyRegistrationsPage />
+            </AdminOnly>
+          }
+        />
+
+        {/* Inscripciones: el administrador gestiona los inscritos de cada
+            evento; el miembro ve las suyas. */}
+        <Route
+          path="/registrations"
+          element={
+            <ByRole
+              admin={<AdminRegistrationsPage />}
+              member={<MyRegistrationsPage />}
             />
           }
         />

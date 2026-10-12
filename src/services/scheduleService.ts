@@ -1,8 +1,10 @@
 import { httpClient, readMetaTotal } from "../lib/httpClient";
+import type { ScheduleGroup } from "../lib/scheduleGroups";
 import type {
   CreateScheduleDTO,
   Schedule,
   UpdateScheduleDTO,
+  ScheduleChange,
 } from "../types/schedule";
 
 const BASE = "/schedules";
@@ -65,4 +67,57 @@ async function remove(id: string): Promise<void> {
   await httpClient.delete<null>(`${BASE}/${id}`);
 }
 
-export const scheduleService = { list, getById, create, update, remove };
+export interface ScheduleTime {
+  id: string;
+  /** ISO datetime. */
+  hora_inicio: string;
+  hora_fin: string;
+}
+
+/**
+ * `PUT /schedules/horarios` — solo ADMIN. Cambia de una vez el horario de
+ * varias actividades de un evento. El backend valida cómo queda el
+ * cronograma completo y guarda todo o nada: es la forma de intercambiar
+ * horarios sin que el primer cambio choque con el que aún no se hizo.
+ */
+async function reschedule(eventoId: string, items: ScheduleTime[]): Promise<Schedule[]> {
+  const { data } = await httpClient.put<Schedule[]>(`${BASE}/horarios`, {
+    evento_id: eventoId,
+    items,
+  });
+  return data ?? [];
+}
+
+/** `GET /schedules/historial` — solo ADMIN. Del cambio más reciente al más antiguo. */
+async function history(
+  eventoId: string,
+  signal?: AbortSignal,
+): Promise<ScheduleChange[]> {
+  const { data } = await httpClient.get<ScheduleChange[]>(`${BASE}/historial`, {
+    query: { evento_id: eventoId },
+    signal,
+  });
+  return data ?? [];
+}
+
+/**
+ * `GET /schedules/agrupados` — solo ADMIN. Todos los eventos con sus
+ * actividades y el estado de cada una, en una sola petición.
+ */
+async function grouped(signal?: AbortSignal): Promise<ScheduleGroup[]> {
+  const { data } = await httpClient.get<ScheduleGroup[]>(`${BASE}/agrupados`, {
+    signal,
+  });
+  return data ?? [];
+}
+
+export const scheduleService = {
+  list,
+  grouped,
+  history,
+  getById,
+  create,
+  update,
+  remove,
+  reschedule,
+};

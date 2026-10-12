@@ -1,14 +1,23 @@
-import { ChevronRight, CircleCheck, Clock, MapPin } from "lucide-react";
+import {
+  ChevronRight,
+  CircleCheck,
+  Clock,
+  LayoutDashboard,
+  MapPin,
+  SlidersHorizontal,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../../auth/useAuth";
 import { ErrorAlert } from "../../components/feedback/ErrorAlert";
 import { Spinner } from "../../components/feedback/Spinner";
+import { useToast } from "../../components/feedback/useToast";
 import { DailyVerse } from "../../components/layout/DailyVerse";
 import { Card } from "../../components/layout/Page";
 import { DateBlock } from "../../components/ui/EventBits";
 import { RoleBadge } from "../../components/users/Badges";
-import { MEMBER_QUICK_LINKS, PARTICIPANT_QUICK_LINK } from "../../config/navigation";
+import { QUICK_LINK_CATALOG } from "../../config/navigation";
 import { useFullList } from "../../hooks/useFullList";
 import {
   eventDateInfo,
@@ -18,18 +27,32 @@ import {
   todayLabel,
 } from "../../lib/eventDates";
 import { formatDateTime } from "../../lib/format";
+import { loadHomeConfig, saveHomeConfig, type HomeConfig } from "../../lib/homeConfig";
 import { eventService } from "../../services/eventService";
 import { notificationService } from "../../services/notificationService";
+import { HomeCustomizeDialog } from "./HomeCustomizeDialog";
 
 const UNREAD_PREVIEW = 3;
 
 const SEE_ALL_CLASS =
   "rounded-lg px-1 py-1.5 text-sm font-bold text-primary hover:underline";
 
-/** Inicio de miembro: saludo, próximo evento, avisos sin leer y accesos rápidos. */
+/**
+ * Inicio de miembro: saludo, próximo evento, avisos sin leer y accesos
+ * rápidos. Cada persona elige qué secciones ve y qué atajos tiene a mano.
+ */
 export function HomePage() {
   const { user, role } = useAuth();
+  const toast = useToast();
+  const userId = user?.id ?? "";
   const now = new Date();
+  const [config, setConfig] = useState<HomeConfig>(() => loadHomeConfig(userId));
+  const [customizing, setCustomizing] = useState(false);
+
+  // La configuración es de cada persona: se relee si cambia la sesión.
+  useEffect(() => {
+    setConfig(loadHomeConfig(userId));
+  }, [userId]);
   const events = useFullList(eventService.list);
   const notifications = useFullList(notificationService.list);
 
@@ -38,11 +61,18 @@ export function HomePage() {
   );
   const nextInfo = nextEvent ? eventDateInfo(nextEvent, now) : null;
   const unread = notifications.items.filter((n) => !n.leida);
-  // El participante suma el acceso a sus invitaciones; el miembro no cambia.
-  const quickLinks =
-    role === "PARTICIPANT"
-      ? [PARTICIPANT_QUICK_LINK, ...MEMBER_QUICK_LINKS]
-      : MEMBER_QUICK_LINKS;
+  const quickLinks = config.keys.flatMap((key) =>
+    QUICK_LINK_CATALOG.filter((item) => item.key === key),
+  );
+  const showQuick = config.quick && quickLinks.length > 0;
+  const allHidden = !config.verse && !config.next && !config.unread && !showQuick;
+
+  const saveConfig = (next: HomeConfig) => {
+    saveHomeConfig(userId, next);
+    setConfig(next);
+    setCustomizing(false);
+    toast.success("Tu inicio quedó actualizado.");
+  };
 
   let summary = "Desde aquí puedes consultar los eventos, los ministerios y tus avisos.";
   if (!events.isLoading && !notifications.isLoading) {
@@ -71,20 +101,51 @@ export function HomePage() {
           <p className="text-base leading-normal text-pretty text-text-secondary">
             {summary}
           </p>
-          {role ? (
-            <div className="mt-1 flex">
-              <RoleBadge role={role} />
-            </div>
-          ) : null}
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            {role ? <RoleBadge role={role} /> : null}
+            <button
+              type="button"
+              onClick={() => setCustomizing(true)}
+              className="inline-flex h-9 items-center gap-1.5 rounded-[10px] border border-button-border bg-card px-3 text-sm font-bold text-foreground hover:bg-accent max-md:h-11"
+            >
+              <SlidersHorizontal className="size-[18px]" aria-hidden="true" />
+              Personalizar inicio
+            </button>
+          </div>
         </div>
-        <DailyVerse
-          className="flex flex-col justify-center bg-accent px-6 py-7 sm:px-8"
-          textClassName="text-lg leading-normal text-pretty text-[#2F3A2E]"
-          referenceClassName="text-sm !font-bold text-primary"
-        />
+        {config.verse ? (
+          <DailyVerse
+            className="flex flex-col justify-center bg-accent px-6 py-7 sm:px-8"
+            textClassName="text-lg leading-normal text-pretty text-[#2F3A2E]"
+            referenceClassName="text-sm !font-bold text-primary"
+          />
+        ) : null}
       </Card>
 
+      {allHidden ? (
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-button-border bg-card px-5 py-9 text-center">
+          <span
+            aria-hidden="true"
+            className="flex size-[46px] items-center justify-center rounded-xl bg-primary-soft text-primary"
+          >
+            <LayoutDashboard className="size-6" />
+          </span>
+          <p className="text-base font-extrabold">
+            Ocultaste todas las secciones del inicio
+          </p>
+          <button
+            type="button"
+            onClick={() => setCustomizing(true)}
+            className="mt-1 h-[42px] rounded-[10px] border border-button-border bg-card px-4 text-[15px] font-bold text-foreground hover:bg-accent max-md:h-11"
+          >
+            Personalizar inicio
+          </button>
+        </div>
+      ) : null}
+
+      {config.next || config.unread ? (
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] gap-5">
+        {config.next ? (
         <Card as="section" className="flex flex-col gap-4 p-6">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-extrabold">Próximo evento</h2>
@@ -133,7 +194,9 @@ export function HomePage() {
             </p>
           )}
         </Card>
+        ) : null}
 
+        {config.unread ? (
         <Card as="section" className="flex flex-col gap-3 p-6">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-extrabold">Avisos sin leer</h2>
@@ -183,12 +246,25 @@ export function HomePage() {
             </p>
           )}
         </Card>
+        ) : null}
       </div>
+      ) : null}
 
+      {showQuick ? (
       <section className="flex flex-col gap-3.5" aria-labelledby="home-quick">
-        <h2 id="home-quick" className="text-lg font-extrabold">
-          Accesos rápidos
-        </h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 id="home-quick" className="text-lg font-extrabold">
+            Accesos rápidos
+          </h2>
+          <button
+            type="button"
+            onClick={() => setCustomizing(true)}
+            aria-label="Editar accesos rápidos"
+            className="rounded-lg px-1 py-1.5 text-sm font-bold text-primary hover:underline"
+          >
+            Editar
+          </button>
+        </div>
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,200px),1fr))] gap-3">
           {quickLinks.map(({ to, label, description, icon: Icon }) => (
             <li key={to}>
@@ -211,6 +287,14 @@ export function HomePage() {
           ))}
         </ul>
       </section>
+      ) : null}
+
+      <HomeCustomizeDialog
+        open={customizing}
+        config={config}
+        onSave={saveConfig}
+        onClose={() => setCustomizing(false)}
+      />
     </div>
   );
 }

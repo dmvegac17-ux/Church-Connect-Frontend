@@ -1,6 +1,7 @@
-import { CalendarCheck, TriangleAlert, User } from "lucide-react";
-import { useEffect, useId, useState } from "react";
+import { CalendarCheck, Info, TriangleAlert, User, UserCheck } from "lucide-react";
+import { useEffect, useId, useMemo, useState } from "react";
 
+import { useAuth } from "../../../auth/useAuth";
 import { Alert, ErrorAlert } from "../../../components/feedback/ErrorAlert";
 import { Spinner } from "../../../components/feedback/Spinner";
 import { Button } from "../../../components/forms/Button";
@@ -12,6 +13,11 @@ import {
 } from "../../../components/forms/fieldStyles";
 import { Modal } from "../../../components/ui/Overlay";
 import {
+  assignmentNotice,
+  occupancyOf,
+  type Occupancy,
+} from "../../../lib/capacity";
+import {
   clockRange,
   conflictStatus,
   dateInDays,
@@ -19,6 +25,7 @@ import {
   shortDate,
   validationField,
 } from "../../../lib/participations";
+import { eventService } from "../../../services/eventService";
 import { participationService } from "../../../services/participationService";
 import { ApiError } from "../../../types/api";
 import type {
@@ -77,7 +84,8 @@ interface ReassignDialogProps {
 
 /**
  * Ventana única para "Reasignar" (invitación liberada) y "Revocar y cambiar"
- * (invitación aceptada). El modo lo decide el servidor.
+ * (invitación aceptada). El modo lo decide el servidor. Quien reasigna puede
+ * elegirse a sí mismo: queda asignado de inmediato, sin invitación ni plazo.
  */
 export function ReassignDialog({
   invitation,
@@ -86,11 +94,16 @@ export function ReassignDialog({
   onConflict,
 }: ReassignDialogProps) {
   const fieldId = useId();
+  const { user: me } = useAuth();
+  const meId = me?.id ?? "";
   const invitationId = invitation?.id ?? null;
   const activityId = invitation?.actividad.id ?? null;
+  const eventId = invitation?.evento.id ?? null;
 
   const [info, setInfo] = useState<ReassignmentInfo | null>(null);
   const [people, setPeople] = useState<EligibleParticipant[]>([]);
+  /** Ocupación del evento, para avisar si la asignación deja sobrecupo. */
+  const [occupancy, setOccupancy] = useState<Occupancy | null>(null);
   const [loadError, setLoadError] = useState<unknown>(null);
   const [to, setTo] = useState("");
   const [days, setDays] = useState("");
@@ -105,6 +118,7 @@ export function ReassignDialog({
   useEffect(() => {
     setInfo(null);
     setPeople([]);
+    setOccupancy(null);
     setLoadError(null);
     setTo("");
     setDays("");
@@ -114,6 +128,14 @@ export function ReassignDialog({
       return;
     }
     const controller = new AbortController();
+
+    if (eventId) {
+      // Solo alimenta un aviso: si falla, se reasigna igual.
+      eventService
+        .getById(eventId, controller.signal)
+        .then((event) => setOccupancy(occupancyOf(event)))
+        .catch(() => {});
+    }
 
     Promise.all([
       participationService.reassignmentInfo(invitationId, controller.signal),
@@ -136,7 +158,33 @@ export function ReassignDialog({
 
     return () => controller.abort();
     // `onConflict` cambia en cada render del padre; la carga depende solo de la invitación.
-  }, [invitationId, activityId]);
+  }, [invitationId, activityId, eventId]);
+
+  // Uno mismo va fijado al inicio; el resto, por nombre.
+  const options = useMemo(
+    () =>
+      [...people].sort(
+        (a, b) =>
+          Number(b.id === meId) - Number(a.id === meId) ||
+          a.nombre_completo.localeCompare(b.nombre_completo, "es"),
+      ),
+    [people, meId],
+  );
+  const chosen = people.find((p) => p.id === to) ?? null;
+  /** Se elige a sí mismo: sin invitación ni días para confirmar. */
+  const selfAssign = to !== "" && to === meId;
+  /** La asignación que se deja es la propia: no hay a quién notificar. */
+  const ownAssignment = invitation?.participante.id === meId;
+  const notice = assignmentNotice(
+    chosen
+      ? {
+          nombre: chosen.nombre_completo,
+          inscrito: chosen.inscrito,
+          participa: chosen.participa,
+        }
+      : null,
+    occupancy,
+  );
 
   const revoke = info?.modo === "revocar";
   const maxDays = info?.dias_para_confirmar_max ?? 0;
@@ -144,12 +192,13 @@ export function ReassignDialog({
   const noTime = info !== null && maxDays < 1;
 
   const toError = to ? undefined : "Elige a quién asignar la actividad.";
-  const localDaysError = info ? daysError(days, daysToEvent, maxDays) : undefined;
+  const localDaysError =
+    info && !selfAssign ? daysError(days, daysToEvent, maxDays) : undefined;
   const shownToError = serverErrors.to ?? (tried ? toError : undefined);
   const shownDaysError =
     serverErrors.days ?? (tried || days.length > 0 ? localDaysError : undefined);
 
-  const validDays = info && !localDaysError ? Number(days) : null;
+  const validDays = info && !selfAssign && !localDaysError ? Number(days) : null;
   const dueDate = validDays ? dateInDays(validDays) : null;
 
   const submit = async () => {
@@ -162,7 +211,9 @@ export function ReassignDialog({
     }
     setSaving(true);
     setServerErrors({});
-    const dto = { participante_id: to, dias_para_confirmar: Number(days) };
+    const dto = selfAssign
+      ? { participante_id: to }
+      : { participante_id: to, dias_para_confirmar: Number(days) };
     try {
       const result = revoke
         ? await participationService.revoke(invitation.id, dto)
@@ -197,7 +248,9 @@ export function ReassignDialog({
       maxWidth="max-w-[520px]"
       title={
         invitation?.estado_respuesta === "aceptada"
-          ? "Revocar confirmación y cambiar participante"
+          ? ownAssignment
+            ? "Dejar esta actividad y asignar a otra persona"
+            : "Revocar confirmación y cambiar participante"
           : "Reasignar actividad"
       }
       subtitle={
@@ -218,14 +271,18 @@ export function ReassignDialog({
           </Button>
           {noTime ? null : (
             <Button
-              variant={revoke ? "danger" : "primary"}
+              variant={revoke && !selfAssign && !ownAssignment ? "danger" : "primary"}
               onClick={() => void submit()}
               loading={saving}
-              loadingLabel="Enviando…"
+              loadingLabel={selfAssign ? "Asignando…" : "Enviando…"}
               // Con un plazo inválido ya escrito, el motivo se lee junto al campo.
-              disabled={!info || Boolean(days && localDaysError)}
+              disabled={!info || Boolean(!selfAssign && days && localDaysError)}
             >
-              {revoke ? "Revocar y enviar invitación" : "Reasignar y enviar invitación"}
+              {selfAssign
+                ? "Asignarme"
+                : revoke
+                  ? "Revocar y enviar invitación"
+                  : "Reasignar y enviar invitación"}
             </Button>
           )}
         </div>
@@ -250,9 +307,12 @@ export function ReassignDialog({
                 </span>
                 <span className="text-[15px] font-bold">
                   {info.asignado_actual.nombre_completo}
+                  {info.asignado_actual.id === meId ? " (Tú)" : ""}
                 </span>
                 <span className="text-[13px] text-muted-foreground">
-                  {RELEASE_LABELS[info.motivo_liberacion]}
+                  {revoke && info.autoasignada
+                    ? "Te asignaste esta actividad"
+                    : RELEASE_LABELS[info.motivo_liberacion]}
                 </span>
                 {info.motivo_rechazo ? (
                   <span className="text-[13px] break-words text-text-secondary">
@@ -262,7 +322,7 @@ export function ReassignDialog({
               </p>
             </div>
 
-            {revoke ? (
+            {revoke && !ownAssignment ? (
               <p
                 role="note"
                 className="flex items-start gap-2 rounded-[10px] bg-destructive-soft px-3 py-2.5 text-sm leading-snug text-destructive-hover"
@@ -297,9 +357,10 @@ export function ReassignDialog({
                     className={controlClass(Boolean(shownToError), "h-[var(--control-h)]")}
                   >
                     <option value="">Selecciona un usuario</option>
-                    {people.map((p) => (
+                    {options.map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.nombre_completo} · {ROLE_LABELS[p.rol]}
+                        {p.nombre_completo}
+                        {p.id === meId ? " (Tú)" : ""} · {ROLE_LABELS[p.rol]} · {p.correo}
                         {p.cruce_horario ? " · otra actividad a esa hora" : ""}
                       </option>
                     ))}
@@ -311,13 +372,49 @@ export function ReassignDialog({
                       No hay otros usuarios activos disponibles. Registra a la
                       persona desde Usuarios.
                     </p>
-                  ) : people.find((p) => p.id === to)?.cruce_horario ? (
+                  ) : chosen?.cruce_horario ? (
                     <p className="text-[13px] font-bold text-warning-foreground">
-                      Esta persona ya tiene otra actividad que se cruza en horario.
+                      {selfAssign
+                        ? "Ya tienes otra actividad que se cruza en horario."
+                        : "Esta persona ya tiene otra actividad que se cruza en horario."}
                     </p>
                   ) : null}
                 </div>
 
+                {notice ? (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className={`flex items-start gap-2 rounded-[10px] border px-3 py-2.5 text-sm leading-snug ${
+                      notice.kind === "warn"
+                        ? "border-warning-border bg-warning-soft text-warning-strong"
+                        : "border-info-border bg-info-soft text-info-foreground"
+                    }`}
+                  >
+                    {notice.kind === "warn" ? (
+                      <TriangleAlert className="size-[18px] shrink-0" aria-hidden="true" />
+                    ) : (
+                      <Info className="size-[18px] shrink-0" aria-hidden="true" />
+                    )}
+                    {notice.text}
+                  </div>
+                ) : null}
+
+                {selfAssign ? (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="flex items-start gap-2 rounded-[10px] border border-info-border bg-info-soft px-3 py-2.5 text-sm leading-snug text-info-foreground"
+                  >
+                    <UserCheck className="size-[18px] shrink-0" aria-hidden="true" />
+                    <span>
+                      <strong className="block font-extrabold">
+                        Te asignarás esta actividad
+                      </strong>
+                      Quedarás asignado de inmediato. No se envía invitación.
+                    </span>
+                  </div>
+                ) : (
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor={`${fieldId}-days`} className={LABEL_CLASS}>
                     Días para confirmar
@@ -357,6 +454,7 @@ export function ReassignDialog({
                     </p>
                   ) : null}
                 </div>
+                )}
               </>
             )}
           </>

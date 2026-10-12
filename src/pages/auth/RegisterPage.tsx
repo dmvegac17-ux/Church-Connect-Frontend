@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../auth/useAuth";
@@ -13,6 +13,8 @@ import {
   passwordPairValid,
 } from "../../components/ui/FormStatus";
 import { HOME_PATH } from "../../config/navigation";
+import { legalService } from "../../services/legalService";
+import { LEGAL_PATHS, type LegalDocument } from "../../types/legal";
 import { useTouched } from "../../hooks/useTouched";
 import { parseValidationErrors } from "../../lib/formErrors";
 import {
@@ -46,6 +48,15 @@ export function RegisterPage() {
     confirmar: "",
   });
   const [acepta, setAcepta] = useState(false);
+  // Versiones vigentes de los documentos: son las que se aceptan al registrarse.
+  const [documents, setDocuments] = useState<LegalDocument[]>([]);
+  const loadDocuments = useCallback(() => {
+    legalService
+      .current()
+      .then(setDocuments)
+      .catch(() => setDocuments([]));
+  }, []);
+  useEffect(loadDocuments, [loadDocuments]);
   const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<unknown>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -100,9 +111,21 @@ export function RegisterPage() {
         correo,
         contrasena: values.contrasena,
         telefono: values.telefono.trim() || undefined,
+        // Las versiones que se mostraron: el servidor guarda la constancia.
+        documentos_aceptados: documents.map((d) => d.id),
       });
     } catch (err) {
-      if (err instanceof ApiError && err.status === 400) {
+      const codigo =
+        err instanceof ApiError
+          ? (err.payload?.data as { codigo?: string } | null | undefined)?.codigo
+          : undefined;
+      if (codigo === "version_no_vigente" || codigo === "aceptacion_requerida") {
+        // Los documentos cambiaron mientras se llenaba el formulario: se
+        // cargan los nuevos y hay que marcar la casilla otra vez.
+        setError(err);
+        setAcepta(false);
+        loadDocuments();
+      } else if (err instanceof ApiError && err.status === 400) {
         setServerErrors({ correo: DUPLICATE_EMAIL_MESSAGE });
       } else if (err instanceof ApiError && err.isValidation) {
         setServerErrors(parseValidationErrors(err).fieldErrors);
@@ -221,7 +244,29 @@ export function RegisterPage() {
 
         <Checkbox
           name="acepta"
-          label="Acepto los términos y condiciones y la política de privacidad"
+          label={
+            <>
+              Acepto los{" "}
+              <a
+                href={LEGAL_PATHS.terminos}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-primary underline"
+              >
+                términos y condiciones
+              </a>{" "}
+              y la{" "}
+              <a
+                href={LEGAL_PATHS.privacidad}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-primary underline"
+              >
+                política de privacidad
+              </a>
+              , y autorizo el tratamiento de mis datos personales
+            </>
+          }
           checked={acepta}
           onChange={(e) => {
             setAcepta(e.target.checked);

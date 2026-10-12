@@ -1,16 +1,31 @@
-import { Ban, CircleAlert, ClipboardList, MailCheck, Repeat } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import {
+  Ban,
+  CircleAlert,
+  ClipboardList,
+  MailCheck,
+  Repeat,
+  UserCheck,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
+import { useAuth } from "../../../auth/useAuth";
 import { ConfirmDialog } from "../../../components/feedback/ConfirmDialog";
 import { ErrorAlert } from "../../../components/feedback/ErrorAlert";
 import { Spinner } from "../../../components/feedback/Spinner";
 import { useToast } from "../../../components/feedback/useToast";
 import { Button } from "../../../components/forms/Button";
+import { CACHE_TTL_MS } from "../../../lib/httpClient";
+import { useRefreshSignal } from "../../../lib/refresh";
 import { Card, PageHeader } from "../../../components/layout/Page";
+import {
+  SortHeader,
+  TablePager,
+  useTableState,
+} from "../../../components/ui/DataTable";
 import {
   Avatar,
   IconButton,
-  Pager,
   Pill,
   SearchInput,
   SegmentedTabs,
@@ -22,25 +37,33 @@ import {
   clockRange,
   conflictStatus,
   shortDate,
+  countParticipations,
+  type AdminFilter,
+  filterParticipations,
+  searchParticipations,
   STATUS_META,
 } from "../../../lib/participations";
 import { participationService } from "../../../services/participationService";
 import { ApiError } from "../../../types/api";
 import type {
   Participation,
-  ParticipationFilter,
   ParticipationList,
   ResponseStatus,
 } from "../../../types/participation";
 import { ReassignDialog } from "./ReassignDialog";
 
-const PAGE_SIZE = 20;
-const SEARCH_DEBOUNCE_MS = 300;
+/** Tamaño de cada petición: el filtro completo se ordena y pagina en la tabla. */
+const FETCH_SIZE = 100;
+/** Tope de seguridad: 20 páginas (2000 invitaciones). */
+const MAX_FETCH_PAGES = 20;
 
-const TABS: { value: ParticipationFilter; label: string }[] = [
+type ParticipationColumn = "actividad" | "participante" | "envio" | "respuesta";
+
+const TABS: { value: AdminFilter; label: string }[] = [
   { value: "todas", label: "Todas" },
   { value: "pendientes", label: "Pendientes" },
   { value: "aceptadas", label: "Aceptadas" },
+  { value: "vencidas", label: "Vencidas" },
   { value: "por_reasignar", label: "Por reasignar" },
   { value: "error_envio", label: "Error de envío" },
 ];
@@ -62,20 +85,44 @@ export function alertText(alertas: ParticipationList["alertas"]): string {
     a
       ? `${a} ${a === 1 ? "actividad necesita" : "actividades necesitan"} una nueva asignación`
       : "",
+    // Lo que falló fue el correo: la invitación sí quedó en la aplicación.
     e
-      ? `${e} ${e === 1 ? "invitación no se pudo enviar" : "invitaciones no se pudieron enviar"}`
+      ? e === 1
+        ? "El correo electrónico de 1 invitación no se pudo enviar; la persona sí la recibió como notificación en la aplicación"
+        : `El correo electrónico de ${e} invitaciones no se pudo enviar; las personas sí las recibieron como notificación en la aplicación`
       : "",
   ].filter(Boolean);
-  return `${partes.join(" y ")}.`;
+  return `${partes.join(". ")}.`;
 }
 
 /** Participaciones (panel de administración): invitaciones y respuestas por actividad. */
 export function AdminParticipationsPage() {
   const toast = useToast();
-  const [filter, setFilter] = useState<ParticipationFilter>("todas");
-  const [search, setSearch] = useState("");
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
+  const { user: me } = useAuth();
+  const meId = me?.id ?? "";
+  // El filtro y la búsqueda viven en la URL: se conservan al recargar.
+  const [params, setParams] = useSearchParams();
+  const filterParam = params.get("filtro");
+  const filter: AdminFilter = TABS.some((tab) => tab.value === filterParam)
+    ? (filterParam as AdminFilter)
+    : "todas";
+  const search = params.get("q") ?? "";
+  const eventId = params.get("evento") ?? "";
+  const query = search.trim();
+  const setParam = (key: string, value: string) =>
+    setParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (value) {
+          next.set(key, value);
+        } else {
+          next.delete(key);
+        }
+        return next;
+      },
+      { replace: true },
+    );
+  const setSearch = (value: string) => setParam("q", value);
   const [reloadKey, setReloadKey] = useState(0);
 
   const [list, setList] = useState<ParticipationList | null>(null);
@@ -87,29 +134,46 @@ export function AdminParticipationsPage() {
   const [replaceTarget, setReplaceTarget] = useState<Participation | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
 
-  // La búsqueda va al servidor: se espera a que se deje de escribir.
-  useEffect(() => {
-    const id = window.setTimeout(() => {
-      setQuery(search.trim());
-      setPage(1);
-    }, SEARCH_DEBOUNCE_MS);
-    return () => window.clearTimeout(id);
-  }, [search]);
-
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
+    // Un refresco en segundo plano conserva lo que se ve: sin «Cargando…».
+    const silent = silentRef.current;
+    silentRef.current = false;
+    if (!silent) {
+      setLoading(true);
+    }
     setError(null);
 
-    participationService
-      .list({
-        filtro: filter,
-        q: query,
-        pagina: page,
-        porPagina: PAGE_SIZE,
-        signal: controller.signal,
-      })
+    // Se trae todo una sola vez: filtrar, buscar, contar, ordenar y paginar
+    // se hace en memoria, sin otra petición por cada cambio.
+    const loadAll = async (): Promise<ParticipationList> => {
+      const fetchPage = (pagina: number) =>
+        participationService.list({
+          filtro: "todas",
+          pagina,
+          porPagina: FETCH_SIZE,
+          signal: controller.signal,
+        });
+
+      // Conteos y alertas vienen iguales en cada página: bastan los primeros.
+      const first = await fetchPage(1);
+      const items = [...first.items];
+      let last = first.items.length;
+      for (
+        let pagina = 2;
+        pagina <= MAX_FETCH_PAGES && last === FETCH_SIZE && items.length < first.total;
+        pagina++
+      ) {
+        const next = await fetchPage(pagina);
+        last = next.items.length;
+        items.push(...next.items);
+      }
+      return { ...first, items };
+    };
+
+    loadAll()
       .then((result) => {
+        loadedAt.current = Date.now();
         setList(result);
         setLoading(false);
       })
@@ -117,18 +181,35 @@ export function AdminParticipationsPage() {
         if (controller.signal.aborted) {
           return;
         }
-        setError(err);
+        // Si falla un refresco en segundo plano, se deja lo que ya había.
+        if (!silent) {
+          setError(err);
+        }
         setLoading(false);
       });
 
     return () => controller.abort();
-  }, [filter, query, page, reloadKey]);
+  }, [reloadKey]);
 
+  // «Actualizar» vuelve a consultar sin borrar lo que se ve.
+  const silentRef = useRef(false);
+  // Cuándo llegaron los datos que se están viendo.
+  const loadedAt = useRef(0);
+  const refreshQuietly = useCallback(() => {
+    silentRef.current = true;
+    setReloadKey((k) => k + 1);
+  }, []);
+  useRefreshSignal(refreshQuietly);
   const refetch = useCallback(() => setReloadKey((k) => k + 1), []);
 
-  const changeFilter = (next: ParticipationFilter) => {
-    setFilter(next);
-    setPage(1);
+  const changeFilter = (next: AdminFilter) => {
+    setParam("filtro", next === "todas" ? "" : next);
+    // La pestaña se muestra al instante con lo ya cargado. Si eso tiene más
+    // de lo que dura la caché, se pone al día en segundo plano: como mucho
+    // una consulta cada 25 s, no una por cada cambio de pestaña.
+    if (Date.now() - loadedAt.current > CACHE_TTL_MS) {
+      refreshQuietly();
+    }
   };
 
   const explainConflict = useCallback(
@@ -171,10 +252,10 @@ export function AdminParticipationsPage() {
     try {
       const updated = await participationService.resend(row.id);
       if (updated.estado_envio === "enviada") {
-        toast.success(`Invitación reenviada a ${row.participante.nombre_completo}.`);
+        toast.success(`Correo reenviado a ${row.participante.nombre_completo}.`);
       } else {
         toast.error(
-          "El correo volvió a fallar. La invitación sigue pendiente y visible para el participante en la aplicación.",
+          "El correo volvió a fallar. La invitación sigue visible para el participante en la aplicación.",
         );
       }
       refetch();
@@ -193,13 +274,50 @@ export function AdminParticipationsPage() {
     }
   };
 
-  const items = list?.items ?? [];
+  // Los contadores de las pestañas respetan la búsqueda, como en el servidor.
+  // Eventos con alguna invitación, para el filtro (del más próximo al más lejano).
+  const eventOptions = useMemo(() => {
+    const byId = new Map<string, { id: string; nombre: string; fecha: string }>();
+    for (const row of list?.items ?? []) {
+      const known = byId.get(row.evento.id);
+      if (!known || row.actividad.fecha < known.fecha) {
+        byId.set(row.evento.id, { ...row.evento, fecha: row.actividad.fecha });
+      }
+    }
+    return [...byId.values()].sort((a, b) => a.fecha.localeCompare(b.fecha));
+  }, [list]);
+  // Un evento que ya no tiene invitaciones (o un enlace viejo) no filtra nada.
+  const activeEvent = eventOptions.some((e) => e.id === eventId) ? eventId : "";
+
+  const matching = useMemo(
+    () =>
+      searchParticipations(list?.items ?? [], query).filter(
+        (row) => !activeEvent || row.evento.id === activeEvent,
+      ),
+    [list, query, activeEvent],
+  );
+  const counts = useMemo(() => countParticipations(matching), [matching]);
+  const items = useMemo(
+    () => filterParticipations(matching, filter),
+    [matching, filter],
+  );
   const alertas = list?.alertas;
   const hasAlert =
     alertas !== undefined &&
     alertas.actividades_por_reasignar + alertas.invitaciones_error_envio > 0;
-  const total = list?.total ?? 0;
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const table = useTableState<Participation, ParticipationColumn>(
+    "admin-participations",
+    items,
+    {
+      actividad: (row) => row.actividad.nombre,
+      participante: (row) => row.participante.nombre_completo,
+      envio: (row) => row.fecha_envio ?? "",
+      respuesta: (row) => STATUS_META[row.estado_respuesta].label,
+    },
+  );
+  /** Las propias llevan «(Tú)»: el administrador también puede participar. */
+  const whoLabel = (row: Participation) =>
+    `${row.participante.nombre_completo}${row.participante.id === meId ? " (Tú)" : ""}`;
 
   const actions = (row: Participation) => (
     <RowActions
@@ -247,8 +365,26 @@ export function AdminParticipationsPage() {
             label="Filtrar por estado"
             value={filter}
             onChange={changeFilter}
-            tabs={TABS.map((tab) => ({ ...tab, count: list?.conteos[tab.value] }))}
+            tabs={TABS.map((tab) => ({
+              ...tab,
+              count: list ? counts[tab.value] : undefined,
+            }))}
           />
+          <label className="flex items-center gap-2 text-sm font-bold text-text-secondary">
+            Evento
+            <select
+              value={activeEvent}
+              onChange={(e) => setParam("evento", e.target.value)}
+              className="h-[var(--control-h)] max-w-[260px] rounded-[10px] border border-input bg-card px-2.5 text-[15px] font-normal text-foreground"
+            >
+              <option value="">Todos los eventos</option>
+              {eventOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.nombre}
+                </option>
+              ))}
+            </select>
+          </label>
           <SearchInput
             label="Buscar participaciones"
             placeholder="Actividad, evento o participante"
@@ -276,25 +412,25 @@ export function AdminParticipationsPage() {
               <table className="w-full min-w-[860px] border-collapse text-sm">
                 <thead>
                   <tr className="bg-surface-alt">
-                    <th scope="col" className={TH_CLASS}>
+                    <SortHeader column="actividad" table={table}>
                       Actividad
-                    </th>
-                    <th scope="col" className={TH_CLASS}>
+                    </SortHeader>
+                    <SortHeader column="participante" table={table}>
                       Participante
-                    </th>
-                    <th scope="col" className={TH_CLASS}>
+                    </SortHeader>
+                    <SortHeader column="envio" table={table}>
                       Envío
-                    </th>
-                    <th scope="col" className={TH_CLASS}>
+                    </SortHeader>
+                    <SortHeader column="respuesta" table={table}>
                       Respuesta
-                    </th>
+                    </SortHeader>
                     <th scope="col" className={`${TH_CLASS} !text-right`}>
                       Acciones
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((row) => (
+                  {table.rows.map((row) => (
                     <tr key={row.id} className={TR_CLASS}>
                       <td className={`${TD_CLASS} py-3`}>
                         <ActivityCell row={row} />
@@ -305,9 +441,7 @@ export function AdminParticipationsPage() {
                             name={row.participante.nombre_completo}
                             className="size-8 text-xs"
                           />
-                          <span className="font-bold">
-                            {row.participante.nombre_completo}
-                          </span>
+                          <span className="font-bold">{whoLabel(row)}</span>
                         </span>
                       </td>
                       <td className={`${TD_CLASS} py-3 whitespace-nowrap`}>
@@ -325,7 +459,7 @@ export function AdminParticipationsPage() {
 
             {/* En móvil, la misma información en tarjetas. */}
             <ul className="md:hidden">
-              {items.map((row) => (
+              {table.rows.map((row) => (
                 <li
                   key={row.id}
                   className="flex flex-col gap-3 border-t border-divider-soft px-4 py-4 first:border-t-0"
@@ -336,7 +470,7 @@ export function AdminParticipationsPage() {
                       name={row.participante.nombre_completo}
                       className="size-8 text-xs"
                     />
-                    <span className="font-bold">{row.participante.nombre_completo}</span>
+                    <span className="font-bold">{whoLabel(row)}</span>
                   </span>
                   <DeliveryCell row={row} />
                   <ResponseCell row={row} />
@@ -345,15 +479,7 @@ export function AdminParticipationsPage() {
               ))}
             </ul>
 
-            <Pager
-              page={page}
-              pageCount={pageCount}
-              total={total}
-              pageSize={PAGE_SIZE}
-              onChange={setPage}
-              disabled={loading}
-              noun="invitaciones"
-            />
+            <TablePager table={table} />
           </div>
         )}
       </Card>
@@ -381,6 +507,12 @@ export function AdminParticipationsPage() {
         onClose={() => setReplaceTarget(null)}
         onDone={(result, mode) => {
           setReplaceTarget(null);
+          if (result.nueva.estado_envio === "autoasignada") {
+            // Se asignó a sí mismo: no hay invitación ni plazo que anunciar.
+            toast.success(`Te asignaste «${result.nueva.actividad.nombre}».`);
+            refetch();
+            return;
+          }
           const name = result.nueva.participante.nombre_completo;
           const due = shortDate(result.nueva.fecha_limite_respuesta);
           const sent =
@@ -419,6 +551,14 @@ function DeliveryCell({ row }: { row: Participation }) {
       </Pill>
     );
   }
+  if (row.estado_envio === "autoasignada") {
+    // Tono neutro: no hubo correo, ni enviado ni fallido.
+    return (
+      <Pill tone="neutral" icon={UserCheck}>
+        Autoasignada
+      </Pill>
+    );
+  }
   if (row.estado_envio === "enviada") {
     return (
       <span className="flex items-center gap-1.5 text-text-strong">
@@ -435,7 +575,9 @@ function ResponseCell({ row }: { row: Participation }) {
   const label =
     row.estado_respuesta === "reasignada" && row.reemplazo
       ? `Reasignada a ${row.reemplazo.participante.nombre_completo}`
-      : meta.label;
+      : row.por_reconfirmar
+        ? "Por reconfirmar"
+        : meta.label;
   const previous =
     row.estado_respuesta === "reasignada" && row.estado_previo
       ? {
@@ -459,7 +601,8 @@ function ResponseCell({ row }: { row: Participation }) {
       ) : null}
       {row.fecha_respuesta ? (
         <p className="text-xs text-muted-foreground">
-          Respondió el {shortDate(row.fecha_respuesta)}
+          {row.estado_envio === "autoasignada" ? "Autoasignada el " : "Respondió el "}
+          {shortDate(row.fecha_respuesta)}
         </p>
       ) : null}
       {row.motivo_rechazo ? (
@@ -512,7 +655,7 @@ function RowActions({
           aria-label={`Reenviar invitación a ${name}`}
           className="md:!h-[34px] md:!px-2.5 md:!text-[13px]"
         >
-          Reenviar
+          Reenviar correo
         </Button>
       ) : null}
       {can("reasignar") ? (
