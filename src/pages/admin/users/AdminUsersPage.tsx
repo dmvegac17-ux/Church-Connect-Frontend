@@ -16,11 +16,15 @@ import { Button, buttonClass } from "../../../components/forms/Button";
 import { controlClass } from "../../../components/forms/fieldStyles";
 import { Card, PageHeader } from "../../../components/layout/Page";
 import {
+  SortHeader,
+  TablePager,
+  useTableState,
+} from "../../../components/ui/DataTable";
+import {
   Avatar,
   EmptyState,
   IconButton,
   IconLink,
-  Pager,
   SearchInput,
   TD_CLASS,
   TH_CLASS,
@@ -41,7 +45,7 @@ import {
 } from "../../../types/user";
 import { UserFormDrawer } from "./UserFormDrawer";
 
-const PAGE_SIZE = 8;
+type UserColumn = "nombre" | "rol" | "estado" | "creado";
 type RoleFilter = UserRole | "all";
 type StatusFilter = "all" | "active" | "inactive";
 
@@ -65,7 +69,6 @@ export function AdminUsersPage({ mode }: { mode?: "create" | "edit" }) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(
     searchParams.get("estado") === "inactivo" ? "inactive" : "all",
   );
-  const [page, setPage] = useState(1);
 
   const [target, setTarget] = useState<User | null>(null);
   const [working, setWorking] = useState(false);
@@ -100,13 +103,13 @@ export function AdminUsersPage({ mode }: { mode?: "create" | "edit" }) {
   );
   const isFiltered =
     query.trim() !== "" || roleFilter !== "all" || statusFilter !== "all";
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, pageCount);
-  const rows = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-
-  useEffect(() => {
-    setPage(1);
-  }, [query, roleFilter, statusFilter]);
+  const table = useTableState<User, UserColumn>("admin-users", filtered, {
+    nombre: (u) => fullNameOf(u),
+    rol: (u) => ROLE_LABELS[u.rol],
+    estado: (u) => (u.activo === false ? 1 : 0),
+    creado: (u) => u.fecha_creacion ?? "",
+  });
+  const rows = table.rows;
 
   const clearFilters = () => {
     setQuery("");
@@ -263,18 +266,18 @@ export function AdminUsersPage({ mode }: { mode?: "create" | "edit" }) {
             <table className="w-full min-w-[720px] border-collapse text-sm">
               <thead>
                 <tr className="bg-surface-alt">
-                  <th scope="col" className={TH_CLASS}>
+                  <SortHeader column="nombre" table={table}>
                     Usuario
-                  </th>
-                  <th scope="col" className={TH_CLASS}>
+                  </SortHeader>
+                  <SortHeader column="rol" table={table}>
                     Rol
-                  </th>
-                  <th scope="col" className={TH_CLASS}>
+                  </SortHeader>
+                  <SortHeader column="estado" table={table}>
                     Estado
-                  </th>
-                  <th scope="col" className={TH_CLASS}>
+                  </SortHeader>
+                  <SortHeader column="creado" table={table}>
                     Creado
-                  </th>
+                  </SortHeader>
                   <th scope="col" className={`${TH_CLASS} !text-right`}>
                     Acciones
                   </th>
@@ -348,14 +351,7 @@ export function AdminUsersPage({ mode }: { mode?: "create" | "edit" }) {
           </div>
         )}
 
-        <Pager
-          page={safePage}
-          pageCount={pageCount}
-          total={filtered.length}
-          pageSize={PAGE_SIZE}
-          onChange={setPage}
-          noun="usuarios"
-        />
+        {isLoading ? null : <TablePager table={table} />}
       </Card>
 
       <UserFormDrawer

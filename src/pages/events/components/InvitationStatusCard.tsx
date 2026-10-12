@@ -23,7 +23,11 @@ function describe(invitation: Participation): {
     case "aceptada":
       return {
         tone: "success",
-        title: `${name} confirmó su participación${
+        title: `${
+          invitation.estado_envio === "autoasignada"
+            ? "Te asignaste esta actividad"
+            : `${name} confirmó su participación`
+        }${
           invitation.fecha_respuesta ? ` el ${shortDate(invitation.fecha_respuesta)}` : ""
         }.`,
         body: "El responsable no se puede cambiar mientras la confirmación esté vigente. Si ya no podrá participar, revoca la confirmación y elige a otra persona.",

@@ -27,6 +27,8 @@ import {
   IconLink,
   Pill,
 } from "../../../components/ui/primitives";
+import { useBackgroundRefresh } from "../../../hooks/useBackgroundRefresh";
+import { TablePager } from "../../../components/ui/DataTable";
 import { useFullList } from "../../../hooks/useFullList";
 import { formatDateTime } from "../../../lib/format";
 import { htmlToPlainText, htmlToPreview } from "../../../lib/htmlText";
@@ -78,10 +80,13 @@ export function AdminNotificationsPage({ mode }: { mode?: "edit" }) {
   const { id: selectedId } = useParams<{ id: string }>();
   const { items, isLoading, error, refetch, setItems } =
     useFullList(listAllNotifications);
+  // Los avisos nuevos aparecen solos, también con la pestaña oculta.
+  useBackgroundRefresh(refetch, { whenHidden: true });
   const users = useFullList(userService.list);
 
   const [tab, setTab] = useState<Tab>("all");
   const [query, setQuery] = useState("");
+  const [order, setOrder] = useState<"recent" | "oldest">("recent");
   const [recipient, setRecipient] =
     useState<RecipientFilterValue>(NO_RECIPIENT_FILTER);
   // Si quedó un borrador, el redactor vuelve a estar ahí (minimizado) al entrar.
@@ -147,13 +152,27 @@ export function AdminNotificationsPage({ mode }: { mode?: "edit" }) {
   }, [items, query, recipient, user?.id]);
 
   const unreadCount = base.filter((n) => !n.leida).length;
-  const visible = useMemo(
-    () =>
-      base.filter(
-        (n) => tab === "all" || (tab === "unread" ? !n.leida : n.leida),
-      ),
-    [base, tab],
-  );
+  const visible = useMemo(() => {
+    const matches = base.filter(
+      (n) => tab === "all" || (tab === "unread" ? !n.leida : n.leida),
+    );
+    // Por fecha de envío; el lector recorre la lista en este mismo orden.
+    const time = (iso: string) => new Date(iso).getTime();
+    return [...matches].sort((a, b) =>
+      order === "oldest"
+        ? time(a.fecha_envio) - time(b.fecha_envio)
+        : time(b.fecha_envio) - time(a.fecha_envio),
+    );
+  }, [base, tab, order]);
+
+  // Paginación en memoria: la lista completa ya está cargada para poder
+  // buscar y filtrar. Cambiar el filtro o la búsqueda vuelve a la página 1.
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  useEffect(() => setPage(1), [tab, query, recipient, order]);
+  const pageCount = Math.max(1, Math.ceil(visible.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const rows = visible.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const selected = selectedId
     ? (items.find((n) => n.id === selectedId) ?? null)
@@ -307,6 +326,19 @@ export function AdminNotificationsPage({ mode }: { mode?: "edit" }) {
                 </button>
               ))}
             </div>
+            <label className="flex shrink-0 items-center gap-2 text-sm text-text-secondary">
+              Orden
+              <select
+                value={order}
+                onChange={(e) =>
+                  setOrder(e.target.value === "oldest" ? "oldest" : "recent")
+                }
+                className="h-10 rounded-[10px] border border-input bg-card px-2 text-sm text-foreground"
+              >
+                <option value="recent">Más recientes</option>
+                <option value="oldest">Más antiguas</option>
+              </select>
+            </label>
           </div>
 
           {isLoading ? (
@@ -320,8 +352,8 @@ export function AdminNotificationsPage({ mode }: { mode?: "edit" }) {
                 : "No hay notificaciones que coincidan."}
             </p>
           ) : (
-            <ul className="overflow-hidden rounded-b-[14px]">
-              {visible.map((n) => {
+            <ul className="overflow-hidden">
+              {rows.map((n) => {
                 const isSelected = n.id === selectedId;
                 const to = recipientName(n);
                 return (
@@ -397,6 +429,21 @@ export function AdminNotificationsPage({ mode }: { mode?: "edit" }) {
                 );
               })}
             </ul>
+          )}
+          {isLoading ? null : (
+            <TablePager
+              table={{
+                total: visible.length,
+                page: currentPage,
+                pageCount,
+                pageSize,
+                setPage: (next) => setPage(Math.min(Math.max(1, next), pageCount)),
+                setPageSize: (size) => {
+                  setPageSize(size);
+                  setPage(1);
+                },
+              }}
+            />
           )}
         </section>
 

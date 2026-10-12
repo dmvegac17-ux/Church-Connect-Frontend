@@ -29,13 +29,39 @@ button,input,select{font-family:inherit}
       <span style="font-weight:800;font-size:17px;letter-spacing:-0.01em">Church Connect</span>
     </button>
     <nav aria-label="Principal" style="display:{{ deskNav }};gap:2px;flex:1;min-width:0">
-      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
-        <button onClick="{{ n.onClick }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:15px;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }}" style-hover="background:rgba(255,255,255,0.12);color:#fff">
-          <span style="white-space:nowrap">{{ n.label }}</span>
-          <sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}">
-            <span aria-label="{{ n.badgeAria }}" style="min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#F1EADF;color:#2F5540;font-size:12px;font-weight:800;display:grid;place-items:center">{{ n.badge }}</span>
-          </sc-if>
-        </button>
+      <sc-for list="{{ deskItems }}" as="n" hint-placeholder-count="4">
+        <sc-if value="{{ n.isLink }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ n.onClick }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:15px;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }}" style-hover="background:rgba(255,255,255,0.12);color:#fff">
+            <span style="white-space:nowrap">{{ n.label }}</span>
+            <sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}">
+              <span aria-label="{{ n.badgeAria }}" style="min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#F1EADF;color:#2F5540;font-size:12px;font-weight:800;display:grid;place-items:center">{{ n.badge }}</span>
+            </sc-if>
+          </button>
+        </sc-if>
+        <sc-if value="{{ n.isGroup }}" hint-placeholder-val="{{ false }}">
+          <div onMouseEnter="{{ n.onEnter }}" onMouseLeave="{{ n.onLeave }}" style="position:relative">
+            <button onClick="{{ n.onToggle }}" aria-haspopup="true" aria-expanded="{{ n.open }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;gap:6px;height:40px;padding:0 8px 0 12px;border:0;border-radius:10px;cursor:pointer;font-size:15px;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }}" style-hover="background:rgba(255,255,255,0.12);color:#fff">
+              <span style="white-space:nowrap">{{ n.label }}</span>
+              <sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}">
+                <span aria-label="{{ n.badgeAria }}" style="min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#F1EADF;color:#2F5540;font-size:12px;font-weight:800;display:grid;place-items:center">{{ n.badge }}</span>
+              </sc-if>
+              <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ n.chevron }}</span>
+            </button>
+            <sc-if value="{{ n.open }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;left:0;top:100%;padding-top:8px;z-index:40">
+                <div role="menu" aria-label="Eventos" style="width:320px;background:#fff;color:#23261F;border:1px solid #E6E1D8;border-radius:14px;box-shadow:0 12px 32px rgba(35,38,31,0.14);padding:6px;display:flex;flex-direction:column;gap:2px">
+                  <sc-for list="{{ n.children }}" as="c" hint-placeholder-count="3">
+                    <button role="menuitem" onClick="{{ c.onClick }}" aria-current="{{ c.current }}" style="display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border:0;border-radius:10px;cursor:pointer;text-align:left;color:#23261F;background:{{ c.subBg }}" style-hover="background:#F4F0E8">
+                      <span aria-hidden="true" style="flex:none;width:34px;height:34px;border-radius:9px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:19px;line-height:1">{{ c.icon }}</span>
+                      <span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:15px;font-weight:700">{{ c.label }}</span><span style="font-size:13px;color:#5F6259;line-height:1.4">{{ c.desc }}</span></span>
+                      <sc-if value="{{ c.hasBadge }}" hint-placeholder-val="{{ false }}"><span aria-label="{{ c.badgeAria }}" style="flex:none;min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#3E6B4F;color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center">{{ c.badge }}</span></sc-if>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
       </sc-for>
     </nav>
     <div style="flex:1;display:{{ mobSpacer }}"></div>
@@ -102,17 +128,28 @@ button,input,select{font-family:inherit}
         <div style="font-size:14px;color:#5F6259">{{ todayLabel }}</div>
         <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:800;letter-spacing:-0.015em">{{ greeting }}, Regino</h1>
         <p style="margin:0;font-size:16px;line-height:1.5;color:#4C5047;text-wrap:pretty">{{ homeSummary }}</p>
-        <div style="display:flex;gap:8px;margin-top:4px">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px">
           <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;background:#F1EADF;color:#5E4E37;font-size:13px;font-weight:700">Miembro</span>
+          <button onClick="{{ openHomeCfg }}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">tune</span>Personalizar inicio</button>
         </div>
       </div>
-      <figure style="margin:0;padding:28px 32px;background:#F4F0E8;display:flex;flex-direction:column;justify-content:center;gap:10px">
+      <sc-if value="{{ showVerse }}" hint-placeholder-val="{{ true }}"><figure style="margin:0;padding:28px 32px;background:#F4F0E8;display:flex;flex-direction:column;justify-content:center;gap:10px">
         <blockquote style="margin:0;font-size:18px;line-height:1.5;font-style:italic;color:#2F3A2E;text-wrap:pretty">“En todas estas cosas somos más que vencedores por medio de aquel que nos amó.”</blockquote>
         <figcaption style="font-size:14px;font-weight:700;color:#3E6B4F">Romanos 8:37</figcaption>
-      </figure>
+      </figure></sc-if>
     </section>
 
+    <sc-if value="{{ homeEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:36px 20px;background:#fff;border:1px dashed #D3CCBF;border-radius:16px">
+        <span aria-hidden="true" style="width:46px;height:46px;border-radius:12px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:24px;line-height:1">dashboard_customize</span>
+        <span style="font-size:16px;font-weight:800">Ocultaste todas las secciones del inicio</span>
+        <button onClick="{{ openHomeCfg }}" style="margin-top:4px;height:42px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Personalizar inicio</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showMidGrid }}" hint-placeholder-val="{{ true }}">
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:20px">
+      <sc-if value="{{ showNext }}" hint-placeholder-val="{{ true }}">
       <section style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
           <h2 style="margin:0;font-size:18px;font-weight:800">Próximo evento</h2>
@@ -134,7 +171,9 @@ button,input,select{font-family:inherit}
           <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1;color:#3E6B4F;align-self:center">chevron_right</span>
         </button>
       </section>
+      </sc-if>
 
+      <sc-if value="{{ showUnread }}" hint-placeholder-val="{{ true }}">
       <section style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
           <h2 style="margin:0;font-size:18px;font-weight:800">Avisos sin leer</h2>
@@ -160,10 +199,13 @@ button,input,select{font-family:inherit}
           </div>
         </sc-if>
       </section>
+      </sc-if>
     </div>
+    </sc-if>
 
+    <sc-if value="{{ showQuick }}" hint-placeholder-val="{{ true }}">
     <section style="display:flex;flex-direction:column;gap:14px">
-      <h2 style="margin:0;font-size:18px;font-weight:800">Accesos rápidos</h2>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h2 style="margin:0;font-size:18px;font-weight:800">Accesos rápidos</h2><button onClick="{{ openHomeCfg }}" style="border:0;background:none;color:#3E6B4F;font-size:14px;font-weight:700;cursor:pointer;padding:6px 4px;border-radius:8px" style-hover="text-decoration:underline">Editar</button></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:12px">
         <sc-for list="{{ quick }}" as="q" hint-placeholder-count="5">
           <button onClick="{{ q.onClick }}" style="text-align:left;color:inherit;background:#fff;border:1px solid #E6E1D8;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;cursor:pointer" style-hover="border-color:#B9CDBE;box-shadow:0 4px 14px rgba(35,38,31,0.06)">
@@ -174,6 +216,62 @@ button,input,select{font-family:inherit}
         </sc-for>
       </div>
     </section>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ homeDraftOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:90;background:rgba(35,38,31,0.45);display:grid;place-items:center;padding:16px">
+    <div role="dialog" aria-modal="true" aria-label="Personalizar inicio" style="width:min(560px,100%);max-height:calc(100vh - 32px);background:#fff;border-radius:16px;display:flex;flex-direction:column;box-shadow:0 24px 48px rgba(35,38,31,0.22)">
+      <div style="padding:20px 24px;border-bottom:1px solid #EFEAE1;display:flex;gap:12px;align-items:flex-start">
+        <div style="flex:1;display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:20px;font-weight:800">Personalizar inicio</h2><span style="font-size:14px;color:#5F6259">Elige qué ver en tu inicio y qué atajos tener a mano.</span></div>
+        <button onClick="{{ closeHomeCfg }}" aria-label="Cerrar" style="flex:none;width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#4C5047;cursor:pointer;display:grid;place-items:center" style-hover="background:#F1EDE5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">close</span></button>
+      </div>
+      <div style="flex:1;overflow:auto;padding:18px 24px;display:flex;flex-direction:column;gap:22px">
+        <section style="display:flex;flex-direction:column;gap:4px">
+          <h3 style="margin:0 0 6px;font-size:15px;font-weight:800">Secciones</h3>
+          <sc-for list="{{ hdSections }}" as="x" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-top:1px solid #F2EEE7">
+              <span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:700">{{ x.label }}</span><span style="font-size:13px;color:#5F6259">{{ x.desc }}</span></span>
+              <span style="font-size:13px;color:#4C5047;min-width:48px;text-align:right">{{ x.state }}</span>
+              <button type="button" role="switch" aria-checked="{{ x.on }}" aria-label="{{ x.label }}" onClick="{{ x.toggle }}" style="position:relative;flex:none;width:48px;height:28px;border:0;border-radius:14px;cursor:pointer;background:{{ x.bg }}"><span style="position:absolute;top:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.2);left:{{ x.x }}"></span></button>
+            </div>
+          </sc-for>
+        </section>
+        <section style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><h3 style="margin:0;font-size:15px;font-weight:800">Accesos rápidos</h3><sc-if value="{{ hdQuickOn }}" hint-placeholder-val="{{ true }}"><span style="font-size:13px;color:#5F6259">{{ hdCount }}</span></sc-if></div>
+          <sc-if value="{{ hdQuickOff }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:12px 14px;border-radius:10px;background:#F8F7F3;font-size:14px;color:#4C5047">Los accesos rápidos están ocultos. Actívalos en «Secciones» para elegirlos.</p></sc-if>
+          <sc-if value="{{ hdQuickOn }}" hint-placeholder-val="{{ true }}">
+            <span style="font-size:13px;color:#5F6259">Marca los que quieras mostrar y ordénalos con las flechas.</span>
+            <ul style="list-style:none;margin:0;padding:0;border:1px solid #E6E1D8;border-radius:12px;overflow:hidden">
+              <sc-for list="{{ hdItems }}" as="q" hint-placeholder-count="7">
+                <li style="display:flex;align-items:center;gap:8px;padding:6px 8px 6px 4px;border-top:1px solid #F2EEE7;background:{{ q.bg }}">
+                  <button type="button" role="checkbox" aria-checked="{{ q.checked }}" aria-disabled="{{ q.dis }}" onClick="{{ q.toggle }}" style="flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:44px;padding:0 8px;border:0;background:transparent;text-align:left;cursor:{{ q.cursor }}">
+                    <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1;color:{{ q.boxColor }}">{{ q.box }}</span>
+                    <span aria-hidden="true" style="flex:none;width:32px;height:32px;border-radius:9px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:18px;line-height:1">{{ q.icon }}</span>
+                    <span style="font-size:15px;font-weight:700;color:{{ q.labelColor }}">{{ q.label }}</span>
+                  </button>
+                  <sc-if value="{{ q.on }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:12px;font-weight:800;color:#3E6B4F;min-width:16px;text-align:center" aria-hidden="true">{{ q.pos }}</span>
+                    <button type="button" onClick="{{ q.up }}" disabled="{{ q.upDis }}" aria-label="{{ q.upAria }}" style="width:36px;height:36px;border:0;border-radius:8px;background:transparent;cursor:pointer;display:grid;place-items:center;color:{{ q.upColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">arrow_upward</span></button>
+                    <button type="button" onClick="{{ q.down }}" disabled="{{ q.downDis }}" aria-label="{{ q.downAria }}" style="width:36px;height:36px;border:0;border-radius:8px;background:transparent;cursor:pointer;display:grid;place-items:center;color:{{ q.downColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">arrow_downward</span></button>
+                  </sc-if>
+                </li>
+              </sc-for>
+            </ul>
+            <sc-if value="{{ hdFull }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#7A5410;font-weight:700">Puedes tener hasta 6 accesos. Quita uno para agregar otro.</span></sc-if>
+            <sc-if value="{{ hdNone }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#7A5410;font-weight:700">Sin accesos marcados, la sección no se mostrará.</span></sc-if>
+          </sc-if>
+        </section>
+      </div>
+      <div style="padding:14px 24px;border-top:1px solid #EFEAE1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px">
+        <button onClick="{{ resetHomeCfg }}" style="height:44px;padding:0 12px;border:0;background:none;color:#3E6B4F;font-size:15px;font-weight:700;cursor:pointer" style-hover="text-decoration:underline">Restablecer</button>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ closeHomeCfg }}" style="height:44px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Cancelar</button>
+          <button onClick="{{ saveHomeCfg }}" disabled="{{ hdSave.disabled }}" style="height:44px;padding:0 18px;border:0;border-radius:10px;font-size:15px;font-weight:700;background:{{ hdSave.bg }};color:{{ hdSave.color }};cursor:{{ hdSave.cursor }}">Guardar</button>
+        </div>
+      </div>
+    </div>
   </div>
 </sc-if>
 
@@ -215,9 +313,12 @@ button,input,select{font-family:inherit}
               </div>
               <p style="margin:0;font-size:14px;line-height:1.5;color:#5F6259;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ e.desc }}</p>
               <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px">
-                <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;background:#F4F0E8;color:#4C4335;font-size:13px;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">group</span>Capacidad: {{ e.capacity }}</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;font-size:13px;font-weight:700;background:{{ e.chipBg }};color:{{ e.chipC }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">{{ e.chipI }}</span>{{ e.chipT }}</span>
                 <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;background:{{ e.cronoBg }};color:{{ e.cronoColor }};font-size:13px;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">{{ e.cronoIcon }}</span>{{ e.cronoLabel }}</span>
               </div>
+              <sc-if value="{{ e.showCardBar }}" hint-placeholder-val="{{ true }}">
+                <div aria-hidden="true" style="height:6px;border-radius:3px;background:#EFEAE1;overflow:hidden"><div style="height:100%;border-radius:3px;width:{{ e.capPct }};background:{{ e.capBar }}"></div></div>
+              </sc-if>
             </div>
           </button>
         </sc-for>
@@ -283,6 +384,45 @@ button,input,select{font-family:inherit}
         </section>
       </div>
       <aside style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <section aria-label="Inscripción" style="display:flex;flex-direction:column;gap:12px;padding-bottom:20px;border-bottom:1px solid #EFEAE1">
+          <h2 style="margin:0;font-size:17px;font-weight:800">Inscripción</h2>
+          <sc-if value="{{ ev.showCap }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
+                <span style="font-size:15px;font-weight:700">{{ ev.capText }}</span>
+                <span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:12px;font-size:12px;font-weight:800;background:{{ ev.capBg }};color:{{ ev.capColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">{{ ev.capIcon }}</span>{{ ev.capLevel }}</span>
+              </div>
+              <div role="progressbar" aria-label="Cupos ocupados" aria-valuenow="{{ ev.usedN }}" aria-valuemin="0" aria-valuemax="{{ ev.cupo }}" style="height:8px;border-radius:4px;background:#EFEAE1;overflow:hidden"><div style="height:100%;border-radius:4px;width:{{ ev.capPct }};background:{{ ev.capBar }}"></div></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ ev.stCan }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ ev.enroll }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border:0;border-radius:12px;background:#3E6B4F;color:#fff;font-size:16px;font-weight:800;cursor:pointer" style-hover="background:#2F5540"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">how_to_reg</span>Inscribirme</button>
+          </sc-if>
+          <sc-if value="{{ ev.stMine }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <span style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:#E3EEE5;color:#2B5A3E;font-size:15px;font-weight:800"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">check_circle</span>Estás inscrito</span>
+              <button onClick="{{ ev.unenroll }}" aria-label="{{ ev.unenrollAria }}" style="height:44px;border:1px solid #E7C3BC;border-radius:10px;background:#fff;color:#A3372A;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#FBEDEA">Cancelar mi inscripción</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ ev.stPart }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div role="note" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#E4EEF6;color:#2A5C82;font-size:15px;line-height:1.45"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">how_to_reg</span><span><strong style="font-weight:800">Participas en este evento.</strong> Ya tienes tu lugar, no necesitas inscribirte.</span></div>
+              <button onClick="{{ goMyParts }}" style="align-self:flex-start;display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 0;color:#3E6B4F;font-size:15px;font-weight:700;cursor:pointer" style-hover="text-decoration:underline">Ver mis participaciones<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">arrow_forward</span></button>
+              <sc-if value="{{ ev.replaced }}" hint-placeholder-val="{{ false }}">
+                <div role="status" style="display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:#F8F7F3;border:1px solid #EFEAE1;font-size:14px;line-height:1.45;color:#4C5047">
+                  <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">swap_horiz</span><span style="flex:1">Tu inscripción se reemplazó porque ahora participas en el evento.</span>
+                  <button onClick="{{ ev.dismissRepl }}" aria-label="Cerrar aviso" style="flex:none;width:32px;height:32px;margin:-6px -6px 0 0;border:0;border-radius:8px;background:transparent;color:#5F6259;cursor:pointer;display:grid;place-items:center"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">close</span></button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ ev.stOut }}" hint-placeholder-val="{{ false }}">
+            <button disabled="{{ true }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border:0;border-radius:12px;background:#ECE7DE;color:#6B6E65;font-size:16px;font-weight:800;cursor:not-allowed"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">block</span>Cupos agotados</button>
+          </sc-if>
+          <sc-if value="{{ ev.stClosed }}" hint-placeholder-val="{{ false }}">
+            <span style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:#EFEAE1;color:#55594F;font-size:15px;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">lock</span>Inscripciones cerradas</span>
+          </sc-if>
+        </section>
         <h2 style="margin:0;font-size:17px;font-weight:800">Detalles</h2>
         <dl style="margin:0;display:flex;flex-direction:column;gap:14px">
           <sc-for list="{{ ev.facts }}" as="f" hint-placeholder-count="4">
@@ -487,6 +627,195 @@ button,input,select{font-family:inherit}
       <div style="height:1px;background:#EFEAE1"></div>
       <p style="margin:0;font-size:16px;line-height:1.7;color:#2F322B;white-space:pre-line">{{ notif.body }}</p>
     </article>
+  </div>
+</sc-if>
+
+<!-- PARTICIPACIONES -->
+<sc-if value="{{ is.participaciones }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Confirmar participaciones" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Confirmar participaciones</h1>
+      <p style="margin:0;font-size:16px;color:#4C5047">Actividades de eventos a las que te invitaron. {{ invSummary }}</p>
+    </div>
+
+    <sc-if value="{{ invLoading }}" hint-placeholder-val="{{ false }}">
+      <div role="status" aria-label="Cargando invitaciones" style="display:flex;flex-direction:column;gap:14px">
+        <sc-for list="{{ invSkel }}" as="k" hint-placeholder-count="3">
+          <div style="display:flex;gap:18px;padding:20px;background:#fff;border:1px solid #E6E1D8;border-radius:16px">
+            <div style="width:60px;height:64px;border-radius:12px;background:#EFEAE1"></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:10px"><div style="width:30%;height:12px;border-radius:6px;background:#EFEAE1"></div><div style="width:55%;height:18px;border-radius:6px;background:#EFEAE1"></div><div style="width:40%;height:12px;border-radius:6px;background:#F4F0E8"></div></div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ invLoadErr }}" hint-placeholder-val="{{ false }}">
+      <div role="alert" style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:40px 20px;background:#fff;border:1px solid #E6E1D8;border-radius:16px">
+        <span aria-hidden="true" style="width:48px;height:48px;border-radius:12px;background:#FBE9E5;color:#A3372A;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:26px;line-height:1">cloud_off</span>
+        <span style="font-size:17px;font-weight:800">No pudimos cargar tus invitaciones</span>
+        <span style="font-size:15px;color:#5F6259">Revisa tu conexión e inténtalo de nuevo.</span>
+        <button onClick="{{ invRetry }}" style="margin-top:4px;height:44px;padding:0 18px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Reintentar</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ invReady }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div role="group" aria-label="Filtrar invitaciones" style="align-self:flex-start;display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:#EFEAE1;border-radius:12px">
+          <sc-for list="{{ invTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.onClick }}" aria-pressed="{{ t.pressed }}" style="height:38px;padding:0 14px;border:0;border-radius:9px;cursor:pointer;font-size:15px;font-weight:700;white-space:nowrap;background:{{ t.bg }};color:{{ t.color }};box-shadow:{{ t.shadow }}">{{ t.label }} · {{ t.count }}</button></sc-for>
+        </div>
+
+        <sc-if value="{{ invHas }}" hint-placeholder-val="{{ true }}">
+          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ invRows }}" as="i" hint-placeholder-count="3">
+              <li style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;overflow:hidden">
+                <div style="display:flex;gap:18px;padding:20px;flex-wrap:wrap">
+                  <div style="flex:none;width:62px;border-radius:12px;text-align:center;padding:9px 0;align-self:flex-start;background:{{ i.dateBg }};color:{{ i.dateColor }}"><span style="display:block;font-size:12px;font-weight:800;letter-spacing:0.06em">{{ i.mon }}</span><span style="display:block;font-size:24px;font-weight:800;line-height:1.1">{{ i.day }}</span></div>
+                  <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
+                      <span style="font-size:14px;font-weight:700;color:#3E6B4F">{{ i.ev }}</span>
+                      <span style="display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:14px;font-size:13px;font-weight:700;background:{{ i.stBg }};color:{{ i.stColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">{{ i.stIcon }}</span>{{ i.stLabel }}</span>
+                    </div>
+                    <h2 style="margin:0;font-size:19px;font-weight:800;color:{{ i.titleColor }}">{{ i.act }}</h2>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px 18px;font-size:15px;color:#3A3D35">
+                      <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:#3E6B4F">calendar_today</span>{{ i.dateLong }}</span>
+                      <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:#3E6B4F">schedule</span>{{ i.time }}</span>
+                      <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:#3E6B4F">location_on</span>{{ i.place }}</span>
+                    </div>
+                    <sc-if value="{{ i.hasDesc }}" hint-placeholder-val="{{ true }}"><p style="margin:0;font-size:15px;line-height:1.55;color:#4C5047;text-wrap:pretty">{{ i.desc }}</p></sc-if>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px 18px;font-size:14px;color:#5F6259">
+                      <sc-if value="{{ i.hasResp }}" hint-placeholder-val="{{ true }}"><span>Responsable: <strong style="color:#3A3D35;font-weight:700">{{ i.resp }}</strong></span></sc-if>
+                      <span>{{ i.sentLabel }}</span>
+                    </div>
+                  </div>
+                </div>
+                <sc-if value="{{ i.pending }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:#FBFAF7;border-top:1px solid #EFEAE1">
+                    <span style="display:flex;align-items:center;gap:6px;font-size:14px;color:{{ i.dueColor }};font-weight:{{ i.dueWeight }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">event_upcoming</span>{{ i.dueLabel }}</span>
+                    <div style="display:flex;flex-wrap:wrap;gap:10px">
+                      <button onClick="{{ i.reject }}" aria-label="{{ i.rejectAria }}" style="height:44px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">No puedo participar</button>
+                      <button onClick="{{ i.accept }}" aria-label="{{ i.acceptAria }}" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 18px;border:0;border-radius:10px;background:#3E6B4F;color:#fff;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#2F5540"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">check</span>Aceptar participación</button>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ i.isAcc }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:8px;align-items:center;padding:12px 20px;background:#F3F7F2;border-top:1px solid #E3EEE5;font-size:14px;color:#2B5A3E"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">check_circle</span>{{ i.accText }}</div>
+                </sc-if>
+                <sc-if value="{{ i.isRej }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:4px;padding:12px 20px;background:#FDF5F3;border-top:1px solid #F4DCD6;font-size:14px;color:#862C21">
+                    <span style="display:flex;gap:8px;align-items:center"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">info</span>{{ i.rejText }}</span>
+                    <sc-if value="{{ i.hasReason }}" hint-placeholder-val="{{ false }}"><span style="padding-left:26px;color:#5F6259">{{ i.reasonLabel }}</span></sc-if>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ i.isOff }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:8px;align-items:center;padding:12px 20px;background:#F8F7F3;border-top:1px solid #EFEAE1;font-size:14px;color:#55594F"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">info</span>{{ i.offText }}</div>
+                </sc-if>
+              </li>
+            </sc-for>
+          </ul>
+        </sc-if>
+
+        <sc-if value="{{ invEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:44px 20px;background:#fff;border:1px solid #E6E1D8;border-radius:16px">
+            <span aria-hidden="true" style="width:48px;height:48px;border-radius:12px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:26px;line-height:1">how_to_reg</span>
+            <span style="font-size:17px;font-weight:800">{{ invEmptyTitle }}</span>
+            <span style="font-size:15px;color:#5F6259;max-width:380px">{{ invEmptyBody }}</span>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ invDlg }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;inset:0;z-index:90;background:rgba(35,38,31,0.45);display:grid;place-items:center;padding:16px">
+        <div role="alertdialog" aria-modal="true" aria-label="{{ dlgTitle }}" style="width:min(480px,100%);background:#fff;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 48px rgba(35,38,31,0.22)">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <span aria-hidden="true" style="flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:24px;line-height:1;background:{{ dlgIconBg }};color:{{ dlgIconColor }}">{{ dlgIcon }}</span>
+            <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+              <h2 style="margin:0;font-size:19px;font-weight:800">{{ dlgTitle }}</h2>
+              <span style="font-size:16px;font-weight:700">{{ dlgAct }}</span>
+              <span style="font-size:14px;color:#5F6259">{{ dlgEv }}</span>
+            </div>
+          </div>
+          <p style="margin:0;font-size:15px;line-height:1.55;color:#3A3D35">{{ dlgBody }}</p>
+          <sc-if value="{{ dlgRej }}" hint-placeholder-val="{{ false }}">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Motivo <span style="font-weight:400;color:#5F6259">(opcional)</span></span><span style="font-weight:400;color:#5F6259;font-size:13px">{{ invReasonCount }}</span></span>
+              <textarea value="{{ invReason }}" onChange="{{ onInvReason }}" rows="3" placeholder="Ej. Estaré de viaje ese día" style="padding:10px 12px;border:1px solid #DDD6CA;border-radius:10px;background:#fff;font-size:15px;line-height:1.5;color:#23261F;resize:vertical" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"></textarea></label>
+          </sc-if>
+          <sc-if value="{{ hasInvErr }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:#FBE9E5;color:#862C21;font-size:14px;line-height:1.45"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">error</span>{{ invErr }}</div>
+          </sc-if>
+          <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:4px">
+            <button onClick="{{ invCancel }}" disabled="{{ invBusy }}" style="height:44px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Volver</button>
+            <button onClick="{{ invSubmit }}" disabled="{{ invBusy }}" aria-busy="{{ invBusy }}" style="height:44px;padding:0 18px;border:0;border-radius:10px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;background:{{ dlgBtnBg }}">{{ dlgBtn }}</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<!-- MIS INSCRIPCIONES -->
+<sc-if value="{{ is.inscripciones }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Mis inscripciones" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Mis inscripciones</h1>
+      <p style="margin:0;font-size:16px;color:#4C5047">{{ misInsCount }}</p>
+    </div>
+    <sc-if value="{{ misInsHas }}" hint-placeholder-val="{{ true }}">
+      <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px">
+        <sc-for list="{{ misIns }}" as="e" hint-placeholder-count="2">
+          <li style="background:#fff;border:1px solid #E6E1D8;border-radius:16px;padding:20px;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+            <div style="flex:none;width:60px;border-radius:10px;text-align:center;padding:8px 0;background:{{ e.dateBg }};color:{{ e.dateColor }}"><div style="font-size:12px;font-weight:800;letter-spacing:0.08em">{{ e.mon }}</div><div style="font-size:24px;font-weight:800;line-height:1.1">{{ e.day }}</div></div>
+            <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:18px;font-weight:800">{{ e.name }}</span>
+              <div style="display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:#4C5047">
+                <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">calendar_today</span>{{ e.whenLabel }}</span>
+                <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">location_on</span>{{ e.place }}</span>
+              </div>
+              <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;font-size:13px;font-weight:700;background:{{ e.chipBg }};color:{{ e.chipC }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">{{ e.chipI }}</span>{{ e.chipT }}</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px">
+              <button onClick="{{ e.open }}" style="height:44px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Ver evento</button>
+              <sc-if value="{{ e.canCancel }}" hint-placeholder-val="{{ true }}"><button onClick="{{ e.unenroll }}" aria-label="{{ e.unenrollAria }}" style="height:44px;padding:0 16px;border:1px solid #E7C3BC;border-radius:10px;background:#fff;color:#A3372A;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#FBEDEA">Cancelar mi inscripción</button></sc-if>
+            </div>
+          </li>
+        </sc-for>
+      </ul>
+    </sc-if>
+    <sc-if value="{{ misInsEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:44px 20px;background:#fff;border:1px solid #E6E1D8;border-radius:16px">
+        <span aria-hidden="true" style="width:48px;height:48px;border-radius:12px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:26px;line-height:1">confirmation_number</span>
+        <span style="font-size:17px;font-weight:800">Aún no estás inscrito en ningún evento</span>
+        <span style="font-size:15px;color:#5F6259;max-width:380px">Cuando te inscribas en un evento aparecerá aquí, con su fecha y lugar.</span>
+        <button onClick="{{ goEventos }}" style="margin-top:6px;height:44px;padding:0 18px;border:0;border-radius:10px;background:#3E6B4F;color:#fff;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#2F5540">Ver eventos</button>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ enrDlg }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:90;background:rgba(35,38,31,0.45);display:grid;place-items:center;padding:16px">
+    <div role="alertdialog" aria-modal="true" aria-label="{{ enrTitle }}" style="width:min(460px,100%);background:#fff;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 48px rgba(35,38,31,0.22)">
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <span aria-hidden="true" style="flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:24px;line-height:1;background:{{ enrIconBg }};color:{{ enrIconC }}">{{ enrIcon }}</span>
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+          <h2 style="margin:0;font-size:19px;font-weight:800">{{ enrTitle }}</h2>
+          <span style="font-size:16px;font-weight:700">{{ enrName }}</span>
+          <span style="font-size:14px;color:#4C5047">{{ enrWhen }}</span>
+          <span style="font-size:14px;color:#4C5047">{{ enrPlace }}</span>
+        </div>
+      </div>
+      <sc-if value="{{ enrIsIn }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ enrOk }}" hint-placeholder-val="{{ true }}"><p style="margin:0;display:flex;align-items:center;gap:8px;font-size:15px;color:#2B5A3E;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">event_seat</span>{{ enrLeft }}</p></sc-if>
+      </sc-if>
+      <sc-if value="{{ enrIsOut }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:15px;line-height:1.55;color:#3A3D35">Liberarás tu cupo y otra persona podrá tomarlo.</p></sc-if>
+      <sc-if value="{{ enrErrShow }}" hint-placeholder-val="{{ false }}">
+        <div role="alert" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;background:#FBE9E5;color:#862C21;font-size:15px;line-height:1.45"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">error</span>{{ enrErr }}</div>
+      </sc-if>
+      <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:4px">
+        <button onClick="{{ enrClose }}" disabled="{{ enrBusy }}" style="height:44px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">{{ enrCloseLabel }}</button>
+        <sc-if value="{{ enrOk }}" hint-placeholder-val="{{ true }}"><button onClick="{{ enrSubmit }}" disabled="{{ enrBusy }}" aria-busy="{{ enrBusy }}" style="height:44px;padding:0 18px;border:0;border-radius:10px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;background:{{ enrBtnBg }}">{{ enrBtn }}</button></sc-if>
+      </div>
+    </div>
   </div>
 </sc-if>
 
@@ -743,16 +1072,17 @@ button,input,select{font-family:inherit}
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script>
+<script type="text/x-dc" data-dc-script data-props="{&quot;estadoCarga&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;normal&quot;,&quot;cargando&quot;,&quot;vacio&quot;,&quot;error&quot;],&quot;default&quot;:&quot;normal&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Participaciones&quot;},&quot;fallarRespuesta&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Participaciones&quot;},&quot;simularCarrera&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Inscripciones&quot;}}">
 const TODAY = '2026-10-08';
 const MONTHS = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEPT','OCT','NOV','DIC'];
 const MLONG = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const EVENTS = [
-  { id:'e1', name:'Vigilia de oración', date:'2026-10-07', time:'04:00 – 07:00 a. m.', place:'Templo central', capacity:90, desc:'Tiempo de oración congregacional antes del amanecer.' },
-  { id:'e2', name:'Regalar flores', date:'2026-10-14', time:'06:00 – 11:00 a. m.', place:'Parques del Río', capacity:80, desc:'Evento que tiene como propósito testificar por medio de flores a los demás.' },
-  { id:'e3', name:'Culto de jóvenes', date:'2026-10-17', time:'07:00 – 09:00 p. m.', place:'Templo central', capacity:120, desc:'Reunión de jóvenes con alabanza, estudio de la Biblia y convivencia.' },
-  { id:'e4', name:'Santa Cena', date:'2026-10-24', time:'10:00 a. m. – 12:30 p. m.', place:'Templo central', capacity:200, desc:'Servicio de comunión para toda la congregación.' },
+  { id:'e1', name:'Vigilia de oración', date:'2026-10-07', time:'04:00 – 07:00 a. m.', place:'Templo central', capacity:90, parts:6, inscr:70, desc:'Tiempo de oración congregacional antes del amanecer.' },
+  { id:'e2', name:'Regalar flores', date:'2026-10-14', time:'06:00 – 11:00 a. m.', place:'Parques del Río', capacity:80, parts:3, inscr:40, part:true, replaced:true, desc:'Evento que tiene como propósito testificar por medio de flores a los demás.' },
+  { id:'e3', name:'Culto de jóvenes', date:'2026-10-17', time:'07:00 – 09:00 p. m.', place:'Templo central', capacity:120, parts:4, inscr:110, desc:'Reunión de jóvenes con alabanza, estudio de la Biblia y convivencia.' },
+  { id:'e4', name:'Santa Cena', date:'2026-10-24', time:'10:00 a. m. – 12:30 p. m.', place:'Templo central', capacity:200, parts:12, inscr:150, mine:true, desc:'Servicio de comunión para toda la congregación.' },
+  { id:'e5', name:'Retiro de parejas', date:'2026-10-31', time:'08:00 a. m. – 05:00 p. m.', place:'Finca La Esperanza', capacity:60, parts:4, inscr:56, desc:'Jornada de reflexión y convivencia para matrimonios.' },
 ];
 const SCHED = [
   { ev:'e2', act:'Reunión y oración inicial', time:'06:00 – 06:30 a. m.', who:'Oración' },
@@ -776,6 +1106,29 @@ const NOTIFS = [
   { id:'n4', title:'Probando manualmente la plantilla', body:'Quiero que me manden pantallazo de lo que les llegue al correo, gracias.', ts:'2026-09-21T17:12', read:true },
   { id:'n5', title:'Mira la campanita', body:'Holis, hola, hello, hi.\nAtte, Marcela Vega', ts:'2026-10-08T22:11', read:false },
 ];
+const INV_TODAY = '2026-10-09';
+const INV_MON = ['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic'];
+const INV_DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const invD = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const invShort = s => { const d = invD(s); return `${d.getDate()} ${INV_MON[d.getMonth()]}`; };
+const invLong = s => { const d = invD(s); return `${INV_DAYS[d.getDay()]}, ${d.getDate()} de ${MLONG[d.getMonth()]}`; };
+const invT = hm => { let [h,m] = hm.split(':').map(Number); const ap = h >= 12 ? 'p. m.' : 'a. m.'; h = h % 12 || 12; return `${h}:${String(m).padStart(2,'0')} ${ap}`; };
+const invDaysTo = s => Math.round((invD(s) - invD(INV_TODAY)) / 86400000);
+const INV_ST = {
+  pendiente:{ l:'Pendiente de respuesta', i:'hourglass_top', bg:'#FBF0D9', c:'#7A5410' },
+  aceptada:{ l:'Aceptada', i:'check_circle', bg:'#E3EEE5', c:'#2B5A3E' },
+  rechazada:{ l:'Rechazada', i:'cancel', bg:'#FBE9E5', c:'#862C21' },
+  vencida:{ l:'Vencida', i:'timer_off', bg:'#EFEAE1', c:'#55594F', muted:true },
+  cancelada:{ l:'Cancelada', i:'block', bg:'#EFEAE1', c:'#55594F', muted:true },
+};
+const INVITES = [
+  { id:'i1', ev:'Culto de jóvenes', place:'Templo central', act:'Alabanza', desc:'Dirigir los cantos de apertura junto al equipo de alabanza.', date:'2026-10-17', ini:'19:00', fin:'19:30', resp:'Alejandra Vega Campos · Alabanza', sent:'2026-10-05', due:'2026-10-11', st:'pendiente' },
+  { id:'i2', ev:'Culto de jóvenes', place:'Templo central', act:'Estudio bíblico', desc:'Apoyar en la lectura y en la dinámica de grupos.', date:'2026-10-17', ini:'19:30', fin:'20:30', resp:'Samuel Díaz Ortiz · Predicación', sent:'2026-10-05', due:'2026-10-14', st:'pendiente' },
+  { id:'i3', ev:'Regalar flores', place:'Parques del Río', act:'Entrega de flores en el parque', desc:'Entregar flores y compartir un mensaje breve con los visitantes.', date:'2026-10-14', ini:'06:30', fin:'10:00', resp:'Diana Campos Cifuentes · Diaconado', sent:'2026-10-01', due:'2026-10-07', st:'aceptada', answered:'2026-10-02' },
+  { id:'i4', ev:'Santa Cena', place:'Templo central', act:'Recepción y bienvenida', desc:'Recibir a los asistentes en la entrada.', date:'2026-10-24', ini:'10:00', fin:'10:30', resp:'Oswal Yorel Mosquera · Diaconado', sent:'2026-10-03', due:'2026-10-15', st:'rechazada', answered:'2026-10-06', reason:'Estaré de viaje ese fin de semana.' },
+  { id:'i5', ev:'Vigilia de oración', place:'Templo central', act:'Lectura bíblica', desc:'', date:'2026-10-07', ini:'04:30', fin:'05:00', resp:'', sent:'2026-09-28', due:'2026-10-05', st:'vencida' },
+  { id:'i6', ev:'Santa Cena', place:'Templo central', act:'Lectura de la palabra', desc:'', date:'2026-10-24', ini:'10:30', fin:'11:00', resp:'', sent:'2026-10-03', due:'2026-10-15', st:'cancelada' },
+];
 const PROFILE = { nombre:'Regino', apellido:'Puentes Meza', correo:'reginopm0897@gmail.com', telefono:'1234dfdfd' };
 const LETTERS = 'A-Za-zÁÉÍÓÚÜÑáéíóúüñ';
 const NAME_RE = new RegExp('^[' + LETTERS + ']+( [' + LETTERS + ']+)*$');
@@ -789,7 +1142,51 @@ const fmtTs = ts => { const d = new Date(ts); let h = d.getHours(); const ap = h
 const ini = n => n.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
 const ICON = 'Material Symbols Rounded';
 
+const QCAT = [
+  { k:'eventos', icon:'calendar_month', label:'Eventos', desc:'Consulta los eventos, su sede y su cronograma.' },
+  { k:'inscripciones', icon:'confirmation_number', label:'Mis inscripciones', desc:'Eventos en los que reservaste tu cupo.' },
+  { k:'cronogramas', icon:'list_alt', label:'Cronogramas', desc:'Revisa las actividades programadas de cada evento.' },
+  { k:'participaciones', icon:'how_to_reg', label:'Confirmar participaciones', desc:'Acepta o rechaza las actividades a las que te invitaron.' },
+  { k:'ministerios', icon:'diversity_3', label:'Ministerios', desc:'Conoce los ministerios y sus integrantes.' },
+  { k:'notificaciones', icon:'notifications', label:'Notificaciones', desc:'Lee los avisos que te han enviado.' },
+  { k:'perfil', icon:'person', label:'Mi perfil', desc:'Actualiza tus datos y tu contraseña.' },
+];
+const HOME_SECTIONS = [
+  { k:'verse', label:'Versículo del día', desc:'Cita bíblica junto al saludo.' },
+  { k:'next', label:'Próximo evento', desc:'El evento más cercano con su fecha y lugar.' },
+  { k:'unread', label:'Avisos sin leer', desc:'Las últimas notificaciones pendientes.' },
+  { k:'quick', label:'Accesos rápidos', desc:'Atajos a las secciones que más usas.' },
+];
+const HOME_DEF = { verse:true, next:true, unread:true, quick:true, keys:['eventos','inscripciones','participaciones','ministerios','notificaciones'] };
+const QMAX = 6;
+const loadHome = () => { try { const v = JSON.parse(localStorage.getItem('cc-home-config') || 'null'); return v && Array.isArray(v.keys) ? { ...HOME_DEF, ...v } : { ...HOME_DEF }; } catch (e) { return { ...HOME_DEF }; } };
 class Component extends DCLogic {
+  homeVals(go) {
+    const s = this.state; const cfg = s.home || (this._home = this._home || loadHome());
+    const quick = cfg.keys.map(k => QCAT.find(q => q.k === k)).filter(Boolean).map(q => ({ ...q, onClick: go(q.k) }));
+    const d = s.homeDraft;
+    let dv = {};
+    if (d) {
+      const sel = d.keys; const full = sel.length >= QMAX;
+      const sw = k => ({ ...HOME_SECTIONS.find(x => x.k === k), on: d[k] ? 'true' : 'false', bg: d[k] ? '#3E6B4F' : '#C9C3B7', x: d[k] ? '22px' : '2px', state: d[k] ? 'Visible' : 'Oculto',
+        toggle: () => this.setState(st => ({ homeDraft:{ ...st.homeDraft, [k]: !st.homeDraft[k] } })) });
+      const mv = (k, dir) => this.setState(st => { const a = [...st.homeDraft.keys]; const i = a.indexOf(k); const j = i + dir; if (j < 0 || j >= a.length) return null; [a[i], a[j]] = [a[j], a[i]]; return { homeDraft:{ ...st.homeDraft, keys:a } }; });
+      const items = [...sel.map(k => QCAT.find(q => q.k === k)).filter(Boolean), ...QCAT.filter(q => !sel.includes(q.k))].map(q => { const on = sel.includes(q.k); const i = sel.indexOf(q.k); const dis = !on && full;
+        return { ...q, on, off: !on, checked: on ? 'true' : 'false', box: on ? 'check_box' : 'check_box_outline_blank', boxColor: on ? '#3E6B4F' : dis ? '#C9C6BD' : '#8A8C83', labelColor: dis ? '#8A8C83' : '#23261F', dis, cursor: dis ? 'not-allowed' : 'pointer', bg: on ? '#F7FAF6' : '#fff',
+          pos: on ? `${i + 1}` : '', toggle: dis ? undefined : () => this.setState(st => ({ homeDraft:{ ...st.homeDraft, keys: on ? st.homeDraft.keys.filter(x => x !== q.k) : [...st.homeDraft.keys, q.k] } })),
+          up: () => mv(q.k, -1), down: () => mv(q.k, 1), upColor: i <= 0 ? '#C9C6BD' : '#4C5047', downColor: i === sel.length - 1 ? '#C9C6BD' : '#4C5047', upDis: i <= 0, downDis: i === sel.length - 1,
+          upAria:`Subir ${q.label}`, downAria:`Bajar ${q.label}` }; });
+      const changed = JSON.stringify(d) !== JSON.stringify(cfg);
+      dv = { hdSections: HOME_SECTIONS.map(x => sw(x.k)), hdQuickOn: !!d.quick, hdQuickOff: !d.quick, hdItems: items, hdCount: `${sel.length} de ${QMAX} seleccionados`, hdFull: full,
+        hdNone: d.quick && !sel.length, hdSave: { disabled: !changed, bg: changed ? '#3E6B4F' : '#ECE7DE', color: changed ? '#fff' : '#7C7E76', cursor: changed ? 'pointer' : 'not-allowed' } };
+    }
+    return { quick, showVerse: !!cfg.verse, showNext: !!cfg.next, showUnread: !!cfg.unread, showQuick: !!cfg.quick && quick.length > 0, showMidGrid: !!(cfg.next || cfg.unread),
+      homeEmpty: !cfg.verse && !cfg.next && !cfg.unread && !(cfg.quick && quick.length),
+      openHomeCfg: () => this.setState({ homeDraft: JSON.parse(JSON.stringify(cfg)) }), homeDraftOpen: !!d, ...dv,
+      closeHomeCfg: () => this.setState({ homeDraft:null }),
+      resetHomeCfg: () => this.setState({ homeDraft: JSON.parse(JSON.stringify(HOME_DEF)) }),
+      saveHomeCfg: () => { const v = this.state.homeDraft; try { localStorage.setItem('cc-home-config', JSON.stringify(v)); } catch (e) {} this._home = v; this.setState({ home:v, homeDraft:null }); this.showToast('Tu inicio quedó actualizado.'); } };
+  }
   state = { screen:'inicio', evId:'e2', minId:'m1', notifId:'n1', evTab:'proximos', evQ:'', cronoEv:'all', notifTab:'todas',
     menuOpen:false, mobOpen:false, narrow:false, toast:null, notifs:NOTIFS,
     saved:{...PROFILE}, form:{...PROFILE}, touched:{}, tried:false, saving:false,
@@ -815,6 +1212,49 @@ class Component extends DCLogic {
     this.setState(st => ({ notifs: st.notifs.filter(x => x.id !== n.id) })); if (wasDetail) this.go('notificaciones');
     this.showToast('Notificación eliminada.', () => { this.setState({ notifs: prev }); if (wasDetail) this.go('notificacion', { notifId:n.id }); }); }
 
+  partVals() {
+    const s = this.state, P = this.props || {}; const load = P.estadoCarga ?? 'normal';
+    const invs = load === 'vacio' ? [] : (s.invs || INVITES); const tab = s.invTab || 'pendientes';
+    const pend = invs.filter(i => i.st === 'pendiente'), resp = invs.filter(i => i.st !== 'pendiente');
+    const list = tab === 'pendientes' ? pend : tab === 'respondidas' ? resp : invs;
+    const rows = [...list].sort((a,b) => (a.date + a.ini).localeCompare(b.date + b.ini)).map(i => { const m = INV_ST[i.st]; const d = invD(i.date);
+      const left = i.due ? invDaysTo(i.due) : 99; const soon = i.st === 'pendiente' && left <= 3;
+      return { ...i, mon: INV_MON[d.getMonth()].toUpperCase(), day: String(d.getDate()).padStart(2,'0'), dateLong: invLong(i.date), time: `${invT(i.ini)} – ${invT(i.fin)}`,
+        stLabel:m.l, stIcon:m.i, stBg:m.bg, stColor:m.c, dateBg: m.muted ? '#EFEAE1' : '#EEF3EE', dateColor: m.muted ? '#55594F' : '#2F5540', titleColor: m.muted ? '#5F6259' : '#23261F',
+        sentLabel:`Invitación recibida el ${invShort(i.sent)}`, hasDesc: !!i.desc, hasResp: !!i.resp,
+        hasDue: i.st === 'pendiente' && !!i.due, dueLabel: left <= 0 ? 'Responde hoy' : left === 1 ? 'Responde antes de mañana' : `Responde antes del ${invShort(i.due)}`, dueColor: soon ? '#7A5410' : '#5F6259', dueWeight: soon ? 800 : 600,
+        pending: i.st === 'pendiente', isAcc: i.st === 'aceptada', isRej: i.st === 'rechazada', isOff: i.st === 'vencida' || i.st === 'cancelada',
+        accText: `Confirmaste tu participación el ${i.answered ? invShort(i.answered) : ''}.`, rejText: `Indicaste que no podrás participar (${i.answered ? invShort(i.answered) : ''}). El administrador asignará a otra persona.`,
+        hasReason: !!i.reason, reasonLabel: `Motivo: ${i.reason || ''}`,
+        offText: i.st === 'vencida' ? `El plazo para responder terminó el ${i.due ? invShort(i.due) : ''}. Ya no puedes responder esta invitación.` : 'El administrador canceló esta invitación. No necesitas hacer nada.',
+        accept: () => this.setState({ invDlg:{ id:i.id, kind:'acc' }, invErr:'' }), reject: () => this.setState({ invDlg:{ id:i.id, kind:'rej' }, invReason:'', invErr:'' }),
+        acceptAria:`Aceptar participación en ${i.act}`, rejectAria:`Rechazar participación en ${i.act}` }; });
+    const dlg = s.invDlg ? (s.invs || INVITES).find(i => i.id === s.invDlg.id) : null; const acc = !!(s.invDlg && s.invDlg.kind === 'acc');
+    const t = (k, l, n) => ({ label:l, count:n, pressed: tab === k ? 'true' : 'false', bg: tab === k ? '#fff' : 'transparent', color: tab === k ? '#23261F' : '#4C5047', shadow: tab === k ? '0 1px 3px rgba(35,38,31,0.12)' : 'none', onClick: () => this.setState({ invTab:k }) });
+    const empty = !invs.length ? ['Aún no tienes invitaciones','Cuando te asignen a una actividad, la verás aquí para confirmar.'] : { pendientes:['No tienes invitaciones pendientes','Cuando te asignen una actividad aparecerá aquí para que confirmes si participas.'], respondidas:['Aún no has respondido invitaciones','Las invitaciones que aceptes o rechaces aparecerán aquí.'], todas:['Todavía no tienes invitaciones','Cuando te asignen una actividad en un evento aparecerá aquí.'] }[tab];
+    const submit = () => { if (s.invBusy || !dlg) return; this.setState({ invBusy:true, invErr:'' });
+      clearTimeout(this.invTm); this.invTm = setTimeout(() => {
+        if (this.props.fallarRespuesta) { this.setState({ invBusy:false, invErr:'No se pudo registrar tu respuesta. Tu invitación sigue pendiente; inténtalo de nuevo.' }); return; }
+        const reason = (this.state.invReason || '').trim();
+        this.setState(st => ({ invBusy:false, invDlg:null, invs:(st.invs || INVITES).map(x => x.id === dlg.id ? { ...x, st: acc ? 'aceptada' : 'rechazada', answered: INV_TODAY, reason: acc ? '' : reason } : x) }));
+        this.showToast(acc ? `Confirmaste tu participación en «${dlg.act}».` : 'Registramos que no podrás participar. El administrador asignará a otra persona.');
+      }, 900); };
+    const nP = pend.length;
+    return {
+      invLoading: load === 'cargando', invLoadErr: load === 'error', invReady: load === 'normal' || load === 'vacio', invSkel:[1,2,3],
+      invTabs:[ t('pendientes','Pendientes',nP), t('respondidas','Respondidas',resp.length), t('todas','Todas',invs.length) ],
+      invRows: rows, invHas: rows.length > 0, invEmpty: !rows.length, invEmptyTitle: empty[0], invEmptyBody: empty[1],
+      invSummary: nP ? `Tienes ${nP} ${nP === 1 ? 'invitación pendiente' : 'invitaciones pendientes'} de respuesta.` : 'No tienes invitaciones pendientes.',
+      invRetry: () => this.showToast('Reintentando cargar invitaciones…'),
+      invDlg: !!dlg, dlgAcc: acc, dlgRej: !acc, dlgTitle: acc ? 'Confirmar participación' : 'Rechazar participación',
+      dlgAct: dlg ? dlg.act : '', dlgEv: dlg ? `${dlg.ev} · ${invLong(dlg.date)} · ${invT(dlg.ini)} – ${invT(dlg.fin)}` : '',
+      dlgIcon: acc ? 'how_to_reg' : 'event_busy', dlgIconBg: acc ? '#E3EEE5' : '#FBE9E5', dlgIconColor: acc ? '#2F7D4F' : '#A3372A',
+      dlgBody: acc ? 'El responsable verá que confirmaste. Si después no puedes asistir, avísale con tiempo.' : 'Tu respuesta quedará registrada y el administrador podrá asignar la actividad a otra persona.',
+      dlgBtn: s.invBusy ? (acc ? 'Confirmando…' : 'Enviando…') : (acc ? 'Sí, participaré' : 'No podré participar'), dlgBtnBg: acc ? '#3E6B4F' : '#A3372A', dlgBtnHover: acc ? '#2F5540' : '#862C21',
+      invReason: s.invReason || '', onInvReason: e => this.setState({ invReason: e.target.value.slice(0, 255) }), invReasonCount: `${(s.invReason || '').length}/255`,
+      invBusy: !!s.invBusy, invErr: s.invErr || '', hasInvErr: !!s.invErr, invSubmit: submit, invCancel: () => { if (!this.state.invBusy) this.setState({ invDlg:null, invErr:'' }); },
+    };
+  }
   evView(e) {
     const d = pd(e.date); const past = e.date < TODAY;
     const n = SCHED.filter(s => s.ev === e.id).length;
@@ -827,7 +1267,48 @@ class Component extends DCLogic {
       cronoLabel: n ? `Cronograma · ${n} actividades` : 'Sin cronograma', cronoBg: n ? '#E3EEE5' : '#F4F0E8',
       cronoColor: n ? '#2B5A3E' : '#5E5446', cronoIcon: n ? 'event_available' : 'event_busy',
       nActLabel: n ? `${n} actividades` : '',
-      open: () => this.go('evento', { evId: e.id }) };
+      ...this.capV(e, past), open: () => this.go('evento', { evId: e.id }) };
+  }
+  capV(e, past) {
+    const o = (this.state.capO || {})[e.id] || {}; const inscr = o.inscr ?? e.inscr ?? 0; const mine = o.mine ?? !!e.mine; const cupo = Math.max(0, e.capacity - (e.parts || 0));
+    const disp = Math.max(0, cupo - inscr); const isPart = !!e.part; const lv = disp <= 0 ? 'out' : disp / cupo <= 0.1 ? 'low' : 'ok';
+    const L = { ok:{ c:'#2B5A3E', bg:'#E3EEE5', bar:'#3E6B4F', i:'event_seat', t:'Disponible' }, low:{ c:'#7A5410', bg:'#FBF0D9', bar:'#A8741A', i:'hourglass_bottom', t:'Pocos cupos' }, out:{ c:'#862C21', bg:'#FBE9E5', bar:'#A3372A', i:'block', t:'Agotado' } }[lv];
+    const capText = disp <= 0 ? `No quedan cupos (${cupo} de ${cupo} ocupados)` : `Quedan ${disp} de ${cupo} cupos`;
+    const chip = past ? { t:'Inscripciones cerradas', i:'lock', bg:'#EFEAE1', c:'#55594F' } : isPart ? { t:'Participas en este evento', i:'how_to_reg', bg:'#E4EEF6', c:'#2A5C82' }
+      : mine ? { t:`Estás inscrito · ${capText}`, i:'check_circle', bg:'#E3EEE5', c:'#2B5A3E' } : lv === 'out' ? { t:'Cupos agotados', i:'block', bg:L.bg, c:L.c }
+      : lv === 'low' ? { t:`Pocos cupos · quedan ${disp} de ${cupo}`, i:L.i, bg:L.bg, c:L.c } : { t:capText, i:L.i, bg:L.bg, c:L.c };
+    return { cupo, disp, inscrNow: inscr, capText, capLevel:L.t, capIcon:L.i, capColor:L.c, capBg:L.bg, capBar:L.bar, usedN: cupo - disp,
+      capPct:`${cupo ? Math.min(100, Math.round((cupo - disp) / cupo * 100)) : 100}%`,
+      showCap: !past, showCardBar: !past && !isPart, chipT:chip.t, chipI:chip.i, chipBg:chip.bg, chipC:chip.c,
+      stClosed: past, stPart: !past && isPart, stMine: !past && !isPart && mine, stOut: !past && !isPart && !mine && disp <= 0, stCan: !past && !isPart && !mine && disp > 0, mineNow: mine && !isPart,
+      replaced: !past && isPart && !!e.replaced && !(this.state.seenRepl || {})[e.id],
+      enroll: () => this.setState({ enrDlg:{ id:e.id, mode:'in' }, enrErr:'' }), unenroll: () => this.setState({ enrDlg:{ id:e.id, mode:'out' }, enrErr:'' }),
+      unenrollAria:`Cancelar mi inscripción en ${e.name}`,
+      dismissRepl: () => this.setState(st => ({ seenRepl:{ ...(st.seenRepl || {}), [e.id]:true } })) };
+  }
+  enrVals(evAll) {
+    const s = this.state; const ed = s.enrDlg ? evAll.find(e => e.id === s.enrDlg.id) : null; const edIn = !!(s.enrDlg && s.enrDlg.mode === 'in');
+    const setCap = (id, patch) => this.setState(st => ({ capO:{ ...(st.capO || {}), [id]:{ ...((st.capO || {})[id] || {}), ...patch } } }));
+    const mis = evAll.filter(e => e.mineNow).map(e => ({ ...e, canCancel: !e.past, whenLabel: `${e.dateLong} · ${e.time}` }));
+    return {
+      misIns: mis, misInsHas: !!mis.length, misInsEmpty: !mis.length,
+      misInsCount: mis.length ? `Estás inscrito en ${mis.length} ${mis.length === 1 ? 'evento' : 'eventos'}.` : 'Reserva tu cupo desde el detalle de cada evento.',
+      goMyParts: () => this.go('participaciones'),
+      enrDlg: !!ed, enrIsIn: edIn, enrIsOut: !edIn, enrErrShow: !!s.enrErr, enrErr: s.enrErr || '', enrOk: !s.enrErr,
+      enrTitle: edIn ? 'Confirmar inscripción' : 'Cancelar inscripción', enrIcon: edIn ? 'how_to_reg' : 'event_busy', enrIconBg: edIn ? '#E3EEE5' : '#FBE9E5', enrIconC: edIn ? '#2F7D4F' : '#A3372A',
+      enrName: ed ? ed.name : '', enrWhen: ed ? `${ed.dateLong} · ${ed.time}` : '', enrPlace: ed ? ed.place : '',
+      enrLeft: ed ? (ed.disp > 0 ? `Quedan ${ed.disp} ${ed.disp === 1 ? 'cupo' : 'cupos'}.` : 'No quedan cupos.') : '',
+      enrBusy: !!s.enrBusy, enrBtn: s.enrBusy ? (edIn ? 'Inscribiendo…' : 'Cancelando…') : (edIn ? 'Inscribirme' : 'Cancelar inscripción'), enrBtnBg: edIn ? '#3E6B4F' : '#A3372A',
+      enrCloseLabel: s.enrErr ? 'Entendido' : (edIn ? 'Volver' : 'Mantener inscripción'),
+      enrClose: () => { if (!this.state.enrBusy) this.setState({ enrDlg:null, enrErr:'' }); },
+      enrSubmit: () => { if (s.enrBusy || !ed) return; this.setState({ enrBusy:true }); clearTimeout(this.enT);
+        this.enT = setTimeout(() => {
+          if (edIn) {
+            if (this.props.simularCarrera) { setCap(ed.id, { inscr: ed.cupo }); this.setState({ enrBusy:false, enrErr:'Se agotaron los cupos mientras te inscribías. Tu inscripción no se registró.' }); return; }
+            const ins = ed.inscrNow + 1; const left = Math.max(0, ed.cupo - ins); setCap(ed.id, { inscr: ins, mine:true }); this.setState({ enrBusy:false, enrDlg:null });
+            this.showToast(`Quedaste inscrito. Quedan ${left} ${left === 1 ? 'cupo' : 'cupos'}.`);
+          } else { setCap(ed.id, { inscr: Math.max(0, ed.inscrNow - 1), mine:false }); this.setState({ enrBusy:false, enrDlg:null }); this.showToast('Cancelaste tu inscripción. Tu cupo quedó libre.'); }
+        }, 800); } };
   }
 
   renderVals() {
@@ -838,14 +1319,26 @@ class Component extends DCLogic {
       { key:'inicio', label:'Inicio', icon:'home', match:['inicio'] },
       { key:'eventos', label:'Eventos', icon:'calendar_month', match:['eventos','evento'] },
       { key:'cronogramas', label:'Cronogramas', icon:'list_alt', match:['cronogramas'] },
+      { key:'participaciones', label:'Participaciones', icon:'how_to_reg', match:['participaciones'], badge: (this.props.estadoCarga ?? 'normal') === 'normal' ? (s.invs || INVITES).filter(i => i.st === 'pendiente').length : 0, badgeLabel:'pendientes' },
+      { key:'inscripciones', label:'Mis inscripciones', icon:'confirmation_number', match:['inscripciones'] },
       { key:'ministerios', label:'Ministerios', icon:'diversity_3', match:['ministerios','ministerio'] },
       { key:'notificaciones', label:'Notificaciones', icon:'notifications', match:['notificaciones','notificacion'], badge: unreadN },
     ];
     const navItems = nav.map(n => { const on = n.match.includes(s.screen); return { ...n, current: on ? 'page' : undefined,
       bg: on ? 'rgba(255,255,255,0.16)' : 'transparent', color: on ? '#fff' : '#E4EDE6', weight: on ? 700 : 600,
-      mBg: on ? '#EEF3EE' : 'transparent', hasBadge: !!n.badge, badgeAria: `${n.badge} sin leer`, onClick: go(n.key) }; });
+      mBg: on ? '#EEF3EE' : 'transparent', hasBadge: !!n.badge, badgeAria: `${n.badge} ${n.badgeLabel || 'sin leer'}`, onClick: go(n.key) }; });
 
-    const is = {}; ['inicio','eventos','evento','cronogramas','ministerios','ministerio','notificaciones','notificacion','perfil','guia'].forEach(k => is[k] = s.screen === k);
+    const byKey = {}; navItems.forEach(n => byKey[n.key] = n);
+    const EV_KEYS = ['eventos','inscripciones','cronogramas','participaciones'];
+    const EV_SUB = { inscripciones:['Mis inscripciones','Eventos en los que reservaste tu cupo'], eventos:['Todos los eventos','Calendario, lugar y detalle de cada evento'], cronogramas:['Cronogramas','Actividades programadas por evento'], participaciones:['Confirmar participaciones','Acepta o rechaza tus invitaciones'] };
+    const grpOn = EV_KEYS.some(k => byKey[k].current); const grpBadge = EV_KEYS.reduce((a, k) => a + (byKey[k].badge || 0), 0);
+    const deskItems = [byKey.inicio,
+      { key:'grp', isGroup:true, label:'Eventos', current: grpOn ? 'page' : undefined, bg: grpOn ? 'rgba(255,255,255,0.16)' : 'transparent', color: grpOn ? '#fff' : '#E4EDE6', weight: grpOn ? 700 : 600,
+        hasBadge: !!grpBadge, badge: grpBadge, badgeAria: `${grpBadge} participaciones pendientes`, open: !!s.evMenu, chevron: s.evMenu ? 'expand_less' : 'expand_more',
+        onEnter: () => this.setState({ evMenu:true }), onLeave: () => this.setState({ evMenu:false }), onToggle: () => this.setState(st => ({ evMenu: !st.evMenu })),
+        children: EV_KEYS.map(k => ({ ...byKey[k], label: EV_SUB[k][0], desc: EV_SUB[k][1], subBg: byKey[k].current ? '#EEF3EE' : 'transparent', onClick: () => { this.setState({ evMenu:false }); byKey[k].onClick(); } })) },
+      byKey.ministerios, byKey.notificaciones].map(n => ({ ...n, isGroup: !!n.isGroup, isLink: !n.isGroup }));
+    const is = {}; ['inicio','eventos','evento','cronogramas','ministerios','ministerio','notificaciones','notificacion','perfil','guia','participaciones','inscripciones'].forEach(k => is[k] = s.screen === k);
 
     const evAll = EVENTS.map(e => this.evView(e));
     const upcoming = evAll.filter(e => !e.past);
@@ -879,7 +1372,7 @@ class Component extends DCLogic {
       { icon:'calendar_today', k:'Fecha', v: ev0.dateLong },
       { icon:'schedule', k:'Horario', v: ev0.time },
       { icon:'location_on', k:'Lugar', v: ev0.place },
-      { icon:'group', k:'Capacidad', v: `${ev0.capacity} personas` } ] };
+      ] };
     const evSched = SCHED.filter(x => x.ev === ev.id);
 
     // cronogramas
@@ -971,7 +1464,7 @@ class Component extends DCLogic {
     const homeSummary = unreadN ? `Tu próximo evento es ${nextEv.name} (${nextEv.relLabel.split(' · ')[0].toLowerCase()}) y tienes ${unreadN} ${unreadN === 1 ? 'aviso' : 'avisos'} sin leer.` : `Tu próximo evento es ${nextEv.name}. No tienes avisos pendientes.`;
 
     return {
-      is, navItems, menuOpen: s.menuOpen, mobOpen: s.mobOpen, narrow: s.narrow, wide: !s.narrow,
+      ...this.enrVals(evAll), is, navItems, deskItems, menuOpen: s.menuOpen, mobOpen: s.mobOpen, narrow: s.narrow, wide: !s.narrow,
       nameDisplay: s.compact ? 'none' : 'inline', deskNav: s.narrow ? 'none' : 'flex', mobNav: s.narrow ? 'flex' : 'none', mobSpacer: s.narrow ? 'block' : 'none',
       mobPanel: s.narrow && s.mobOpen, mobIcon: s.mobOpen ? 'close' : 'menu', menuChevron: s.menuOpen ? 'expand_less' : 'expand_more',
       toggleMenu: () => this.setState(st => ({ menuOpen: !st.menuOpen })), toggleMob: () => this.setState(st => ({ mobOpen: !st.mobOpen })),
@@ -984,13 +1477,7 @@ class Component extends DCLogic {
       todayLabel: `${DAYS[td.getDay()]}, ${td.getDate()} de ${MLONG[td.getMonth()]}`,
       greeting: h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches', homeSummary,
       nextEv, hasUnread: unreadN > 0, noUnread: unreadN === 0, unreadList: unreadList.slice(0, 3),
-      quick: [
-        { icon:'calendar_month', label:'Eventos', desc:'Consulta los eventos, su sede y su cronograma.', onClick: go('eventos') },
-        { icon:'list_alt', label:'Cronogramas', desc:'Revisa las actividades programadas de cada evento.', onClick: go('cronogramas') },
-        { icon:'diversity_3', label:'Ministerios', desc:'Conoce los ministerios y sus integrantes.', onClick: go('ministerios') },
-        { icon:'notifications', label:'Notificaciones', desc:'Lee los avisos que te han enviado.', onClick: go('notificaciones') },
-        { icon:'person', label:'Mi perfil', desc:'Revisa y actualiza tus datos personales.', onClick: go('perfil') },
-      ],
+      ...this.homeVals(go),
       evTabs, evQ: s.evQ, onEvQ: e => this.setState({ evQ: e.target.value }), evList, hasEvents: evList.length > 0, noEvents: evList.length === 0,
       evEmptyTitle: q ? `No hay eventos que coincidan con «${s.evQ.trim()}»` : 'No hay eventos en esta vista',
       clearEv: () => this.setState({ evQ:'', evTab:'todos' }),
@@ -1022,7 +1509,7 @@ class Component extends DCLogic {
       pwRules, pwBtn: btn(pwOn, s.pwSaving ? 'Actualizando…' : 'Actualizar contraseña'),
       savePw: e => { e.preventDefault(); if (!pwOn) return; this.setState({ pwSaving:true });
         setTimeout(() => { this.setState({ pwSaving:false, pw1:'', pw2:'', show1:false, show2:false }); this.showToast('Contraseña actualizada.'); }, 900); },
-      palette, diag, flows, perScreen,
+      ...this.partVals(), palette, diag, flows, perScreen,
     };
   }
 }

@@ -2,13 +2,14 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
-import { PARTICIPANT_EVENT_MENU, PARTICIPATIONS_PATH } from "../../config/navigation";
+import { MEMBER_EVENT_MENU, PARTICIPATIONS_PATH } from "../../config/navigation";
 
 /**
- * Menú "Eventos" de la barra superior del participante: eventos, cronogramas
- * y la confirmación de sus invitaciones, con el número de pendientes.
+ * Desplegable «Eventos» de la barra superior del miembro: todos los eventos,
+ * sus inscripciones, los cronogramas y la confirmación de sus invitaciones,
+ * con el número de pendientes. Se abre con el mouse, con clic o con teclado.
  */
-export function ParticipantEventsMenu({ pendingCount }: { pendingCount: number }) {
+export function EventsMenu({ pendingCount }: { pendingCount: number }) {
   const { pathname } = useLocation();
   const menuId = useId();
   const [open, setOpen] = useState(false);
@@ -17,7 +18,7 @@ export function ParticipantEventsMenu({ pendingCount }: { pendingCount: number }
   const menuRef = useRef<HTMLDivElement>(null);
   const openedByHover = useRef(false);
 
-  const active = PARTICIPANT_EVENT_MENU.some(
+  const active = MEMBER_EVENT_MENU.some(
     ({ to }) => pathname === to || pathname.startsWith(`${to}/`),
   );
   const pendingLabel = pendingCount >= 100 ? "99+" : String(pendingCount);
@@ -133,7 +134,7 @@ export function ParticipantEventsMenu({ pendingCount }: { pendingCount: number }
             onKeyDown={onMenuKeyDown}
             className="flex w-80 flex-col gap-0.5 rounded-[14px] border border-border bg-popover p-1.5 text-popover-foreground shadow-menu"
           >
-            {PARTICIPANT_EVENT_MENU.map(({ to, label, description, icon: Icon }) => (
+            {MEMBER_EVENT_MENU.map(({ to, label, description, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}

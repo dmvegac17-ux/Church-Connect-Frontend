@@ -32,7 +32,7 @@ async function list({
   };
 }
 
-/** `GET /users/{id}` — ADMIN cualquiera; MEMBER/PARTICIPANT solo el propio. */
+/** `GET /users/{id}` — ADMIN cualquiera; MEMBER solo el propio. */
 async function getById(id: string, signal?: AbortSignal): Promise<User> {
   const { data } = await httpClient.get<User>(`/users/${id}`, { signal });
   return data;

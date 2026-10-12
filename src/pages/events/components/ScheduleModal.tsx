@@ -3,19 +3,25 @@ import {
   ArrowUp,
   ChevronDown,
   ChevronUp,
+  Info,
   MailPlus,
   Plus,
   Send,
   Trash2,
+  TriangleAlert,
+  UserCheck,
 } from "lucide-react";
+import { todayDateValue } from "../../../lib/eventLimits";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "../../../auth/useAuth";
 import { ConfirmDialog } from "../../../components/feedback/ConfirmDialog";
 import { ErrorAlert } from "../../../components/feedback/ErrorAlert";
 import { Spinner } from "../../../components/feedback/Spinner";
 import { useToast } from "../../../components/feedback/useToast";
 import { Button } from "../../../components/forms/Button";
+import { DateTimeRangePicker } from "../../../components/forms/DateTimeRangePicker";
 import {
   controlClass,
   FieldError,
@@ -25,8 +31,11 @@ import { TextArea } from "../../../components/forms/TextArea";
 import { TextField } from "../../../components/forms/TextField";
 import { FormStatus } from "../../../components/ui/FormStatus";
 import { Modal } from "../../../components/ui/Overlay";
-import { IconButton } from "../../../components/ui/primitives";
-import { useFullList } from "../../../hooks/useFullList";
+import { IconButton, Pill, type PillTone } from "../../../components/ui/primitives";
+import { fetchAllPages, useFullList } from "../../../hooks/useFullList";
+import { assignmentNotice, occupancyOf } from "../../../lib/capacity";
+import { joinWall, shortMoment, timeText } from "../../../lib/dateTimeRange";
+import { firstFreeSlot, swapSlots } from "../../../lib/scheduleOrder";
 import { eventDateInfo, timeLabel } from "../../../lib/eventDates";
 import {
   formatDurationMinutes,
@@ -39,7 +48,9 @@ import {
   daysUntil,
   shortDate,
 } from "../../../lib/participations";
+import { eventService } from "../../../services/eventService";
 import { participationService } from "../../../services/participationService";
+import { registrationService } from "../../../services/registrationService";
 import { scheduleService } from "../../../services/scheduleService";
 import { userService } from "../../../services/userService";
 import { ApiError } from "../../../types/api";
@@ -48,9 +59,9 @@ import type { Participation } from "../../../types/participation";
 import type { User } from "../../../types/user";
 import { daysError, ReassignDialog } from "../../admin/participations/ReassignDialog";
 import { EventSelect } from "../../schedules/components/EventSelect";
-import { TimeSelect } from "../../schedules/components/TimeSelect";
 import { InvitationStatusCard, LockedResponsible } from "./InvitationStatusCard";
 import { ResponsiblePicker } from "./ResponsiblePicker";
+import { ScheduleHistory } from "./ScheduleHistory";
 
 const ACTIVIDAD_MAX = 150;
 const DESCRIPCION_MAX = 1000;
@@ -76,9 +87,12 @@ interface ScheduleRowState {
   dias: string;
 }
 
-/** Los administradores supervisan: no reciben invitaciones que confirmar. */
+/**
+ * Cualquier usuario activo puede participar, también un administrador.
+ * Participar no es un rol: es estar asignado a una actividad.
+ */
 function canBeInvited(user: User | null): user is User {
-  return user !== null && user.rol !== "ADMIN";
+  return user !== null;
 }
 
 interface ScheduleModalProps {
@@ -101,15 +115,6 @@ function timePart(datetimeLocal: string): string {
   return datetimeLocal.split("T")[1] ?? "";
 }
 
-function withTime(dateOnly: string, time: string): string {
-  return `${dateOnly}T${time || "00:00"}`;
-}
-
-function addMinute(hhmm: string): string {
-  const [h, m] = hhmm.split(":").map(Number);
-  const total = Math.min(h * 60 + m + 1, 23 * 60 + 59);
-  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
-}
 
 function rowDurationMinutes(row: ScheduleRowState): number {
   if (!row.horaInicio || !row.horaFin) {
@@ -118,6 +123,47 @@ function rowDurationMinutes(row: ScheduleRowState): number {
   const diff =
     (new Date(row.horaFin).getTime() - new Date(row.horaInicio).getTime()) / 60000;
   return Number.isFinite(diff) && diff > 0 ? diff : 0;
+}
+
+/** Huella de una actividad: sirve para marcar la que tiene cambios sin guardar. */
+function rowSignature(r: ScheduleRowState): string {
+  return JSON.stringify([
+    r.actividad.trim(),
+    r.descripcion.trim(),
+    r.horaInicio,
+    r.horaFin,
+    r.responsable.trim(),
+    r.invitado?.id ?? "",
+    r.dias,
+  ]);
+}
+
+/** Indicador de la línea resumen: en qué está la actividad y su responsable. */
+function rowStatus(
+  row: ScheduleRowState,
+  invitation: Participation | undefined,
+  outside: boolean,
+): { label: string; tone: PillTone } {
+  if (outside) {
+    return { label: "Fuera de rango", tone: "danger" };
+  }
+  if (row.invitado) {
+    return { label: "Se asignará al guardar", tone: "info" };
+  }
+  switch (invitation?.estado_respuesta) {
+    case "aceptada":
+      return { label: "Confirmado", tone: "success" };
+    case "pendiente":
+      return invitation.por_reconfirmar
+        ? { label: "Por reconfirmar", tone: "warning" }
+        : { label: "Pendiente", tone: "warning" };
+    case "rechazada":
+      return { label: "Rechazado", tone: "danger" };
+    case "vencida":
+      return { label: "Sin respuesta", tone: "danger" };
+    default:
+      return { label: "Sin asignar", tone: "neutral" };
+  }
 }
 
 /** Huella de lo que se guardaría: sirve para saber si hay cambios. */
@@ -150,6 +196,8 @@ export function ScheduleModal({
 }: ScheduleModalProps) {
   const toast = useToast();
   const navigate = useNavigate();
+  const { user: me } = useAuth();
+  const meId = me?.id ?? "";
   const [pickedId, setPickedId] = useState("");
   const event = fixedEvent ?? events.find((e) => e.id === pickedId) ?? null;
 
@@ -173,9 +221,26 @@ export function ScheduleModal({
   const [saveError, setSaveError] = useState<unknown>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const focusedRef = useRef(false);
+  /** Horario con que se cargó cada actividad guardada: para saber cuáles se movieron. */
+  const loadedTimes = useRef<Record<string, { horaInicio: string; horaFin: string }>>({});
+  const loadedVersion = useRef<number | null>(null);
+  // Cómo estaba guardada cada actividad, para marcar las que cambiaron.
+  const loadedSignatures = useRef<Record<string, string>>({});
+  // Actividades desplegadas. Las que tienen errores se muestran siempre.
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const toggleRow = (localId: string) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(localId)) {
+        next.add(localId);
+      }
+      return next;
+    });
 
   /** Invitación vigente de cada actividad guardada, por id de actividad. */
   const [invitations, setInvitations] = useState<Record<string, Participation>>({});
+  /** Quién está inscrito como público: su inscripción se reemplaza al asignarlo. */
+  const [enrolledIds, setEnrolledIds] = useState<ReadonlySet<string>>(new Set());
   const [cancelTarget, setCancelTarget] = useState<Participation | null>(null);
   const [replaceTarget, setReplaceTarget] = useState<Participation | null>(null);
   const [removeTarget, setRemoveTarget] = useState<ScheduleRowState | null>(null);
@@ -205,6 +270,7 @@ export function ScheduleModal({
     setLoadError(null);
     setSaveError(null);
     setInvitations({});
+    setEnrolledIds(new Set());
     if (!eventId) {
       setLoading(false);
       return;
@@ -213,11 +279,22 @@ export function ScheduleModal({
     const controller = new AbortController();
     setLoading(true);
 
+    // Solo alimenta un aviso: si falla, el cronograma se edita igual.
+    fetchAllPages(
+      (page) => registrationService.listByEvent(eventId, page),
+      controller.signal,
+    )
+      .then((list) => setEnrolledIds(new Set(list.map((r) => r.usuario_id))))
+      .catch(() => {});
+
     Promise.all([
       scheduleService.list({ eventoId: eventId, signal: controller.signal }),
       participationService.listByEvent(eventId, controller.signal),
+      // Versión con la que se abre: al guardar se comprueba que siga vigente.
+      eventService.getVersion(eventId).catch(() => null),
     ])
-      .then(([result, current]) => {
+      .then(([result, current, version]) => {
+        loadedVersion.current = version;
         setInvitations(
           Object.fromEntries(current.map((inv) => [inv.actividad.id, inv])),
         );
@@ -237,6 +314,17 @@ export function ScheduleModal({
             invitado: null,
             dias: "",
           }));
+        loadedTimes.current = Object.fromEntries(
+          loaded.map((row) => [
+            row.id as string,
+            { horaInicio: row.horaInicio, horaFin: row.horaFin },
+          ]),
+        );
+        loadedSignatures.current = Object.fromEntries(
+          loaded.map((row) => [row.id as string, rowSignature(row)]),
+        );
+        // Las guardadas empiezan contraídas: la línea resumen dice lo esencial.
+        setExpanded(new Set());
         setRows(loaded);
         setInitialSnapshot(snapshot(loaded));
         setOpenDescriptions(
@@ -263,6 +351,7 @@ export function ScheduleModal({
     const row = rows.find((r) => r.id === focusScheduleId);
     if (row) {
       focusedRef.current = true;
+      setExpanded((prev) => new Set(prev).add(row.localId));
       requestAnimationFrame(() =>
         document
           .getElementById(`schedule-row-${row.localId}`)
@@ -305,9 +394,37 @@ export function ScheduleModal({
     return { daysToEvent, maxDays: Math.min(MAX_CONFIRM_DAYS, daysToEvent - 1) };
   };
 
-  /** Al guardar se enviará una invitación al responsable recién elegido. */
+  /** Quien edita se eligió a sí mismo: queda asignado sin invitación ni plazo. */
+  const isSelfAssign = (row: ScheduleRowState) =>
+    row.invitado !== null && row.invitado.id === meId;
+
+  /** Al guardar se asignará al responsable recién elegido (invitación o propia). */
   const willInvite = (row: ScheduleRowState) =>
-    canBeInvited(row.invitado) && !lockedBy(row) && confirmWindow(row).maxDays >= 1;
+    canBeInvited(row.invitado) &&
+    !lockedBy(row) &&
+    (isSelfAssign(row) || confirmWindow(row).maxDays >= 1);
+
+  /** Personas que ya ocupan un lugar como participantes del evento. */
+  const participantIds = new Set(
+    Object.values(invitations)
+      .filter(
+        (i) => i.estado_respuesta === "pendiente" || i.estado_respuesta === "aceptada",
+      )
+      .map((i) => i.participante.id),
+  );
+
+  /** Aviso al asignar: se reemplaza su inscripción o el evento queda con sobrecupo. */
+  const noticeFor = (row: ScheduleRowState) =>
+    event && row.invitado && willInvite(row)
+      ? assignmentNotice(
+          {
+            nombre: row.responsable,
+            inscrito: enrolledIds.has(row.invitado.id),
+            participa: participantIds.has(row.invitado.id),
+          },
+          occupancyOf(event),
+        )
+      : null;
 
   const explainInvitationError = (err: unknown, fallback: string) => {
     toast.error(err instanceof ApiError ? err.message : fallback);
@@ -376,6 +493,9 @@ export function ScheduleModal({
   const eventMin = event ? toDatetimeLocalValue(event.fecha_inicio) : "";
   const eventMax = event ? toDatetimeLocalValue(event.fecha_fin) : "";
   const eventDateOnly = eventMin.split("T")[0];
+  // Las actividades se programan de hoy en adelante, dentro del evento.
+  const todayMin = `${todayDateValue()}T00:00`;
+  const scheduleMin = eventMin > todayMin ? eventMin : todayMin;
   const isSingleDay = eventDateOnly === eventMax.split("T")[0];
   const info = event ? eventDateInfo(event) : null;
   const rangeHint = event
@@ -401,8 +521,10 @@ export function ScheduleModal({
     if (!event) {
       return result;
     }
-    const start = new Date(event.fecha_inicio);
-    const end = new Date(event.fecha_fin);
+    // Las filas guardan hora de Colombia: el evento se compara igual, para
+    // que el resultado no dependa de la zona horaria del navegador.
+    const start = new Date(toDatetimeLocalValue(event.fecha_inicio));
+    const end = new Date(toDatetimeLocalValue(event.fecha_fin));
 
     for (const row of rows) {
       const errs: Partial<Record<RowField, string>> = {};
@@ -423,7 +545,7 @@ export function ScheduleModal({
           errs.time = "El horario debe quedar dentro del horario del evento.";
         }
       }
-      if (willInvite(row)) {
+      if (willInvite(row) && !isSelfAssign(row)) {
         const { daysToEvent, maxDays } = confirmWindow(row);
         const message = daysError(row.dias, daysToEvent, maxDays);
         if (message) {
@@ -481,25 +603,25 @@ export function ScheduleModal({
       prev.map((row) => (row.localId === localId ? { ...row, ...changes } : row)),
     );
 
-  const setStart = (row: ScheduleRowState, value: string) => {
-    // Si el fin queda antes (o igual) que el nuevo inicio, se borra.
-    const keepEnd = row.horaFin && new Date(row.horaFin) > new Date(value);
-    patch(row.localId, { horaInicio: value, horaFin: keepEnd ? row.horaFin : "" });
-    touch(row.localId, "time");
-  };
+
+  // Una actividad nueva solo cabe donde el horario del evento sigue libre.
+  const freeSlot = event ? firstFreeSlot(rows, eventMin, eventMax) : null;
 
   const addRow = () => {
-    const last = rows[rows.length - 1];
-    // La nueva actividad empieza donde termina la anterior.
-    const start =
-      last?.horaFin && last.horaFin < eventMax ? last.horaFin : rows.length ? "" : eventMin;
+    if (!freeSlot) {
+      return;
+    }
+    // Una actividad nueva aparece desplegada, lista para llenarse.
+    const localId = newLocalId();
+    setExpanded((prev) => new Set(prev).add(localId));
     setRows((prev) => [
       ...prev,
       {
-        localId: newLocalId(),
+        localId,
         actividad: "",
         descripcion: "",
-        horaInicio: start,
+        // Empieza en el primer hueco libre: al final, o donde quedó espacio.
+        horaInicio: freeSlot.horaInicio,
         horaFin: "",
         responsable: "",
         invitado: null,
@@ -524,16 +646,30 @@ export function ScheduleModal({
     setRows((prev) => prev.filter((r) => r.localId !== row.localId));
   };
 
+  /**
+   * Mover una actividad la intercambia con su vecina, y con ella el horario:
+   * el orden de la lista y el de las horas siguen coincidiendo. Cada una
+   * conserva su duración (ver `swapSlots`).
+   */
   const moveRow = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= rows.length) {
+      return;
+    }
+    const upperIndex = Math.min(index, target);
+    const upper = rows[upperIndex];
+    const lower = rows[upperIndex + 1];
+    const { movedUp, movedDown } = swapSlots(upper, lower);
+
     setRows((prev) => {
-      const target = index + direction;
-      if (target < 0 || target >= prev.length) {
-        return prev;
-      }
       const next = [...prev];
-      [next[index], next[target]] = [next[target], next[index]];
+      next[upperIndex] = { ...lower, ...movedUp };
+      next[upperIndex + 1] = { ...upper, ...movedDown };
       return next;
     });
+    // Los horarios cambiaron: si algo quedó mal, se dice junto a cada una.
+    touch(upper.localId, "time");
+    touch(lower.localId, "time");
   };
 
   const toggleDescription = (localId: string) =>
@@ -556,17 +692,68 @@ export function ScheduleModal({
     setSaving(true);
     setSaveError(null);
 
-    const deleteOps = removedIds.map((id) =>
-      scheduleService.remove(id).catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 404) {
-          return;
-        }
-        throw err;
-      }),
+    // 0. Si otra persona guardó cambios en este evento o en su cronograma
+    //    después de abrirlo, no se sobrescriben.
+    const vigente = await eventService.getVersion(event.id).catch(() => null);
+    if (
+      vigente !== null &&
+      loadedVersion.current !== null &&
+      vigente !== loadedVersion.current
+    ) {
+      setSaving(false);
+      setSaveError(
+        new Error(
+          "Otra persona modificó este evento o su cronograma mientras lo editabas. Cierra el cronograma y vuelve a abrirlo para ver la versión actual; tus cambios no se guardaron.",
+        ),
+      );
+      return;
+    }
+
+    // 1. Primero se elimina: deja libre el horario que otras van a ocupar.
+    const deleteResults = await Promise.allSettled(
+      removedIds.map((id) =>
+        scheduleService.remove(id).catch((err: unknown) => {
+          if (err instanceof ApiError && err.status === 404) {
+            return;
+          }
+          throw err;
+        }),
+      ),
     );
+
+    // 2. Después se mueven juntas las actividades guardadas cuyo horario
+    //    cambió. Al reordenar se intercambian horas: guardadas de a una, la
+    //    primera chocaría con la que todavía ocupa su hueco.
+    const moved = rows.filter((row) => {
+      const before = row.id ? loadedTimes.current[row.id] : undefined;
+      return (
+        before !== undefined &&
+        (before.horaInicio !== row.horaInicio || before.horaFin !== row.horaFin)
+      );
+    });
+    if (moved.length > 0) {
+      try {
+        await scheduleService.reschedule(
+          event.id,
+          moved.map((row) => ({
+            id: row.id as string,
+            hora_inicio: fromDatetimeLocalValue(row.horaInicio),
+            hora_fin: fromDatetimeLocalValue(row.horaFin),
+          })),
+        );
+      } catch (err) {
+        // Sin los horarios en su sitio, guardar el resto solo sumaría errores.
+        setSaving(false);
+        onSaved();
+        setSaveError(err);
+        void reloadInvitations();
+        return;
+      }
+    }
 
     const invited: Participation[] = [];
 
+    // 3. Por último, el contenido de cada actividad y las nuevas.
     const rowOps = rows.map(async (row) => {
       const dto = {
         evento_id: event.id,
@@ -585,26 +772,43 @@ export function ScheduleModal({
         invited.push(
           await participationService.invite(saved.id, {
             participante_id: row.invitado.id,
-            dias_para_confirmar: Number(row.dias),
+            // Sin plazo cuando se asigna a sí mismo: queda aceptada al guardar.
+            dias_para_confirmar: isSelfAssign(row) ? undefined : Number(row.dias),
           }),
         );
       }
     });
 
-    const results = await Promise.allSettled([...deleteOps, ...rowOps]);
+    const results = [...deleteResults, ...(await Promise.allSettled(rowOps))];
     setSaving(false);
 
     const failures = results.filter((r) => r.status === "rejected");
+    // Lo que se acaba de guardar es ahora la versión conocida.
+    loadedVersion.current = await eventService.getVersion(event.id).catch(() => null);
     onSaved();
     if (failures.length === 0) {
+      // Las propias no llevan invitación ni correo: no se anuncian como envío.
+      const sent = invited.filter((i) => i.estado_envio !== "autoasignada");
+      const own = invited.length - sent.length;
       if (invited.length === 0) {
         toast.success(`Cronograma de «${event.titulo}» guardado.`);
+      } else if (sent.length === 0) {
+        toast.notify({
+          variant: "success",
+          message: `Cronograma guardado. Te asignaste ${
+            own === 1
+              ? `«${invited[0].actividad.nombre}»`
+              : `${own} actividades`
+          }.`,
+          actionLabel: "Ver participaciones",
+          onAction: () => navigate("/participations"),
+        });
       } else {
-        const failedMail = invited.filter((i) => i.estado_envio === "error").length;
+        const failedMail = sent.filter((i) => i.estado_envio === "error").length;
         const who =
-          invited.length === 1
-            ? invited[0].participante.nombre_completo
-            : `${invited.length} participantes`;
+          sent.length === 1
+            ? sent[0].participante.nombre_completo
+            : `${sent.length} participantes`;
         toast.notify({
           variant: failedMail > 0 ? "info" : "success",
           message:
@@ -746,12 +950,51 @@ export function ScheduleModal({
                 </p>
               ) : null}
 
+              {rows.length > 1 ? (
+                <div className="flex flex-wrap justify-end gap-1.5">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setExpanded(new Set(rows.map((r) => r.localId)))}
+                  >
+                    Expandir todas
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setExpanded(new Set())}>
+                    Contraer todas
+                  </Button>
+                </div>
+              ) : null}
+
               {rows.map((row, index) => {
+                // Con errores se despliega sola: no pueden quedar escondidos.
+                const rowOpen =
+                  expanded.has(row.localId) ||
+                  Object.keys(rowErrors[row.localId] ?? {}).length > 0;
+                const status = rowStatus(
+                  row,
+                  row.id ? invitations[row.id] : undefined,
+                  Boolean(row.horaInicio && row.horaFin) &&
+                    (row.horaInicio < eventMin || row.horaFin > eventMax),
+                );
+                const unsaved = !row.id
+                  ? "Nueva"
+                  : loadedSignatures.current[row.id] !== rowSignature(row)
+                    ? "Sin guardar"
+                    : null;
+                const rowTime = !row.horaInicio
+                  ? "Sin horario"
+                  : `${
+                      isSingleDay
+                        ? timeText(timePart(row.horaInicio))
+                        : shortMoment(row.horaInicio)
+                    } – ${row.horaFin ? timeText(timePart(row.horaFin)) : "sin fin"}`;
                 const descOpen = openDescriptions.has(row.localId);
                 const timeError = shown(row.localId, "time");
                 const invitation = row.id ? invitations[row.id] : undefined;
                 const locked = lockedBy(row);
                 const inviting = willInvite(row);
+                const selfAssign = isSelfAssign(row);
+                const notice = noticeFor(row);
                 const window_ = confirmWindow(row);
                 const daysMessage = shown(row.localId, "dias");
                 return (
@@ -761,9 +1004,39 @@ export function ScheduleModal({
                     aria-label={`Actividad ${index + 1}`}
                     className="flex flex-col gap-3.5 rounded-[14px] border border-border p-4"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-sm font-extrabold text-text-secondary">
-                        Actividad {index + 1}
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="min-w-0 flex-1">
+                        <button
+                          type="button"
+                          aria-expanded={rowOpen}
+                          aria-controls={`schedule-body-${row.localId}`}
+                          onClick={() => toggleRow(row.localId)}
+                          className="flex w-full items-start gap-2 rounded-lg py-0.5 text-left hover:text-primary"
+                        >
+                          {rowOpen ? (
+                            <ChevronUp className="mt-0.5 size-[18px] shrink-0 text-text-secondary" aria-hidden="true" />
+                          ) : (
+                            <ChevronDown className="mt-0.5 size-[18px] shrink-0 text-text-secondary" aria-hidden="true" />
+                          )}
+                          <span className="flex min-w-0 flex-col gap-1">
+                            <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                              <span className="text-[15px] font-extrabold break-words">
+                                {index + 1}. {row.actividad.trim() || "Sin título"}
+                              </span>
+                              <Pill tone={status.tone} className="!h-6 !px-2 !text-xs">
+                                {status.label}
+                              </Pill>
+                              {unsaved ? (
+                                <Pill tone="info" className="!h-6 !px-2 !text-xs">
+                                  {unsaved}
+                                </Pill>
+                              ) : null}
+                            </span>
+                            <span className="text-[13px] font-normal text-text-secondary">
+                              {rowTime} · {row.responsable.trim() || "Sin responsable"}
+                            </span>
+                          </span>
+                        </button>
                       </h3>
                       <div className="flex items-center gap-0.5">
                         <IconButton
@@ -787,6 +1060,11 @@ export function ScheduleModal({
                       </div>
                     </div>
 
+                    {rowOpen ? (
+                    <div
+                      id={`schedule-body-${row.localId}`}
+                      className="flex flex-col gap-3.5"
+                    >
                     <TextField
                       label="Título"
                       name={`actividad-${row.localId}`}
@@ -798,59 +1076,32 @@ export function ScheduleModal({
                       error={shown(row.localId, "actividad")}
                     />
 
-                    {isSingleDay ? (
-                      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-                        <TimeSelect
-                          compact
-                          label="Inicio"
-                          name={`hora_inicio-${row.localId}`}
-                          value={timePart(row.horaInicio)}
-                          minTime={timePart(eventMin)}
-                          maxTime={timePart(eventMax)}
-                          onChange={(t) => setStart(row, withTime(eventDateOnly, t))}
-                        />
-                        <TimeSelect
-                          compact
-                          label="Fin"
-                          name={`hora_fin-${row.localId}`}
-                          value={timePart(row.horaFin)}
-                          minTime={addMinute(
-                            row.horaInicio ? timePart(row.horaInicio) : timePart(eventMin),
-                          )}
-                          maxTime={timePart(eventMax)}
-                          onChange={(t) => {
-                            patch(row.localId, { horaFin: withTime(eventDateOnly, t) });
-                            touch(row.localId, "time");
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-                        <TextField
-                          label="Inicio"
-                          name={`hora_inicio-${row.localId}`}
-                          type="datetime-local"
-                          required
-                          min={eventMin}
-                          max={eventMax}
-                          value={row.horaInicio}
-                          onChange={(e) => setStart(row, e.target.value)}
-                        />
-                        <TextField
-                          label="Fin"
-                          name={`hora_fin-${row.localId}`}
-                          type="datetime-local"
-                          required
-                          min={row.horaInicio || eventMin}
-                          max={eventMax}
-                          value={row.horaFin}
-                          onChange={(e) => {
-                            patch(row.localId, { horaFin: e.target.value });
-                            touch(row.localId, "time");
-                          }}
-                        />
-                      </div>
-                    )}
+                    <DateTimeRangePicker
+                      compact
+                      autoTime
+                      fixedDate={isSingleDay ? eventDateOnly : undefined}
+                      // Dentro del horario del evento y de hoy en adelante.
+                      min={scheduleMin}
+                      max={eventMax}
+                      labels={
+                        isSingleDay
+                          ? { startTime: "Inicio", endTime: "Fin" }
+                          : { startDate: "Día de inicio", endDate: "Día de fin" }
+                      }
+                      value={{
+                        startDate: row.horaInicio.split("T")[0],
+                        startTime: timePart(row.horaInicio),
+                        endDate: row.horaFin.split("T")[0],
+                        endTime: timePart(row.horaFin),
+                      }}
+                      onChange={(next) => {
+                        patch(row.localId, {
+                          horaInicio: joinWall(next.startDate, next.startTime),
+                          horaFin: joinWall(next.endDate, next.endTime),
+                        });
+                        touch(row.localId, "time");
+                      }}
+                    />
                     {timeError ? (
                       <FieldError>{timeError}</FieldError>
                     ) : (
@@ -872,6 +1123,7 @@ export function ScheduleModal({
                         }}
                         onBlur={() => touch(row.localId, "responsable")}
                         users={activeUsers}
+                        currentUserId={meId}
                         loading={users.isLoading}
                         error={shown(row.localId, "responsable")}
                         onUserCreated={(user) =>
@@ -890,8 +1142,41 @@ export function ScheduleModal({
                       />
                     ) : null}
 
+                    {notice ? (
+                      <div
+                        role="status"
+                        aria-live="polite"
+                        className={`flex items-start gap-2 rounded-[10px] border px-3 py-2.5 text-sm leading-snug ${
+                          notice.kind === "warn"
+                            ? "border-warning-border bg-warning-soft text-warning-strong"
+                            : "border-info-border bg-info-soft text-info-foreground"
+                        }`}
+                      >
+                        {notice.kind === "warn" ? (
+                          <TriangleAlert className="size-[18px] shrink-0" aria-hidden="true" />
+                        ) : (
+                          <Info className="size-[18px] shrink-0" aria-hidden="true" />
+                        )}
+                        {notice.text}
+                      </div>
+                    ) : null}
+
                     {row.invitado && !locked ? (
-                      inviting ? (
+                      selfAssign ? (
+                        <div
+                          role="status"
+                          aria-live="polite"
+                          className="flex items-start gap-2 rounded-[10px] border border-info-border bg-info-soft px-3 py-2.5 text-sm leading-snug text-info-foreground"
+                        >
+                          <UserCheck className="size-[18px] shrink-0" aria-hidden="true" />
+                          <span>
+                            <strong className="block font-extrabold">
+                              Te asignarás esta actividad
+                            </strong>
+                            Quedarás asignado de inmediato. No se envía invitación.
+                          </span>
+                        </div>
+                      ) : inviting ? (
                         <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-surface-alt px-3.5 py-3">
                           <label
                             htmlFor={`dias-${row.localId}`}
@@ -939,15 +1224,10 @@ export function ScheduleModal({
                             </p>
                           ) : null}
                         </div>
-                      ) : canBeInvited(row.invitado) ? (
+                      ) : (
                         <p className={HINT_CLASS}>
                           La actividad es mañana o ya pasó: se guardará el responsable
                           sin pedirle confirmación.
-                        </p>
-                      ) : (
-                        <p className={HINT_CLASS}>
-                          Los administradores no reciben invitación: quedará como
-                          responsable sin confirmación.
                         </p>
                       )
                     ) : null}
@@ -986,6 +1266,8 @@ export function ScheduleModal({
                         </div>
                       ) : null}
                     </div>
+                    </div>
+                    ) : null}
                   </section>
                 );
               })}
@@ -993,11 +1275,25 @@ export function ScheduleModal({
               <button
                 type="button"
                 onClick={addRow}
-                className="flex h-12 items-center justify-center gap-2 rounded-xl border border-dashed border-primary text-[15px] font-bold text-primary hover:bg-primary-selected"
+                disabled={!freeSlot}
+                aria-describedby={freeSlot ? undefined : "schedule-full-hint"}
+                className="flex h-12 items-center justify-center gap-2 rounded-xl border border-dashed border-primary text-[15px] font-bold text-primary hover:bg-primary-selected disabled:cursor-not-allowed disabled:border-transparent disabled:bg-disabled disabled:text-disabled-foreground"
               >
                 <Plus className="size-5" aria-hidden="true" />
                 Agregar actividad
               </button>
+              {freeSlot ? null : (
+                // El botón deshabilitado va con el texto que explica por qué.
+                <p
+                  id="schedule-full-hint"
+                  className="text-center text-[13px] text-muted-foreground"
+                >
+                  El horario del evento ya está completo. Acorta o elimina una
+                  actividad para agregar otra.
+                </p>
+              )}
+
+              <ScheduleHistory eventId={event.id} />
             </>
           )}
         </div>
@@ -1027,7 +1323,7 @@ export function ScheduleModal({
                 lockedBy(removeTarget)?.estado_respuesta === "aceptada"
                   ? "aceptada"
                   : "pendiente"
-              } para «${removeTarget.actividad}». Al guardar el cronograma, la actividad y su invitación se eliminarán.`
+              } para «${removeTarget.actividad}». Al guardar el cronograma, la actividad se cancelará y se le avisará por correo y en la aplicación.`
             : undefined
         }
         confirmLabel="Eliminar actividad"

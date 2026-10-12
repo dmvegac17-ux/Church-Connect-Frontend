@@ -1,4 +1,4 @@
-import { Calendar, CalendarCog, Pencil, Plus, Trash2 } from "lucide-react";
+import { Calendar, CalendarCog, Lock, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -7,6 +7,12 @@ import { Spinner } from "../../../components/feedback/Spinner";
 import { useToast } from "../../../components/feedback/useToast";
 import { buttonClass } from "../../../components/forms/Button";
 import { Card, PageHeader } from "../../../components/layout/Page";
+import { OccupancyCell } from "../../../components/registrations/AforoBits";
+import {
+  SortHeader,
+  TablePager,
+  useTableState,
+} from "../../../components/ui/DataTable";
 import {
   DateBlock,
   ScheduleCountPill,
@@ -23,6 +29,7 @@ import {
 } from "../../../components/ui/primitives";
 import { useEventFilters } from "../../../hooks/useEventFilters";
 import { useFullList } from "../../../hooks/useFullList";
+import { occupancyOf } from "../../../lib/capacity";
 import { eventDateInfo } from "../../../lib/eventDates";
 import { eventService } from "../../../services/eventService";
 import { ApiError } from "../../../types/api";
@@ -30,11 +37,22 @@ import type { Event } from "../../../types/event";
 import { DeleteEventDialog } from "../../events/components/DeleteEventDialog";
 import { ScheduleModal } from "../../events/components/ScheduleModal";
 
-/** Eventos (panel de administración): tabla con estado del cronograma y acciones. */
+type EventColumn = "evento" | "lugar" | "ocupacion" | "crono";
+
+/** Eventos (panel de administración): tabla con ocupación, cronograma y acciones. */
 export function AdminEventsPage() {
   const toast = useToast();
   const { items, isLoading, error, refetch } = useFullList(eventService.list);
   const filters = useEventFilters(items);
+  const table = useTableState<Event, EventColumn>("admin-events", filters.visible, {
+    evento: (e) => e.fecha_inicio,
+    lugar: (e) => e.lugar,
+    ocupacion: (e) => {
+      const o = occupancyOf(e);
+      return o.aforo ? o.ocupados / o.aforo : 0;
+    },
+    crono: (e) => e.total_actividades,
+  });
 
   const [target, setTarget] = useState<Event | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -113,25 +131,25 @@ export function AdminEventsPage() {
             <table className="w-full min-w-[760px] border-collapse text-sm">
               <thead>
                 <tr className="bg-surface-alt">
-                  <th scope="col" className={TH_CLASS}>
+                  <SortHeader column="evento" table={table}>
                     Evento
-                  </th>
-                  <th scope="col" className={TH_CLASS}>
+                  </SortHeader>
+                  <SortHeader column="lugar" table={table}>
                     Lugar
-                  </th>
-                  <th scope="col" className={TH_CLASS}>
-                    Capacidad
-                  </th>
-                  <th scope="col" className={TH_CLASS}>
+                  </SortHeader>
+                  <SortHeader column="ocupacion" table={table}>
+                    Ocupación
+                  </SortHeader>
+                  <SortHeader column="crono" table={table}>
                     Cronograma
-                  </th>
+                  </SortHeader>
                   <th scope="col" className={`${TH_CLASS} !text-right`}>
                     Acciones
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {filters.visible.map((ev) => {
+                {table.rows.map((ev) => {
                   const info = eventDateInfo(ev);
                   const hasSchedule = ev.total_actividades > 0;
                   return (
@@ -153,8 +171,8 @@ export function AdminEventsPage() {
                         </div>
                       </td>
                       <td className={`${TD_CLASS} text-text-strong`}>{ev.lugar}</td>
-                      <td className={`${TD_CLASS} text-text-strong`}>
-                        {ev.capacidad}
+                      <td className={`${TD_CLASS} whitespace-nowrap`}>
+                        <OccupancyCell occupancy={occupancyOf(ev)} />
                       </td>
                       <td className={TD_CLASS}>
                         <ScheduleCountPill
@@ -164,16 +182,28 @@ export function AdminEventsPage() {
                       </td>
                       <td className={TD_CLASS}>
                         <div className="flex justify-end gap-1">
-                          <IconButton
-                            icon={CalendarCog}
-                            label={`${hasSchedule ? "Editar" : "Crear"} el cronograma de ${ev.titulo}`}
-                            onClick={() => setScheduleEvent(ev)}
-                          />
-                          <IconLink
-                            icon={Pencil}
-                            label={`Editar el evento ${ev.titulo}`}
-                            to={`/events/${ev.id}/editar`}
-                          />
+                          {info.isPast ? (
+                            // Un evento finalizado queda como registro: ni
+                            // él ni su cronograma se editan; solo se elimina.
+                            <IconButton
+                              icon={Lock}
+                              disabled
+                              label="Evento finalizado: no se puede editar, solo eliminar"
+                            />
+                          ) : (
+                            <>
+                              <IconButton
+                                icon={CalendarCog}
+                                label={`${hasSchedule ? "Editar" : "Crear"} el cronograma de ${ev.titulo}`}
+                                onClick={() => setScheduleEvent(ev)}
+                              />
+                              <IconLink
+                                icon={Pencil}
+                                label={`Editar el evento ${ev.titulo}`}
+                                to={`/events/${ev.id}/editar`}
+                              />
+                            </>
+                          )}
                           <IconButton
                             icon={Trash2}
                             danger
@@ -189,6 +219,7 @@ export function AdminEventsPage() {
             </table>
           </div>
         )}
+        {isLoading ? null : <TablePager table={table} />}
       </Card>
 
       <DeleteEventDialog

@@ -12,9 +12,8 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import {
   HOME_PATH,
+  MEMBER_MOBILE_NAV,
   MEMBER_NAV,
-  PARTICIPANT_EVENT_MENU,
-  PARTICIPANT_NAV,
   PARTICIPATIONS_PATH,
   PROFILE_PATH,
 } from "../../config/navigation";
@@ -23,30 +22,24 @@ import { useUnreadNotificationsCount } from "../../hooks/useUnreadNotificationsC
 import { fullNameOf } from "../../lib/people";
 import { Avatar } from "../ui/primitives";
 import { BrandLogo } from "./BrandLogo";
-import { ParticipantEventsMenu } from "./ParticipantEventsMenu";
+import { EventsMenu } from "./EventsMenu";
 
 /**
- * Barra superior de la vista de miembro: logo, navegación horizontal,
- * contador de avisos sin leer y menú de usuario. Por debajo de 920px la
- * navegación pasa a un panel desplegable con ítems de 48px.
+ * Barra superior de la vista de miembro: logo, navegación horizontal con el
+ * desplegable «Eventos», contador de avisos sin leer y menú de usuario. Por
+ * debajo de 880px la navegación pasa a un panel desplegable con ítems de 48px.
  */
 export function Navbar() {
-  const { user, role, logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { count: unreadCount } = useUnreadNotificationsCount();
   const unreadLabel = unreadCount >= 100 ? "99+" : String(unreadCount);
 
-  // La opción de participaciones solo existe para el rol participante; el
-  // miembro conserva su navegación sin cambios.
-  const isParticipant = role === "PARTICIPANT";
-  const pendingCount = usePendingInvitationsCount(isParticipant);
+  // Cualquier usuario puede ser asignado a una actividad: el contador de
+  // invitaciones pendientes no depende del rol y se oculta cuando es 0.
+  const pendingCount = usePendingInvitationsCount(true);
   const pendingLabel = pendingCount >= 100 ? "99+" : String(pendingCount);
-  const groupedPaths = new Set(PARTICIPANT_EVENT_MENU.map((item) => item.to));
-  const desktopNav = isParticipant
-    ? MEMBER_NAV.filter((item) => !groupedPaths.has(item.to))
-    : MEMBER_NAV;
-  const mobileNav = isParticipant ? PARTICIPANT_NAV : MEMBER_NAV;
   const badgeFor = (to: string) =>
     to === "/notifications" && unreadCount > 0
       ? { label: unreadLabel, text: `${unreadCount} sin leer` }
@@ -150,9 +143,9 @@ export function Navbar() {
 
         <nav
           aria-label="Principal"
-          className="hidden min-w-0 flex-1 gap-0.5 min-[920px]:flex"
+          className="hidden min-w-0 flex-1 gap-0.5 min-[880px]:flex"
         >
-          {desktopNav.map(({ to, label }) => (
+          {MEMBER_NAV.map(({ to, label }) => (
             <Fragment key={to}>
               <NavLink
                 to={to}
@@ -166,24 +159,22 @@ export function Navbar() {
                 }
               >
                 {label}
-                {to === "/notifications" && unreadCount > 0 ? (
+                {badgeFor(to) ? (
                   <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-secondary px-1.5 text-xs font-extrabold text-primary-hover">
-                    <span aria-hidden="true">{unreadLabel}</span>
-                    <span className="sr-only">{unreadCount} sin leer</span>
+                    <span aria-hidden="true">{badgeFor(to)?.label}</span>
+                    <span className="sr-only">{badgeFor(to)?.text}</span>
                   </span>
                 ) : null}
               </NavLink>
-              {isParticipant && to === HOME_PATH ? (
-                <ParticipantEventsMenu pendingCount={pendingCount} />
-              ) : null}
+              {to === HOME_PATH ? <EventsMenu pendingCount={pendingCount} /> : null}
             </Fragment>
           ))}
         </nav>
-        <div className="flex-1 min-[920px]:hidden" />
+        <div className="flex-1 min-[880px]:hidden" />
 
         <div
           ref={menuContainerRef}
-          className="relative hidden shrink-0 min-[920px]:block"
+          className="relative hidden shrink-0 min-[880px]:block"
         >
           <button
             ref={menuButtonRef}
@@ -251,7 +242,7 @@ export function Navbar() {
           aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={mobileOpen}
           aria-controls={mobileOpen ? panelId : undefined}
-          className="relative flex size-11 items-center justify-center rounded-xl border border-white/35 min-[920px]:hidden"
+          className="relative flex size-11 items-center justify-center rounded-xl border border-white/35 min-[880px]:hidden"
         >
           {mobileOpen ? (
             <X className="size-6" aria-hidden="true" />
@@ -275,10 +266,10 @@ export function Navbar() {
       {mobileOpen ? (
         <div
           id={panelId}
-          className="flex flex-col gap-0.5 border-b border-border bg-card px-4 pt-3 pb-4 text-foreground shadow-[0_12px_24px_rgba(35,38,31,0.10)] min-[920px]:hidden"
+          className="flex flex-col gap-0.5 border-b border-border bg-card px-4 pt-3 pb-4 text-foreground shadow-[0_12px_24px_rgba(35,38,31,0.10)] min-[880px]:hidden"
         >
           <nav aria-label="Principal" className="flex flex-col gap-0.5">
-            {mobileNav.map(({ to, label, icon: Icon }) => {
+            {MEMBER_MOBILE_NAV.map(({ to, label, icon: Icon }) => {
               const badge = badgeFor(to);
               return (
                 <NavLink

@@ -9,6 +9,9 @@ import type {
 
 const BASE = "/notificaciones";
 
+/** Máximo de notificaciones por petición al marcarlas por lotes. Igual que en el backend. */
+export const MARK_BATCH_MAX = 500;
+
 export interface PageParams {
   limit?: number;
   offset?: number;
@@ -98,8 +101,46 @@ async function createBulk(
   };
 }
 
+/**
+ * `PUT /notificaciones/leidas` — marca varias notificaciones propias con una
+ * sola petición (y una sola sentencia en la base). Todo o nada: `403` si
+ * algún id no es propio. Máximo 500 por petición.
+ */
+async function markRead(ids: string[], leida: boolean): Promise<number> {
+  // El servidor acepta hasta `MARK_BATCH_MAX` ids por petición: si hay más,
+  // se envían en tandas para que nunca llegue a rechazarlo.
+  let updated = 0;
+  for (let start = 0; start < ids.length; start += MARK_BATCH_MAX) {
+    const { data } = await httpClient.put<{ actualizadas: number }>(
+      `${BASE}/leidas`,
+      { ids: ids.slice(start, start + MARK_BATCH_MAX), leida },
+    );
+    updated += data.actualizadas;
+  }
+  return updated;
+}
+
+/** `PUT /notificaciones/leidas/todas` — todas las propias sin leer, sin enviar ids. */
+async function markAllRead(): Promise<number> {
+  const { data } = await httpClient.put<{ actualizadas: number }>(
+    `${BASE}/leidas/todas`,
+  );
+  return data.actualizadas;
+}
+
+/** `GET /notificaciones/no-leidas` — solo el número, sin traer la bandeja. */
+async function unreadCount(signal?: AbortSignal): Promise<number> {
+  const { data } = await httpClient.get<{ total: number }>(`${BASE}/no-leidas`, {
+    signal,
+  });
+  return data.total;
+}
+
 export const notificationService = {
   list,
+  markRead,
+  markAllRead,
+  unreadCount,
   getById,
   createBulk,
   update,

@@ -28,13 +28,13 @@ button,input,select,textarea{font-family:inherit}
   <nav aria-label="Principal" style="display:flex;flex-direction:column;gap:2px;margin-top:24px;flex:1">
     <sc-for list="{{ navMain }}" as="n" hint-placeholder-count="1">
       <button onClick="{{ n.onClick }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;gap:12px;height:42px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:15px;text-align:left;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }}" style-hover="background:rgba(255,255,255,0.10);color:#fff">
-        <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:21px;line-height:1">{{ n.icon }}</span>{{ n.label }}
+        <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:21px;line-height:1">{{ n.icon }}</span><span style="flex:1">{{ n.label }}</span><sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}"><span aria-label="{{ n.badgeAria }}" style="min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#F1EADF;color:#2F5540;font-size:12px;font-weight:800;display:grid;place-items:center">{{ n.badge }}</span></sc-if>
       </button>
     </sc-for>
     <div style="font-size:12px;font-weight:800;letter-spacing:0.06em;color:#A9C2AF;padding:18px 12px 6px">GESTIÓN</div>
     <sc-for list="{{ navManage }}" as="n" hint-placeholder-count="5">
       <button onClick="{{ n.onClick }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;gap:12px;height:42px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:15px;text-align:left;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }}" style-hover="background:rgba(255,255,255,0.10);color:#fff">
-        <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:21px;line-height:1">{{ n.icon }}</span>{{ n.label }}
+        <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:21px;line-height:1">{{ n.icon }}</span><span style="flex:1">{{ n.label }}</span><sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}"><span aria-label="{{ n.badgeAria }}" style="min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#F1EADF;color:#2F5540;font-size:12px;font-weight:800;display:grid;place-items:center">{{ n.badge }}</span></sc-if>
       </button>
     </sc-for>
   </nav>
@@ -59,10 +59,10 @@ button,input,select,textarea{font-family:inherit}
     <div onClick="{{ stop }}" style="width:280px;max-width:85%;height:100%;background:#2F5540;color:#fff;padding:16px 12px;display:flex;flex-direction:column;gap:2px;overflow:auto">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 6px 16px"><span style="font-weight:800">Menú</span><button onClick="{{ closeNav }}" aria-label="Cerrar menú" style="width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#fff;cursor:pointer;display:grid;place-items:center"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">close</span></button></div>
       <sc-for list="{{ navMain }}" as="n" hint-placeholder-count="1">
-        <button onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:16px;text-align:left;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">{{ n.icon }}</span>{{ n.label }}</button>
+        <button onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:16px;text-align:left;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">{{ n.icon }}</span><span style="flex:1">{{ n.label }}</span><sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}"><span aria-label="{{ n.badgeAria }}" style="min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#F1EADF;color:#2F5540;font-size:12px;font-weight:800;display:grid;place-items:center">{{ n.badge }}</span></sc-if></button>
       </sc-for>
       <sc-for list="{{ navManage }}" as="n" hint-placeholder-count="5">
-        <button onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:16px;text-align:left;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">{{ n.icon }}</span>{{ n.label }}</button>
+        <button onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:16px;text-align:left;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">{{ n.icon }}</span><span style="flex:1">{{ n.label }}</span><sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}"><span aria-label="{{ n.badgeAria }}" style="min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:#F1EADF;color:#2F5540;font-size:12px;font-weight:800;display:grid;place-items:center">{{ n.badge }}</span></sc-if></button>
       </sc-for>
       <div style="height:1px;background:rgba(255,255,255,0.14);margin:8px 0"></div>
       <button onClick="{{ perfilNav.onClick }}" style="display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border:0;border-radius:10px;cursor:pointer;font-size:16px;text-align:left;background:transparent;color:#fff"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">person</span>Mi perfil</button>
@@ -148,10 +148,10 @@ button,input,select,textarea{font-family:inherit}
         <div style="overflow-x:auto">
           <table style="width:100%;min-width:720px;border-collapse:collapse;font-size:14px">
             <thead><tr style="background:#FBFAF7">
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Usuario</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Rol</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Estado</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Creado</th>
+              <th scope="col" aria-sort="{{ sU.nombre.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sU.nombre.onClick }}" title="Ordenar por usuario" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sU.nombre.color }}" style-hover="background:#EFEAE1">Usuario<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sU.nombre.iconColor }}">{{ sU.nombre.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sU.rol.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sU.rol.onClick }}" title="Ordenar por rol" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sU.rol.color }}" style-hover="background:#EFEAE1">Rol<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sU.rol.iconColor }}">{{ sU.rol.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sU.estado.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sU.estado.onClick }}" title="Ordenar por estado" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sU.estado.color }}" style-hover="background:#EFEAE1">Estado<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sU.estado.iconColor }}">{{ sU.estado.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sU.creado.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sU.creado.onClick }}" title="Ordenar por creado" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sU.creado.color }}" style-hover="background:#EFEAE1">Creado<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sU.creado.iconColor }}">{{ sU.creado.icon }}</span></button></th>
               <th scope="col" style="text-align:right;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Acciones</th>
             </tr></thead>
             <tbody>
@@ -181,13 +181,16 @@ button,input,select,textarea{font-family:inherit}
           <button onClick="{{ clearU }}" style="margin-top:4px;height:40px;padding:0 14px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Limpiar filtros</button>
         </div>
       </sc-if>
-      <sc-if value="{{ uPager.show }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid #EFEAE1;font-size:14px;color:#4C5047;flex-wrap:wrap">
-          <span>{{ uPager.label }}</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button onClick="{{ uPager.prev }}" disabled="{{ uPager.prevDis }}" aria-label="Página anterior" style="width:38px;height:38px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ uPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_left</span></button>
-            <span>{{ uPager.page }}</span>
-            <button onClick="{{ uPager.next }}" disabled="{{ uPager.nextDis }}" aria-label="Página siguiente" style="width:38px;height:38px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ uPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_right</span></button>
+      <sc-if value="{{ uPager.show }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px 16px;padding:10px 16px;border-top:1px solid #EFEAE1;font-size:14px;color:#4C5047;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:8px">Filas por página<select value="{{ uPager.size }}" onChange="{{ uPager.onSize }}" style="height:34px;padding:0 8px;border:1px solid #DDD6CA;border-radius:8px;background:#fff;font-size:14px;color:#23261F"><sc-for list="{{ uPager.sizes }}" as="z" hint-placeholder-count="4"><option value="{{ z.v }}">{{ z.v }}</option></sc-for></select></label>
+            <span aria-live="polite">{{ uPager.label }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onClick="{{ uPager.first }}" disabled="{{ uPager.prevDis }}" aria-label="Primera página" title="Primera página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ uPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">first_page</span></button><button onClick="{{ uPager.prev }}" disabled="{{ uPager.prevDis }}" aria-label="Página anterior" title="Página anterior" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ uPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_left</span></button>
+            <span style="padding:0 6px;white-space:nowrap">{{ uPager.page }}</span>
+            <button onClick="{{ uPager.next }}" disabled="{{ uPager.nextDis }}" aria-label="Página siguiente" title="Página siguiente" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ uPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_right</span></button><button onClick="{{ uPager.last }}" disabled="{{ uPager.nextDis }}" aria-label="Última página" title="Última página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ uPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">last_page</span></button>
           </div>
         </div>
       </sc-if>
@@ -215,10 +218,10 @@ button,input,select,textarea{font-family:inherit}
         <div style="overflow-x:auto">
           <table style="width:100%;min-width:760px;border-collapse:collapse;font-size:14px">
             <thead><tr style="background:#FBFAF7">
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Evento</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Lugar</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Capacidad</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Cronograma</th>
+              <th scope="col" aria-sort="{{ sE.evento.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sE.evento.onClick }}" title="Ordenar por evento" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sE.evento.color }}" style-hover="background:#EFEAE1">Evento<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sE.evento.iconColor }}">{{ sE.evento.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sE.lugar.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sE.lugar.onClick }}" title="Ordenar por lugar" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sE.lugar.color }}" style-hover="background:#EFEAE1">Lugar<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sE.lugar.iconColor }}">{{ sE.lugar.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sE.ocupacion.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sE.ocupacion.onClick }}" title="Ordenar por ocupación" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sE.ocupacion.color }}" style-hover="background:#EFEAE1">Ocupación<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sE.ocupacion.iconColor }}">{{ sE.ocupacion.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sE.crono.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sE.crono.onClick }}" title="Ordenar por cronograma" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sE.crono.color }}" style-hover="background:#EFEAE1">Cronograma<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sE.crono.iconColor }}">{{ sE.crono.icon }}</span></button></th>
               <th scope="col" style="text-align:right;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Acciones</th>
             </tr></thead>
             <tbody>
@@ -229,7 +232,7 @@ button,input,select,textarea{font-family:inherit}
                     <span style="display:flex;flex-direction:column;gap:2px;min-width:0"><button onClick="{{ e.open }}" style="border:0;background:none;padding:0;color:#23261F;font-size:15px;font-weight:800;cursor:pointer;text-align:left" style-hover="color:#3E6B4F;text-decoration:underline">{{ e.name }}</button><span style="font-size:13px;color:#5F6259">{{ e.sub }}</span></span>
                   </div></td>
                   <td style="padding:10px 16px;color:#3A3D35">{{ e.place }}</td>
-                  <td style="padding:10px 16px;color:#3A3D35">{{ e.cap }}</td>
+                  <td style="padding:10px 16px;white-space:nowrap"><div style="font-size:14px;font-weight:800;color:{{ e.occColor }}">{{ e.occLabel }}</div><div style="font-size:12px;font-weight:700;color:{{ e.occSubColor }}">{{ e.occSub }}</div></td>
                   <td style="padding:10px 16px"><span style="display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 9px;border-radius:13px;font-size:12px;font-weight:700;white-space:nowrap;background:{{ e.cronoBg }};color:{{ e.cronoColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">{{ e.cronoIcon }}</span>{{ e.cronoLabel }}</span></td>
                   <td style="padding:10px 16px"><div style="display:flex;justify-content:flex-end;gap:4px">
                     <button onClick="{{ e.openSched }}" disabled="{{ e.past }}" aria-label="{{ e.schedAria }}" title="{{ e.schedAria }}" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;cursor:{{ e.schedCursor }};color:{{ e.schedColor }};display:grid;place-items:center" style-hover="background:#F1EDE5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ e.schedIcon }}</span></button>
@@ -240,6 +243,19 @@ button,input,select,textarea{font-family:inherit}
               </sc-for>
             </tbody>
           </table>
+        </div>
+      </sc-if>
+      <sc-if value="{{ evPager.show }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px 16px;padding:10px 16px;border-top:1px solid #EFEAE1;font-size:14px;color:#4C5047;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:8px">Filas por página<select value="{{ evPager.size }}" onChange="{{ evPager.onSize }}" style="height:34px;padding:0 8px;border:1px solid #DDD6CA;border-radius:8px;background:#fff;font-size:14px;color:#23261F"><sc-for list="{{ evPager.sizes }}" as="z" hint-placeholder-count="4"><option value="{{ z.v }}">{{ z.v }}</option></sc-for></select></label>
+            <span aria-live="polite">{{ evPager.label }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onClick="{{ evPager.first }}" disabled="{{ evPager.prevDis }}" aria-label="Primera página" title="Primera página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ evPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">first_page</span></button><button onClick="{{ evPager.prev }}" disabled="{{ evPager.prevDis }}" aria-label="Página anterior" title="Página anterior" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ evPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_left</span></button>
+            <span style="padding:0 6px;white-space:nowrap">{{ evPager.page }}</span>
+            <button onClick="{{ evPager.next }}" disabled="{{ evPager.nextDis }}" aria-label="Página siguiente" title="Página siguiente" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ evPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_right</span></button><button onClick="{{ evPager.last }}" disabled="{{ evPager.nextDis }}" aria-label="Última página" title="Última página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ evPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">last_page</span></button>
+          </div>
         </div>
       </sc-if>
       <sc-if value="{{ evEmpty }}" hint-placeholder-val="{{ false }}">
@@ -272,6 +288,34 @@ button,input,select,textarea{font-family:inherit}
         <button onClick="{{ ev.del }}" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid #E7C3BC;border-radius:10px;background:#fff;color:#A3372A;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#FBEDEA"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">delete</span>Eliminar</button>
       </div>
     </div>
+    <section aria-label="Aforo" style="background:#fff;border:1px solid #E6E1D8;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap"><h2 style="margin:0;font-size:17px;font-weight:800">Aforo</h2><span style="font-size:13px;color:#5F6259">{{ af.cupoPub }}</span></div>
+      <dl style="margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+        <div style="padding:12px 14px;border-radius:12px;background:#FBFAF7;border:1px solid #EFEAE1"><dt style="font-size:13px;color:#4C5047;font-weight:700">Aforo total</dt><dd style="margin:2px 0 0;font-size:26px;font-weight:800">{{ af.cap }}</dd></div>
+        <div style="padding:12px 14px;border-radius:12px;background:#FBFAF7;border:1px solid #EFEAE1"><dt style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4C5047;font-weight:700"><span aria-hidden="true" style="width:10px;height:10px;border-radius:3px;background:#2F5540"></span>Participantes</dt><dd style="margin:2px 0 0;font-size:26px;font-weight:800">{{ af.parts }}</dd></div>
+        <div style="padding:12px 14px;border-radius:12px;background:#FBFAF7;border:1px solid #EFEAE1"><dt style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4C5047;font-weight:700"><span aria-hidden="true" style="width:10px;height:10px;border-radius:3px;background:#8DB59A"></span>Público inscrito</dt><dd style="margin:2px 0 0;font-size:26px;font-weight:800">{{ af.pub }}</dd></div>
+        <div style="padding:12px 14px;border-radius:12px;background:{{ af.dispBg }};border:1px solid {{ af.dispBd }}"><dt style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4C5047;font-weight:700"><span aria-hidden="true" style="width:10px;height:10px;border-radius:3px;background:#EFEAE1;border:1px solid #C9C3B7"></span>Disponibles</dt><dd style="margin:2px 0 0;font-size:26px;font-weight:800;color:{{ af.dispColor }}">{{ af.dispLabel }}</dd><dd style="margin:0;font-size:12px;font-weight:700;color:{{ af.dispColor }}">{{ af.dispSub }}</dd></div>
+      </dl>
+      <div style="position:relative;padding-top:18px">
+        <div role="img" aria-label="{{ af.barAria }}" style="display:flex;height:14px;border-radius:7px;overflow:hidden;background:#EFEAE1;border:1px solid #DDD6CA">
+          <div style="width:{{ af.wParts }};background:#2F5540"></div><div style="width:{{ af.wPub }};background:#8DB59A"></div>
+        </div>
+        <sc-if value="{{ af.over }}" hint-placeholder-val="{{ false }}"><div aria-hidden="true" style="position:absolute;top:18px;height:16px;right:0;left:{{ af.capLeft }};border-radius:0 7px 7px 0;background:repeating-linear-gradient(135deg,rgba(163,55,42,0.85) 0 4px,rgba(163,55,42,0.35) 4px 8px)"></div></sc-if>
+        <div aria-hidden="true" style="position:absolute;top:12px;bottom:-4px;width:2px;left:{{ af.capLeft }};background:{{ af.capMarker }}"></div>
+        <span aria-hidden="true" style="position:absolute;top:0;left:{{ af.capLeft }};transform:translateX(-100%);padding-right:6px;font-size:11px;font-weight:800;white-space:nowrap;color:{{ af.capMarker }}">Aforo {{ af.cap }}</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:#4C5047">
+        <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="width:10px;height:10px;border-radius:3px;background:#2F5540"></span>Participantes</span>
+        <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="width:10px;height:10px;border-radius:3px;background:#8DB59A"></span>Público</span>
+        <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="width:10px;height:10px;border-radius:3px;background:#EFEAE1;border:1px solid #C9C3B7"></span>Disponible</span>
+      </div>
+      <sc-if value="{{ af.over }}" hint-placeholder-val="{{ false }}">
+        <div role="alert" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#FBE9E5;border:1px solid #F4DCD6;color:#862C21;font-size:14px;line-height:1.5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">warning</span><span><strong style="display:block;font-weight:800">Sobrecupo</strong>{{ af.overText }}</span></div>
+      </sc-if>
+      <sc-if value="{{ af.full }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:#FBF0D9;border:1px solid #F0DDB4;color:#5E4210;font-size:14px;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">event_busy</span>El evento está lleno. Los miembros lo ven como «Cupos agotados».</div>
+      </sc-if>
+    </section>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px;align-items:start">
       <section style="background:#fff;border:1px solid #E6E1D8;border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:18px">
         <div style="display:flex;flex-direction:column;gap:6px"><h2 style="margin:0;font-size:14px;font-weight:700;color:#4C5047">Descripción</h2><p style="margin:0;font-size:15px;line-height:1.6;text-wrap:pretty">{{ ev.desc }}</p></div>
@@ -312,6 +356,11 @@ button,input,select,textarea{font-family:inherit}
         </sc-if>
       </section>
     </div>
+    <section aria-label="Inscritos" style="background:#fff;border:1px solid #E6E1D8;border-radius:14px;padding:16px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:12px"><span aria-hidden="true" style="flex:none;width:38px;height:38px;border-radius:10px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:21px;line-height:1">confirmation_number</span>
+        <span style="display:flex;flex-direction:column"><span style="font-size:16px;font-weight:800">Inscritos</span><span style="font-size:14px;color:#5F6259">{{ af.pub }} de público · {{ af.parts }} participantes</span></span></div>
+      <button onClick="{{ goInscritos }}" style="display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap" style-hover="background:#F4F0E8">Gestionar inscritos<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">arrow_forward</span></button>
+    </section>
   </div>
 </sc-if>
 
@@ -332,7 +381,7 @@ button,input,select,textarea{font-family:inherit}
         <sc-if value="{{ ff.descripcion.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ ff.descripcion.err }}</span></sc-if></label>
       <label style="display:flex;flex-direction:column;gap:6px;max-width:220px"><span style="font-size:14px;font-weight:700">Capacidad</span>
         <input type="number" min="1" inputmode="numeric" value="{{ ff.capacidad.value }}" onChange="{{ ff.capacidad.onChange }}" onBlur="{{ ff.capacidad.onBlur }}" aria-invalid="{{ ff.capacidad.hasErr }}" style="height:42px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ ff.capacidad.border }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0">
-        <sc-if value="{{ ff.capacidad.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ ff.capacidad.err }}</span></sc-if></label>
+        <sc-if value="{{ ff.capacidad.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ ff.capacidad.err }}</span></sc-if><span style="font-size:13px;color:#5F6259">{{ capHelp }}</span></label>
     </section>
     <section style="background:#fff;border:1px solid #E6E1D8;border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:16px">
       <h2 style="margin:0;font-size:16px;font-weight:800">Fecha y hora</h2>
@@ -396,10 +445,10 @@ button,input,select,textarea{font-family:inherit}
         <div style="overflow-x:auto">
           <table style="width:100%;min-width:720px;border-collapse:collapse;font-size:14px">
             <thead><tr style="background:#FBFAF7">
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Actividad</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Evento</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Horario</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Responsable</th>
+              <th scope="col" aria-sort="{{ sC.actividad.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sC.actividad.onClick }}" title="Ordenar por actividad" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sC.actividad.color }}" style-hover="background:#EFEAE1">Actividad<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sC.actividad.iconColor }}">{{ sC.actividad.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sC.evento.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sC.evento.onClick }}" title="Ordenar por evento" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sC.evento.color }}" style-hover="background:#EFEAE1">Evento<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sC.evento.iconColor }}">{{ sC.evento.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sC.horario.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sC.horario.onClick }}" title="Ordenar por horario" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sC.horario.color }}" style-hover="background:#EFEAE1">Horario<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sC.horario.iconColor }}">{{ sC.horario.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sC.responsable.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sC.responsable.onClick }}" title="Ordenar por responsable" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sC.responsable.color }}" style-hover="background:#EFEAE1">Responsable<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sC.responsable.iconColor }}">{{ sC.responsable.icon }}</span></button></th>
               <th scope="col" style="text-align:right;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Acciones</th>
             </tr></thead>
             <tbody>
@@ -419,6 +468,19 @@ button,input,select,textarea{font-family:inherit}
           </table>
         </div>
       </sc-if>
+      <sc-if value="{{ cronoPager.show }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px 16px;padding:10px 16px;border-top:1px solid #EFEAE1;font-size:14px;color:#4C5047;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:8px">Filas por página<select value="{{ cronoPager.size }}" onChange="{{ cronoPager.onSize }}" style="height:34px;padding:0 8px;border:1px solid #DDD6CA;border-radius:8px;background:#fff;font-size:14px;color:#23261F"><sc-for list="{{ cronoPager.sizes }}" as="z" hint-placeholder-count="4"><option value="{{ z.v }}">{{ z.v }}</option></sc-for></select></label>
+            <span aria-live="polite">{{ cronoPager.label }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onClick="{{ cronoPager.first }}" disabled="{{ cronoPager.prevDis }}" aria-label="Primera página" title="Primera página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ cronoPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">first_page</span></button><button onClick="{{ cronoPager.prev }}" disabled="{{ cronoPager.prevDis }}" aria-label="Página anterior" title="Página anterior" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ cronoPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_left</span></button>
+            <span style="padding:0 6px;white-space:nowrap">{{ cronoPager.page }}</span>
+            <button onClick="{{ cronoPager.next }}" disabled="{{ cronoPager.nextDis }}" aria-label="Página siguiente" title="Página siguiente" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ cronoPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_right</span></button><button onClick="{{ cronoPager.last }}" disabled="{{ cronoPager.nextDis }}" aria-label="Última página" title="Última página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ cronoPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">last_page</span></button>
+          </div>
+        </div>
+      </sc-if>
       <sc-if value="{{ cronoEmpty }}" hint-placeholder-val="{{ false }}">
         <div style="padding:44px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
           <span aria-hidden="true" style="width:46px;height:46px;border-radius:12px;background:#FBF0D9;color:#7A5410;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:24px;line-height:1">event_busy</span>
@@ -428,6 +490,281 @@ button,input,select,textarea{font-family:inherit}
         </div>
       </sc-if>
     </section>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.inscripciones }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Admin · Inscripciones" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:4px"><h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Inscripciones</h1><span style="font-size:15px;color:#5F6259">Público inscrito y participantes de cada evento.</span></div>
+      <div role="group" aria-label="Vista de inscripciones" style="display:flex;gap:4px;padding:4px;background:#EFEAE1;border-radius:12px">
+        <sc-for list="{{ insViews }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" aria-pressed="{{ t.pressed }}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:0;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;background:{{ t.bg }};color:{{ t.color }};box-shadow:{{ t.shadow }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">{{ t.icon }}</span>{{ t.label }}</button></sc-for>
+      </div>
+    </div>
+    <sc-if value="{{ insVResumen }}" hint-placeholder-val="{{ false }}">
+    <section aria-label="Total de inscritos" style="background:#fff;border:1px solid #E6E1D8;border-radius:14px;overflow:hidden">
+      <dl style="margin:0;padding:16px 20px;display:flex;flex-wrap:wrap;gap:14px 40px;border-bottom:1px solid #EFEAE1">
+        <div><dt style="font-size:13px;font-weight:700;color:#4C5047">Total de inscritos</dt><dd style="margin:2px 0 0;font-size:30px;font-weight:800;line-height:1.1">{{ ov.total }}</dd><dd style="margin:0;font-size:12px;color:#5F6259">en {{ ov.nEv }} eventos</dd></div>
+        <div><dt style="font-size:13px;font-weight:700;color:#4C5047">En eventos próximos</dt><dd style="margin:2px 0 0;font-size:30px;font-weight:800;line-height:1.1;color:#2F5540">{{ ov.up }}</dd><dd style="margin:0;font-size:12px;color:#5F6259">{{ ov.nUp }} eventos</dd></div>
+        <div><dt style="font-size:13px;font-weight:700;color:#4C5047">Participantes</dt><dd style="margin:2px 0 0;font-size:30px;font-weight:800;line-height:1.1">{{ ov.parts }}</dd><dd style="margin:0;font-size:12px;color:#5F6259">sumados por evento</dd></div>
+      </dl>
+      <div style="overflow-x:auto">
+        <table style="width:100%;min-width:720px;border-collapse:collapse;font-size:14px">
+          <caption style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Resumen de inscritos por evento</caption>
+          <thead><tr style="background:#FBFAF7"><th scope="col" aria-sort="{{ sO.evento.aria }}" style="text-align:left;padding:10px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sO.evento.onClick }}" title="Ordenar por evento" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sO.evento.color }}" style-hover="background:#EFEAE1">Evento<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sO.evento.iconColor }}">{{ sO.evento.icon }}</span></button></th><th scope="col" aria-sort="{{ sO.fecha.aria }}" style="text-align:left;padding:10px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sO.fecha.onClick }}" title="Ordenar por fecha" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sO.fecha.color }}" style-hover="background:#EFEAE1">Fecha<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sO.fecha.iconColor }}">{{ sO.fecha.icon }}</span></button></th><th scope="col" aria-sort="{{ sO.aforo.aria }}" style="text-align:right;padding:10px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sO.aforo.onClick }}" title="Ordenar por aforo" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sO.aforo.color }}" style-hover="background:#EFEAE1">Aforo<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sO.aforo.iconColor }}">{{ sO.aforo.icon }}</span></button></th><th scope="col" aria-sort="{{ sO.participantes.aria }}" style="text-align:right;padding:10px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sO.participantes.onClick }}" title="Ordenar por participantes" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sO.participantes.color }}" style-hover="background:#EFEAE1">Participantes<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sO.participantes.iconColor }}">{{ sO.participantes.icon }}</span></button></th><th scope="col" aria-sort="{{ sO.publico.aria }}" style="text-align:right;padding:10px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sO.publico.onClick }}" title="Ordenar por público" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sO.publico.color }}" style-hover="background:#EFEAE1">Público<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sO.publico.iconColor }}">{{ sO.publico.icon }}</span></button></th><th scope="col" aria-sort="{{ sO.disponibles.aria }}" style="text-align:right;padding:10px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sO.disponibles.onClick }}" title="Ordenar por disponibles" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sO.disponibles.color }}" style-hover="background:#EFEAE1">Disponibles<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sO.disponibles.iconColor }}">{{ sO.disponibles.icon }}</span></button></th><th scope="col" style="text-align:right;padding:10px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Acciones</span></th></tr></thead>
+          <tbody>
+            <sc-for list="{{ ov.rows }}" as="r" hint-placeholder-count="4">
+              <tr style="border-top:1px solid #F2EEE7" style-hover="background:#FBFAF7">
+                <td style="padding:10px 16px;font-weight:800">{{ r.name }}</td>
+                <td style="padding:10px 16px;color:#3A3D35;white-space:nowrap">{{ r.date }} <span style="margin-left:6px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px;background:{{ r.stBg }};color:{{ r.stC }}">{{ r.stLabel }}</span></td>
+                <td style="padding:10px 16px;text-align:right">{{ r.cap }}</td>
+                <td style="padding:10px 16px;text-align:right">{{ r.parts }}</td>
+                <td style="padding:10px 16px;text-align:right;font-weight:800">{{ r.pub }}</td>
+                <td style="padding:10px 16px;text-align:right;white-space:nowrap;font-weight:700;color:{{ r.occColor }}">{{ r.occSub }}</td>
+                <td style="padding:10px 16px;text-align:right"><button onClick="{{ r.pick }}" aria-label="{{ r.aria }}" style="height:34px;padding:0 10px;border:1px solid #D3CCBF;border-radius:9px;background:#fff;color:#23261F;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap" style-hover="background:#F4F0E8">Ver inscritos</button></td>
+              </tr>
+            </sc-for>
+          </tbody>
+          
+        </table>
+      </div>
+      <sc-if value="{{ ovPager.show }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px 16px;padding:10px 16px;border-top:1px solid #EFEAE1;font-size:14px;color:#4C5047;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:8px">Filas por página<select value="{{ ovPager.size }}" onChange="{{ ovPager.onSize }}" style="height:34px;padding:0 8px;border:1px solid #DDD6CA;border-radius:8px;background:#fff;font-size:14px;color:#23261F"><sc-for list="{{ ovPager.sizes }}" as="z" hint-placeholder-count="4"><option value="{{ z.v }}">{{ z.v }}</option></sc-for></select></label>
+            <span aria-live="polite">{{ ovPager.label }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onClick="{{ ovPager.first }}" disabled="{{ ovPager.prevDis }}" aria-label="Primera página" title="Primera página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ ovPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">first_page</span></button><button onClick="{{ ovPager.prev }}" disabled="{{ ovPager.prevDis }}" aria-label="Página anterior" title="Página anterior" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ ovPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_left</span></button>
+            <span style="padding:0 6px;white-space:nowrap">{{ ovPager.page }}</span>
+            <button onClick="{{ ovPager.next }}" disabled="{{ ovPager.nextDis }}" aria-label="Página siguiente" title="Página siguiente" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ ovPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_right</span></button><button onClick="{{ ovPager.last }}" disabled="{{ ovPager.nextDis }}" aria-label="Última página" title="Última página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ ovPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">last_page</span></button>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+    </sc-if>
+    <sc-if value="{{ insVEvento }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between">
+      <div style="display:flex;gap:14px;align-items:center;min-width:0">
+        <span style="flex:none;width:56px;border-radius:12px;text-align:center;padding:7px 0;background:{{ ev.dateBg }};color:{{ ev.dateColor }}"><span style="display:block;font-size:11px;font-weight:800;letter-spacing:0.06em">{{ ev.mon }}</span><span style="display:block;font-size:22px;font-weight:800;line-height:1.1">{{ ev.day }}</span></span>
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+          <h2 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.01em">{{ ev.name }}</h2>
+          <span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:14px;color:#4C5047"><span>{{ ev.dateLong }} · {{ ev.time }}</span><span style="font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px;background:{{ ev.stBg }};color:{{ ev.stColor }}">{{ ev.stLabel }}</span></span>
+        </div>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:4px;min-width:260px"><span style="font-size:13px;font-weight:700;color:#4C5047">Cambiar evento</span>
+        <select value="{{ ev.id }}" onChange="{{ onInsEv }}" style="height:42px;padding:0 10px;border:1px solid #DDD6CA;border-radius:10px;background:#fff;font-size:15px;color:#23261F"><sc-for list="{{ evOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.id }}">{{ o.label }}</option></sc-for></select></label>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:14px 18px;background:#fff;border:1px solid #E6E1D8;border-radius:14px;font-size:14px;color:#4C5047">
+      <span>Aforo total <strong style="color:#23261F;font-size:16px">{{ af.cap }}</strong></span>
+      <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="width:10px;height:10px;border-radius:3px;background:#2F5540"></span>Participantes <strong style="color:#23261F;font-size:16px">{{ af.parts }}</strong></span>
+      <span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="width:10px;height:10px;border-radius:3px;background:#8DB59A"></span>Público <strong style="color:#23261F;font-size:16px">{{ af.pub }}</strong></span>
+      <span>Disponibles <strong style="font-size:16px;color:{{ af.dispColor }}">{{ af.dispLabel }}</strong></span>
+      <button onClick="{{ goEvDetail }}" style="margin-left:auto;border:0;background:none;padding:6px 0;color:#3E6B4F;font-size:14px;font-weight:700;cursor:pointer" style-hover="text-decoration:underline">Ver evento</button>
+    </div>
+    <sc-if value="{{ af.over }}" hint-placeholder-val="{{ false }}">
+      <div role="alert" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#FBE9E5;border:1px solid #F4DCD6;color:#862C21;font-size:14px;line-height:1.5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">warning</span><span><strong style="display:block;font-weight:800">Sobrecupo</strong>{{ af.overText }}</span></div>
+    </sc-if>
+    <section aria-label="Inscritos" style="background:#fff;border:1px solid #E6E1D8;border-radius:14px;overflow:hidden">
+      <div style="padding:14px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid #EFEAE1">
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <h2 style="margin:0;font-size:17px;font-weight:800">Inscritos</h2>
+          <div role="group" aria-label="Tipo de asistente" style="display:flex;gap:4px;padding:4px;background:#EFEAE1;border-radius:12px">
+            <sc-for list="{{ insTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" aria-pressed="{{ t.pressed }}" style="height:34px;padding:0 12px;border:0;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;background:{{ t.bg }};color:{{ t.color }};box-shadow:{{ t.shadow }}">{{ t.label }}</button></sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ insPub }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <button onClick="{{ openInsAdd }}" disabled="{{ insAddDis }}" title="{{ insAddWhy }}" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:0;border-radius:10px;font-size:14px;font-weight:700;white-space:nowrap;background:{{ insAddBg }};color:{{ insAddColor }};cursor:{{ insAddCursor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">person_add</span>Inscribir persona</button>
+            <sc-if value="{{ insAddDis }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:700;color:#7A5410">{{ insAddWhy }}</span></sc-if>
+          </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ insPub }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:12px 16px;border-bottom:1px solid #EFEAE1">
+          <label style="position:relative;display:block;max-width:360px">
+            <span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Buscar inscritos</span>
+            <span aria-hidden="true" style="position:absolute;left:12px;top:11px;font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#6B6E65">search</span>
+            <input type="search" value="{{ insQ }}" onChange="{{ onInsQ }}" placeholder="Buscar por nombre o correo" style="width:100%;height:42px;padding:0 12px 0 40px;border:1px solid #DDD6CA;border-radius:10px;background:#fff;font-size:15px;color:#23261F" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0">
+          </label>
+        </div>
+        <sc-if value="{{ insHas }}" hint-placeholder-val="{{ true }}">
+          <div style="overflow-x:auto">
+            <table style="width:100%;min-width:820px;border-collapse:collapse;font-size:14px">
+              <thead><tr style="background:#FBFAF7"><th scope="col" aria-sort="{{ sI.persona.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sI.persona.onClick }}" title="Ordenar por persona" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sI.persona.color }}" style-hover="background:#EFEAE1">Persona<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sI.persona.iconColor }}">{{ sI.persona.icon }}</span></button></th><th scope="col" aria-sort="{{ sI.inscripcion.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sI.inscripcion.onClick }}" title="Ordenar por inscripción" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sI.inscripcion.color }}" style-hover="background:#EFEAE1">Inscripción<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sI.inscripcion.iconColor }}">{{ sI.inscripcion.icon }}</span></button></th><th scope="col" aria-sort="{{ sI.por.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sI.por.onClick }}" title="Ordenar por inscrito por" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sI.por.color }}" style-hover="background:#EFEAE1">Inscrito por<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sI.por.iconColor }}">{{ sI.por.icon }}</span></button></th><th scope="col" aria-sort="{{ sI.nota.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sI.nota.onClick }}" title="Ordenar por nota" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sI.nota.color }}" style-hover="background:#EFEAE1">Nota<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sI.nota.iconColor }}">{{ sI.nota.icon }}</span></button></th><th scope="col" style="text-align:right;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Acciones</th></tr></thead>
+              <tbody>
+                <sc-for list="{{ insRows }}" as="p" hint-placeholder-count="6">
+                  <tr style="border-top:1px solid #F2EEE7" style-hover="background:#FBFAF7">
+                    <td style="padding:10px 16px"><div style="display:flex;align-items:center;gap:12px"><span aria-hidden="true" style="flex:none;width:34px;height:34px;border-radius:50%;background:#F1EADF;color:#5E4E37;display:grid;place-items:center;font-size:12px;font-weight:800">{{ p.ini }}</span><span style="display:flex;flex-direction:column;min-width:0"><span style="font-weight:800">{{ p.name }}</span><span style="font-size:13px;color:#5F6259">{{ p.email }}</span></span></div></td>
+                    <td style="padding:10px 16px;color:#3A3D35;white-space:nowrap">{{ p.date }}</td>
+                    <td style="padding:10px 16px;color:#3A3D35"><span style="display:flex;align-items:center;gap:6px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:#5F6259">{{ p.byIcon }}</span>{{ p.by }}</span></td>
+                    <td style="padding:10px 16px;max-width:260px;color:{{ p.noteColor }}">{{ p.note }}</td>
+                    <td style="padding:10px 16px"><div style="display:flex;justify-content:flex-end;gap:4px">
+                      <button onClick="{{ p.edit }}" aria-label="{{ p.editAria }}" title="Editar nota" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;color:#4C5047;cursor:pointer;display:grid;place-items:center" style-hover="background:#F1EDE5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">edit</span></button>
+                      <button onClick="{{ p.del }}" aria-label="{{ p.delAria }}" title="Eliminar inscripción" style="width:38px;height:38px;border:0;border-radius:9px;background:transparent;color:#A3372A;cursor:pointer;display:grid;place-items:center" style-hover="background:#FBEDEA"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">delete</span></button>
+                    </div></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </sc-if>
+        <sc-if value="{{ insEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+            <span aria-hidden="true" style="width:46px;height:46px;border-radius:12px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:24px;line-height:1">confirmation_number</span>
+            <span style="font-size:16px;font-weight:800">{{ insEmptyText }}</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ insPager.show }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px 16px;padding:10px 16px;border-top:1px solid #EFEAE1;font-size:14px;color:#4C5047;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:8px">Filas por página<select value="{{ insPager.size }}" onChange="{{ insPager.onSize }}" style="height:34px;padding:0 8px;border:1px solid #DDD6CA;border-radius:8px;background:#fff;font-size:14px;color:#23261F"><sc-for list="{{ insPager.sizes }}" as="z" hint-placeholder-count="4"><option value="{{ z.v }}">{{ z.v }}</option></sc-for></select></label>
+            <span aria-live="polite">{{ insPager.label }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onClick="{{ insPager.first }}" disabled="{{ insPager.prevDis }}" aria-label="Primera página" title="Primera página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ insPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">first_page</span></button><button onClick="{{ insPager.prev }}" disabled="{{ insPager.prevDis }}" aria-label="Página anterior" title="Página anterior" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ insPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_left</span></button>
+            <span style="padding:0 6px;white-space:nowrap">{{ insPager.page }}</span>
+            <button onClick="{{ insPager.next }}" disabled="{{ insPager.nextDis }}" aria-label="Página siguiente" title="Página siguiente" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ insPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_right</span></button><button onClick="{{ insPager.last }}" disabled="{{ insPager.nextDis }}" aria-label="Última página" title="Última página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ insPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">last_page</span></button>
+          </div>
+        </div>
+      </sc-if>
+      </sc-if>
+      <sc-if value="{{ insPart }}" hint-placeholder-val="{{ false }}">
+        <div role="note" style="display:flex;gap:8px;align-items:center;padding:12px 16px;background:#F8F7F3;border-bottom:1px solid #EFEAE1;font-size:14px;color:#3A3D35"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">info</span>Los participantes ocupan aforo aunque no se inscriban.</div>
+        <sc-if value="{{ partHas }}" hint-placeholder-val="{{ true }}">
+          <ul style="list-style:none;margin:0;padding:0">
+            <sc-for list="{{ partRows }}" as="p" hint-placeholder-count="3">
+              <li style="border-top:1px solid #F2EEE7">
+                <button onClick="{{ p.go }}" aria-label="{{ p.goAria }}" style="width:100%;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border:0;background:#fff;color:inherit;text-align:left;cursor:pointer" style-hover="background:#FBFAF7">
+                  <span aria-hidden="true" style="flex:none;width:34px;height:34px;border-radius:50%;background:#F1EADF;color:#5E4E37;display:grid;place-items:center;font-size:12px;font-weight:800">{{ p.ini }}</span>
+                  <span style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:800">{{ p.name }}</span><span style="font-size:13px;color:#5F6259">{{ p.acts }}</span></span>
+                  <sc-if value="{{ p.hasSt }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:13px;font-size:12px;font-weight:700;background:{{ p.stBg }};color:{{ p.stC }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">{{ p.stI }}</span>{{ p.stL }}</span></sc-if>
+                  <sc-if value="{{ p.noSt }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:700;color:#5F6259">Sin invitación</span></sc-if>
+                  <span style="display:flex;align-items:center;gap:2px;font-size:13px;font-weight:700;color:#3E6B4F">Gestionar<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">chevron_right</span></span>
+                </button>
+              </li>
+            </sc-for>
+          </ul>
+        </sc-if>
+        <sc-if value="{{ partEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:32px 20px;text-align:center;font-size:15px;color:#5F6259">Aún no hay participantes asignados a actividades de este evento.</div></sc-if>
+      </sc-if>
+    </section>
+
+    <sc-if value="{{ insAdd }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;inset:0;z-index:85;background:rgba(35,38,31,0.45);display:grid;place-items:center;padding:16px">
+        <div role="dialog" aria-modal="true" aria-label="Inscribir persona" style="width:min(500px,100%);max-height:calc(100vh - 32px);background:#fff;border-radius:16px;display:flex;flex-direction:column;box-shadow:0 24px 48px rgba(35,38,31,0.22)">
+          <div style="padding:18px 20px 12px;display:flex;gap:12px;align-items:flex-start">
+            <div style="flex:1;display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:19px;font-weight:800">Inscribir persona</h2><span style="font-size:14px;color:#5F6259">{{ insAddDisp }}</span></div>
+            <button onClick="{{ closeInsAdd }}" aria-label="Cerrar" style="flex:none;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:#4C5047;cursor:pointer;display:grid;place-items:center" style-hover="background:#F1EDE5"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">close</span></button>
+          </div>
+          <div style="padding:0 20px 12px"><label style="position:relative;display:block"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Buscar usuario</span><span aria-hidden="true" style="position:absolute;left:12px;top:11px;font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#6B6E65">search</span><input type="search" autoFocus="{{ true }}" value="{{ insQ2 }}" onChange="{{ onInsQ2 }}" placeholder="Nombre o correo" style="width:100%;height:42px;padding:0 12px 0 40px;border:1px solid #DDD6CA;border-radius:10px;font-size:15px" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"></label></div>
+          <div role="listbox" aria-label="Usuarios activos" style="flex:1;overflow:auto;border-top:1px solid #EFEAE1;min-height:140px;max-height:300px">
+            <sc-for list="{{ insList }}" as="u" hint-placeholder-count="5">
+              <button type="button" role="option" aria-selected="{{ u.sel }}" aria-disabled="{{ u.dis }}" disabled="{{ u.dis }}" onClick="{{ u.pick }}" style="width:100%;display:flex;align-items:center;gap:12px;padding:10px 20px;border:0;border-bottom:1px solid #F2EEE7;text-align:left;background:{{ u.bg }};cursor:{{ u.cursor }}">
+                <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1;color:{{ u.iconColor }}">{{ u.icon }}</span>
+                <span aria-hidden="true" style="flex:none;width:32px;height:32px;border-radius:50%;background:#F1EADF;color:#5E4E37;display:grid;place-items:center;font-size:12px;font-weight:800">{{ u.ini }}</span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px;font-weight:700;color:{{ u.nameColor }}">{{ u.name }}</span><span style="font-size:12px;color:#5F6259;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ u.email }}</span></span>
+                <sc-if value="{{ u.hasWhy }}" hint-placeholder-val="{{ false }}"><span style="flex:none;font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px;background:#EFEAE1;color:#4C5047">{{ u.why }}</span></sc-if>
+              </button>
+            </sc-for>
+            <sc-if value="{{ insListEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:24px 20px;text-align:center;font-size:14px;color:#5F6259">Nadie coincide con la búsqueda.</div></sc-if>
+          </div>
+          <div style="padding:12px 20px;border-top:1px solid #EFEAE1">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Nota <span style="font-weight:400;color:#5F6259">(opcional)</span></span><span style="font-weight:400;color:#5F6259;font-size:13px">{{ insNoteCount }}</span></span><input value="{{ insNote }}" onChange="{{ onInsNote }}" maxlength="200" placeholder="Ej. Asistirá con un acompañante" style="height:40px;padding:0 12px;border:1px solid #DDD6CA;border-radius:10px;font-size:15px" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"></label>
+          </div>
+          <div style="padding:14px 20px;border-top:1px solid #EFEAE1;display:flex;justify-content:flex-end;gap:10px">
+            <button onClick="{{ closeInsAdd }}" style="height:42px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer">Cancelar</button>
+            <button onClick="{{ insAddSubmit }}" disabled="{{ insAddBtn.disabled }}" style="height:42px;padding:0 18px;border:0;border-radius:10px;font-size:15px;font-weight:700;background:{{ insAddBtn.bg }};color:{{ insAddBtn.color }};cursor:{{ insAddBtn.cursor }}">Inscribir</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ insEdit }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;inset:0;z-index:85;background:rgba(35,38,31,0.45);display:grid;place-items:center;padding:16px">
+        <div role="dialog" aria-modal="true" aria-label="Editar inscripción" style="width:min(460px,100%);background:#fff;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 48px rgba(35,38,31,0.22)">
+          <div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:19px;font-weight:800">Editar inscripción</h2><span style="font-size:15px;font-weight:700">{{ insEditName }}</span></div>
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Nota <span style="font-weight:400;color:#5F6259">(opcional)</span></span><span style="font-weight:400;color:#5F6259;font-size:13px">{{ insEditCount }}</span></span>
+            <textarea autoFocus="{{ true }}" value="{{ insEditNote }}" onChange="{{ onInsEditNote }}" maxlength="200" rows="3" style="padding:10px 12px;border:1px solid #DDD6CA;border-radius:10px;font-size:15px;line-height:1.5;resize:vertical" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"></textarea></label>
+          <div style="display:flex;justify-content:flex-end;gap:10px">
+            <button onClick="{{ closeInsEdit }}" style="height:42px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer">Cancelar</button>
+            <button onClick="{{ saveInsEdit }}" style="height:42px;padding:0 18px;border:0;border-radius:10px;background:#3E6B4F;color:#fff;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#2F5540">Guardar nota</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ is.misparticipaciones }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Admin · Mis participaciones" style="display:flex;flex-direction:column;gap:20px;max-width:900px">
+    <div style="display:flex;flex-direction:column;gap:4px"><h1 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.015em">Mis participaciones</h1><span style="font-size:15px;color:#5F6259">Actividades en las que participas tú. {{ mySummary }}</span></div>
+    <div role="group" aria-label="Filtrar mis invitaciones" style="align-self:flex-start;display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:#EFEAE1;border-radius:12px">
+      <sc-for list="{{ myTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" aria-pressed="{{ t.pressed }}" style="height:34px;padding:0 12px;border:0;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;background:{{ t.bg }};color:{{ t.color }};box-shadow:{{ t.shadow }}">{{ t.label }} · {{ t.count }}</button></sc-for>
+    </div>
+    <sc-if value="{{ myHas }}" hint-placeholder-val="{{ true }}">
+      <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ myRows }}" as="i" hint-placeholder-count="2">
+          <li style="background:#fff;border:1px solid #E6E1D8;border-radius:14px;overflow:hidden">
+            <div style="display:flex;gap:14px;padding:16px;flex-wrap:wrap">
+              <div style="flex:none;width:52px;border-radius:10px;text-align:center;padding:6px 0;align-self:flex-start;background:{{ i.dateBg }};color:{{ i.dateColor }}"><span style="display:block;font-size:11px;font-weight:800;letter-spacing:0.06em">{{ i.mon }}</span><span style="display:block;font-size:20px;font-weight:800;line-height:1.1">{{ i.day }}</span></div>
+              <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
+                  <span style="font-size:13px;font-weight:700;color:#3E6B4F">{{ i.ev }}</span>
+                  <span style="display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:13px;font-size:12px;font-weight:700;background:{{ i.stBg }};color:{{ i.stColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">{{ i.stIcon }}</span>{{ i.stLabel }}</span>
+                </div>
+                <h2 style="margin:0;font-size:17px;font-weight:800;color:{{ i.titleColor }}">{{ i.act }}</h2>
+                <div style="display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:#3A3D35">
+                  <span style="display:flex;align-items:center;gap:5px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:#3E6B4F">calendar_today</span>{{ i.date }}</span>
+                  <span style="display:flex;align-items:center;gap:5px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:#3E6B4F">schedule</span>{{ i.time }}</span>
+                  <span style="display:flex;align-items:center;gap:5px"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:#3E6B4F">location_on</span>{{ i.place }}</span>
+                </div>
+                <span style="font-size:13px;color:#5F6259">{{ i.origin }}</span>
+              </div>
+            </div>
+            <sc-if value="{{ i.pending }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#FBFAF7;border-top:1px solid #EFEAE1">
+                <sc-if value="{{ i.hasDue }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#7A5410"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1">event_upcoming</span>{{ i.dueLabel }}</span></sc-if>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-left:auto">
+                  <button onClick="{{ i.reject }}" aria-label="{{ i.rejectAria }}" style="height:38px;padding:0 14px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">No puedo participar</button>
+                  <button onClick="{{ i.accept }}" aria-label="{{ i.acceptAria }}" style="display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 14px;border:0;border-radius:10px;background:#3E6B4F;color:#fff;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#2F5540"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">check</span>Aceptar participación</button>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ i.isAcc }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:center;padding:10px 16px;background:#F3F7F2;border-top:1px solid #E3EEE5;font-size:13px;color:#2B5A3E"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1">check_circle</span>{{ i.accText }}</div></sc-if>
+            <sc-if value="{{ i.isRej }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:center;padding:10px 16px;background:#FDF5F3;border-top:1px solid #F4DCD6;font-size:13px;color:#862C21"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1">info</span>{{ i.rejText }}</div></sc-if>
+            <sc-if value="{{ i.isOff }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:center;padding:10px 16px;background:#F8F7F3;border-top:1px solid #EFEAE1;font-size:13px;color:#55594F"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1">info</span>{{ i.offText }}</div></sc-if>
+          </li>
+        </sc-for>
+      </ul>
+    </sc-if>
+    <sc-if value="{{ myEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:40px 20px;background:#fff;border:1px solid #E6E1D8;border-radius:14px">
+        <span aria-hidden="true" style="width:46px;height:46px;border-radius:12px;background:#EEF3EE;color:#3E6B4F;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:24px;line-height:1">event_available</span>
+        <span style="font-size:16px;font-weight:800">{{ myEmptyTitle }}</span>
+        <span style="font-size:14px;color:#5F6259;max-width:380px">{{ myEmptyBody }}</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ myDlg }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;inset:0;z-index:90;background:rgba(35,38,31,0.45);display:grid;place-items:center;padding:16px">
+        <div role="alertdialog" aria-modal="true" aria-label="{{ myDlgTitle }}" style="width:min(460px,100%);background:#fff;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px;box-shadow:0 24px 48px rgba(35,38,31,0.22)">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span aria-hidden="true" style="flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-family:'Material Symbols Rounded';font-size:22px;line-height:1;background:{{ myDlgIconBg }};color:{{ myDlgIconColor }}">{{ myDlgIcon }}</span>
+            <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><h2 style="margin:0;font-size:18px;font-weight:800">{{ myDlgTitle }}</h2><span style="font-size:15px;font-weight:700">{{ myDlgAct }}</span><span style="font-size:13px;color:#5F6259">{{ myDlgEv }}</span></div>
+          </div>
+          <p style="margin:0;font-size:14px;line-height:1.55;color:#3A3D35">{{ myDlgBody }}</p>
+          <sc-if value="{{ myRej }}" hint-placeholder-val="{{ false }}">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Motivo <span style="font-weight:400;color:#5F6259">(opcional)</span></span><span style="font-weight:400;color:#5F6259;font-size:13px">{{ myReasonCount }}</span></span>
+              <textarea value="{{ myReason }}" onChange="{{ onMyReason }}" rows="3" style="padding:10px 12px;border:1px solid #DDD6CA;border-radius:10px;font-size:15px;line-height:1.5;resize:vertical" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"></textarea></label>
+          </sc-if>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px">
+            <button onClick="{{ myCancel }}" disabled="{{ myBusy }}" style="height:42px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer">Volver</button>
+            <button onClick="{{ mySubmit }}" disabled="{{ myBusy }}" aria-busy="{{ myBusy }}" style="height:42px;padding:0 18px;border:0;border-radius:10px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;background:{{ myDlgBtnBg }}">{{ myDlgBtn }}</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
   </div>
 </sc-if>
 
@@ -456,10 +793,10 @@ button,input,select,textarea{font-family:inherit}
         <div style="overflow-x:auto">
           <table style="width:100%;min-width:860px;border-collapse:collapse;font-size:14px">
             <thead><tr style="background:#FBFAF7">
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Actividad</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Participante</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Envío</th>
-              <th scope="col" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Respuesta</th>
+              <th scope="col" aria-sort="{{ sV.actividad.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sV.actividad.onClick }}" title="Ordenar por actividad" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sV.actividad.color }}" style-hover="background:#EFEAE1">Actividad<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sV.actividad.iconColor }}">{{ sV.actividad.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sV.participante.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sV.participante.onClick }}" title="Ordenar por participante" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sV.participante.color }}" style-hover="background:#EFEAE1">Participante<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sV.participante.iconColor }}">{{ sV.participante.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sV.envio.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sV.envio.onClick }}" title="Ordenar por envío" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sV.envio.color }}" style-hover="background:#EFEAE1">Envío<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sV.envio.iconColor }}">{{ sV.envio.icon }}</span></button></th>
+              <th scope="col" aria-sort="{{ sV.respuesta.aria }}" style="text-align:left;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8"><button type="button" onClick="{{ sV.respuesta.onClick }}" title="Ordenar por respuesta" style="display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:4px 6px;margin:-4px -6px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:{{ sV.respuesta.color }}" style-hover="background:#EFEAE1">Respuesta<span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:{{ sV.respuesta.iconColor }}">{{ sV.respuesta.icon }}</span></button></th>
               <th scope="col" style="text-align:right;padding:12px 16px;font-size:13px;font-weight:700;color:#4C5047;border-bottom:1px solid #E6E1D8">Acciones</th>
             </tr></thead>
             <tbody>
@@ -469,6 +806,7 @@ button,input,select,textarea{font-family:inherit}
                   <td style="padding:12px 16px"><div style="display:flex;align-items:center;gap:10px"><span aria-hidden="true" style="flex:none;width:32px;height:32px;border-radius:50%;background:#F1EADF;color:#5E4E37;display:grid;place-items:center;font-size:12px;font-weight:800">{{ r.whoIni }}</span><span style="font-weight:700">{{ r.who }}</span></div></td>
                   <td style="padding:12px 16px;white-space:nowrap">
                     <sc-if value="{{ r.mailOk }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:6px;color:#3A3D35"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:#2F7D4F">mark_email_read</span>Enviada {{ r.sent }}</span></sc-if>
+                    <sc-if value="{{ r.mailSelf }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:13px;font-size:12px;font-weight:700;background:#EFEAE1;color:#3A3D35"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">person_check</span>Autoasignada</span></sc-if>
                     <sc-if value="{{ r.mailErr }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:13px;font-size:12px;font-weight:700;background:#FBE9E5;color:#862C21"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">error</span>Error de envío</span></sc-if>
                   </td>
                   <td style="padding:12px 16px">
@@ -489,6 +827,19 @@ button,input,select,textarea{font-family:inherit}
               </sc-for>
             </tbody>
           </table>
+        </div>
+      </sc-if>
+      <sc-if value="{{ invPager.show }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px 16px;padding:10px 16px;border-top:1px solid #EFEAE1;font-size:14px;color:#4C5047;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:8px">Filas por página<select value="{{ invPager.size }}" onChange="{{ invPager.onSize }}" style="height:34px;padding:0 8px;border:1px solid #DDD6CA;border-radius:8px;background:#fff;font-size:14px;color:#23261F"><sc-for list="{{ invPager.sizes }}" as="z" hint-placeholder-count="4"><option value="{{ z.v }}">{{ z.v }}</option></sc-for></select></label>
+            <span aria-live="polite">{{ invPager.label }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onClick="{{ invPager.first }}" disabled="{{ invPager.prevDis }}" aria-label="Primera página" title="Primera página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ invPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">first_page</span></button><button onClick="{{ invPager.prev }}" disabled="{{ invPager.prevDis }}" aria-label="Página anterior" title="Página anterior" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ invPager.prevColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_left</span></button>
+            <span style="padding:0 6px;white-space:nowrap">{{ invPager.page }}</span>
+            <button onClick="{{ invPager.next }}" disabled="{{ invPager.nextDis }}" aria-label="Página siguiente" title="Página siguiente" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ invPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">chevron_right</span></button><button onClick="{{ invPager.last }}" disabled="{{ invPager.nextDis }}" aria-label="Última página" title="Última página" style="width:36px;height:36px;border:1px solid #DDD6CA;border-radius:9px;background:#fff;cursor:pointer;display:grid;place-items:center;color:{{ invPager.nextColor }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">last_page</span></button>
+          </div>
         </div>
       </sc-if>
       <sc-if value="{{ invEmptyA }}" hint-placeholder-val="{{ false }}">
@@ -715,7 +1066,7 @@ button,input,select,textarea{font-family:inherit}
             <span style="width:28px;height:28px;border-radius:8px;background:#3E6B4F"></span><span><strong>#3E6B4F</strong> primario y enlaces</span>
             <span style="width:28px;height:28px;border-radius:8px;background:#F8F7F3;border:1px solid #E6E1D8"></span><span><strong>#F8F7F3</strong> fondo</span>
             <span style="width:28px;height:28px;border-radius:8px;background:#F1EADF"></span><span><strong>#F1EADF</strong> arena, rol Miembro</span>
-            <span style="width:28px;height:28px;border-radius:8px;background:#E4EEF6"></span><span><strong>#E4EEF6 / #2A5C82</strong> info, rol Participante</span>
+            <span style="width:28px;height:28px;border-radius:8px;background:#E4EEF6"></span><span><strong>#E4EEF6 / #2A5C82</strong> información</span>
             <span style="width:28px;height:28px;border-radius:8px;background:#FBF0D9"></span><span><strong>#FBF0D9 / #7A5410</strong> aviso, sin cronograma</span>
             <span style="width:28px;height:28px;border-radius:8px;background:#A3372A"></span><span><strong>#A3372A</strong> destructivo</span>
           </div>
@@ -782,7 +1133,7 @@ button,input,select,textarea{font-family:inherit}
       <sc-if value="{{ dUser }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;gap:16px">
           <sc-if value="{{ fromSmNote }}" hint-placeholder-val="{{ false }}">
-            <div role="note" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#E4EEF6;color:#2A5C82;font-size:14px;line-height:1.45"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">info</span>Se registrará con el rol Participante y quedará asignado a la actividad del cronograma. Al terminar volverás al cronograma.</div>
+            <div role="note" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#E4EEF6;color:#2A5C82;font-size:14px;line-height:1.45"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">info</span>Se registrará con el rol Miembro y quedará asignado a la actividad del cronograma. Al terminar volverás al cronograma.</div>
           </sc-if>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:14px">
             <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Nombre</span><input autoFocus="{{ true }}" maxlength="50" value="{{ ff.nombre.value }}" onChange="{{ ff.nombre.onChange }}" onBlur="{{ ff.nombre.onBlur }}" aria-invalid="{{ ff.nombre.hasErr }}" style="height:42px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ ff.nombre.border }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><sc-if value="{{ ff.nombre.hasErr }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ ff.nombre.err }}</span></sc-if></label>
@@ -997,7 +1348,7 @@ button,input,select,textarea{font-family:inherit}
                       <sc-for list="{{ r.whoOpts }}" as="o" hint-placeholder-count="6">
                         <button type="button" role="option" aria-selected="{{ o.sel }}" onClick="{{ o.pick }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 12px;border:0;border-top:1px solid #F2EEE7;cursor:pointer;text-align:left;background:{{ o.bg }}" style-hover="background:#F8F7F3">
                           <span aria-hidden="true" style="flex:none;width:30px;height:30px;border-radius:50%;background:#F1EADF;color:#5E4E37;display:grid;place-items:center;font-size:12px;font-weight:800">{{ o.ini }}</span>
-                          <span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px;font-weight:700;color:#23261F">{{ o.name }}</span><span style="font-size:12px;color:#5F6259;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ o.rol }} · {{ o.email }}</span></span>
+                          <span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:14px;font-weight:700;color:#23261F">{{ o.name }}</span><span style="display:flex;align-items:center;gap:6px;min-width:0;margin-top:2px"><span style="flex:none;font-size:11px;font-weight:700;padding:1px 7px;border-radius:9px;background:{{ o.rolBg }};color:{{ o.rolColor }}">{{ o.rol }}</span><span style="font-size:12px;color:#5F6259;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ o.email }}</span></span></span>
                           <span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:#3E6B4F">{{ o.check }}</span>
                         </button>
                       </sc-for>
@@ -1006,6 +1357,12 @@ button,input,select,textarea{font-family:inherit}
                   </div>
                 </sc-if>
                 <sc-if value="{{ r.hasErrWho }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ r.errWho }}</span></sc-if>
+                <sc-if value="{{ r.hasAn }}" hint-placeholder-val="{{ false }}">
+                  <div role="status" aria-live="polite" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;font-size:14px;line-height:1.45;font-weight:700;background:{{ r.anBg }};border:1px solid {{ r.anBd }};color:{{ r.anC }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">{{ r.anIcon }}</span>{{ r.anText }}</div>
+                </sc-if>
+                <sc-if value="{{ r.selfAssign }}" hint-placeholder-val="{{ false }}">
+                  <div role="status" aria-live="polite" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#E4EEF6;border:1px solid #C9DCEC;color:#2A5C82;font-size:14px;line-height:1.45"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">person_check</span><span><strong style="display:block;font-weight:800">Te asignarás esta actividad</strong>Quedarás asignado de inmediato. No se envía invitación.</span></div>
+                </sc-if>
                 <sc-if value="{{ r.needDays }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid #E6E1D8;border-radius:12px;background:#FBFAF7">
                     <label style="display:flex;flex-wrap:wrap;align-items:center;gap:10px"><span style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:#3E6B4F">send</span>Días para confirmar</span>
@@ -1086,11 +1443,17 @@ button,input,select,textarea{font-family:inherit}
         <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Nuevo participante</span>
           <select value="{{ rTo }}" onChange="{{ onRTo }}" aria-invalid="{{ rShowTo }}" style="height:42px;padding:0 10px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ rToBorder }}"><option value="">Selecciona un usuario</option><sc-for list="{{ rUsers }}" as="u" hint-placeholder-count="5"><option value="{{ u.id }}">{{ u.label }}</option></sc-for></select>
           <sc-if value="{{ rShowTo }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#A3372A">{{ rToErr }}</span></sc-if></label>
-        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Días para confirmar</span>
+        <sc-if value="{{ rHasAn }}" hint-placeholder-val="{{ false }}">
+          <div role="status" aria-live="polite" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;font-size:14px;line-height:1.45;font-weight:700;background:{{ rAnBg }};border:1px solid {{ rAnBd }};color:{{ rAnC }}"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">{{ rAnIcon }}</span>{{ rAnText }}</div>
+        </sc-if>
+        <sc-if value="{{ rSelf }}" hint-placeholder-val="{{ false }}">
+          <div role="status" aria-live="polite" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#E4EEF6;border:1px solid #C9DCEC;color:#2A5C82;font-size:14px;line-height:1.45"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">person_check</span><span><strong style="display:block;font-weight:800">Te asignarás esta actividad</strong>Quedarás asignado de inmediato. No se envía invitación.</span></div>
+        </sc-if>
+        <sc-if value="{{ rNotSelf }}" hint-placeholder-val="{{ true }}"><label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">Días para confirmar</span>
           <span style="display:flex;align-items:center;gap:10px"><input type="text" inputmode="numeric" value="{{ rDays }}" onChange="{{ onRDays }}" placeholder="Ej. 7" aria-invalid="{{ rShowDays }}" style="width:110px;height:42px;padding:0 12px;border-radius:10px;background:#fff;font-size:15px;color:#23261F;border:1px solid {{ rDaysBorder }}" style-focus="border-color:#3E6B4F;outline:3px solid #CFE0D3;outline-offset:0"><span style="font-size:15px;color:#4C5047">días</span></span>
           <span style="font-size:13px;color:#5F6259">{{ rHelp }}</span>
           <sc-if value="{{ rShowDays }}" hint-placeholder-val="{{ false }}"><span role="alert" style="display:flex;gap:6px;align-items:center;font-size:13px;color:#A3372A"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">error</span>{{ rDaysErr }}</span></sc-if>
-          <sc-if value="{{ rHasDue }}" hint-placeholder-val="{{ false }}"><span style="display:flex;gap:6px;align-items:center;font-size:13px;font-weight:700;color:#2B5A3E"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">event_available</span>{{ rDue }}</span></sc-if></label>
+          <sc-if value="{{ rHasDue }}" hint-placeholder-val="{{ false }}"><span style="display:flex;gap:6px;align-items:center;font-size:13px;font-weight:700;color:#2B5A3E"><span aria-hidden="true" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">event_available</span>{{ rDue }}</span></sc-if></label></sc-if>
       </div>
       <div style="padding:14px 22px;border-top:1px solid #EFEAE1;display:flex;justify-content:flex-end;gap:10px">
         <button onClick="{{ rClose }}" style="height:42px;padding:0 16px;border:1px solid #D3CCBF;border-radius:10px;background:#fff;color:#23261F;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#F4F0E8">Cancelar</button>
@@ -1170,8 +1533,8 @@ const MIN60 = Array.from({ length:60 }, (_, i) => String(i).padStart(2,'0'));
 const splitT = hm => { if (!hm) return ['','','']; let [h,m] = hm.split(':').map(Number); const p = h >= 12 ? 'p' : 'a'; h = h % 12 || 12; return [String(h), String(m).padStart(2,'0'), p]; };
 const joinT = (h, m, p) => (h && m && p) ? `${String((+h % 12) + (p === 'p' ? 12 : 0)).padStart(2,'0')}:${m}` : '';
 let SEQ = 100; const nid = p => p + (++SEQ);
-const ROLES = ['Administrador','Participante','Miembro'];
-const ROLE_C = { Administrador:['#E3EEE5','#2B5A3E'], Participante:['#E4EEF6','#2A5C82'], Miembro:['#F1EADF','#5E4E37'] };
+const ROLES = ['Administrador','Miembro'];
+const ROLE_C = { Administrador:['#E3EEE5','#2B5A3E'], Miembro:['#F1EADF','#5E4E37'] };
 
 const USERS = [
   ['u1','Marcela','Vega','dimaveca18@gmail.com','','Administrador',true,'2026-08-02'],
@@ -1182,9 +1545,9 @@ const USERS = [
   ['u6','Alejandra','Vega Campos','vegacamposalejandra@gmail.com','','Miembro',true,'2026-10-04'],
   ['u7','Diana','Campos Cifuentes','dianaconferencista710@gmail.com','','Miembro',true,'2026-10-08'],
   ['u8','Regino','Puentes Meza','reginopm0897@gmail.com','1234dfdfd','Miembro',true,'2026-09-02'],
-  ['u9','Samuel','Díaz Ortiz','samuel.diaz@gmail.com','','Participante',true,'2026-09-10'],
+  ['u9','Samuel','Díaz Ortiz','samuel.diaz@gmail.com','','Miembro',true,'2026-09-10'],
   ['u10','Rosa','Medina Lara','rosamedina@gmail.com','','Miembro',false,'2026-08-20'],
-  ['u11','Tomás','Vidal Ruiz','tomasvidal@gmail.com','','Participante',true,'2026-09-15'],
+  ['u11','Tomás','Vidal Ruiz','tomasvidal@gmail.com','','Miembro',true,'2026-09-15'],
   ['u12','Elena','Cruz Mora','elenacruz@gmail.com','','Miembro',true,'2026-09-28'],
 ].map(([id,nombre,apellido,correo,tel,rol,activo,created]) => ({ id,nombre,apellido,correo,tel,rol,activo,created }));
 const EVENTS = [
@@ -1202,6 +1565,8 @@ const SCHED = [
   { id:'s5', ev:'e3', act:'Estudio bíblico', desc:'', ini:'19:30', fin:'20:30', who:'u11' },
   { id:'s6', ev:'e4', act:'Recepción y bienvenida', desc:'Recibir a los asistentes en la entrada.', ini:'10:00', fin:'10:30', who:'u8' },
   { id:'s7', ev:'e4', act:'Lectura bíblica', desc:'', ini:'11:00', fin:'11:15', who:'u8' },
+  { id:'s8', ev:'e3', act:'Oración final', desc:'', ini:'20:30', fin:'21:00', who:'u1' },
+  { id:'s9', ev:'e4', act:'Bienvenida pastoral', desc:'', ini:'12:00', fin:'12:30', who:'u1' },
 ];
 const MINS = [
   { id:'m1', name:'Escuela Sabatica', icon:'menu_book', desc:'Enfocado en la lectura y estudio de la lección de escuela sabatica para adultos', members:['u5'] },
@@ -1235,8 +1600,21 @@ const INVS = [
   { id:'i6', ev:'e4', act:'Lectura de la palabra', ini:'10:30', fin:'11:00', who:'u8', sent:'2026-10-03', mail:'ok', st:'cancelada' },
   { id:'i7', ev:'e2', act:'Cierre y testimonios', ini:'10:00', fin:'11:00', who:'u9', sent:'2026-10-01', mail:'ok', st:'aceptada', answered:'2026-10-01' },
   { id:'i8', ev:'e3', act:'Estudio bíblico', ini:'19:30', fin:'20:30', who:'u11', sent:'2026-10-05', mail:'error', st:'pendiente' },
+  { id:'i10', ev:'e3', act:'Oración final', ini:'20:30', fin:'21:00', who:'u1', by:'u3', sent:'2026-10-06', mail:'ok', st:'pendiente', due:'2026-10-14' },
+  { id:'i11', ev:'e4', act:'Bienvenida pastoral', ini:'12:00', fin:'12:30', who:'u1', sent:'2026-10-04', mail:'self', st:'aceptada', answered:'2026-10-04' },
   { id:'i9', ev:'e2', act:'Reunión y oración inicial', ini:'06:00', fin:'06:30', who:'u12', sent:'2026-10-04', mail:'ok', st:'pendiente' },
 ];
+const FN = ['Ana','Luis','Carmen','Jorge','Lucía','Pedro','Sofía','Miguel','Valentina','Andrés','Paula','Felipe','Camila','Juan','Mariana','Daniel','Natalia','Sebastián','Gabriela','Mateo'];
+const LN = ['Gómez','Rodríguez','López','Martínez','García','Pérez','Sánchez','Ramírez','Torres','Flórez','Rivera','Morales','Castro','Ortiz','Rojas','Herrera'];
+const ascii = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const genEnr = (ev, n, seed) => Array.from({ length:n }, (_, i) => { const f = FN[(i * 7 + seed) % FN.length], l = LN[(i * 5 + seed * 3) % LN.length], l2 = LN[(i * 3 + seed + 1) % LN.length];
+  return { id:`r${ev}${i}`, name:`${f} ${l} ${l2}`, email:`${ascii(f)}.${ascii(l)}${i}@gmail.com`, date:`2026-09-${String(10 + (i % 20)).padStart(2,'0')}`, by: i % 9 === 0 ? 'u3' : 'self', note: i % 13 === 0 ? 'Asistirá con un acompañante menor de edad.' : '' }; });
+const ENR = {
+  e1: genEnr('e1', 64, 2),
+  e2: genEnr('e2', 79, 5),
+  e3: [{ id:'re3u12', uid:'u12', date:'2026-10-02', by:'self', note:'' }, ...genEnr('e3', 116, 3)],
+  e4: [{ id:'re4u4', uid:'u4', date:'2026-10-06', by:'self', note:'Llevará pan para la Santa Cena.' }, { id:'re4u6', uid:'u6', date:'2026-10-05', by:'u1', note:'' }, { id:'re4u10', uid:'u10', date:'2026-10-01', by:'self', note:'' }, ...genEnr('e4', 147, 1)],
+};
 const MAXES = { titulo:150, descripcion:2000, lugar:200, direccion:255, nombre:255, desc:255, ntitulo:200 };
 
 class Component extends DCLogic {
@@ -1288,7 +1666,8 @@ class Component extends DCLogic {
     if (kind === 'event') { req('titulo','Escribe el título.'); req('descripcion','Escribe una descripción.'); req('lugar','Indica el lugar.');
       req('fechaIni','Elige la fecha.'); req('horaIni','Elige la hora.'); req('fechaFin','Elige la fecha.'); req('horaFin','Elige la hora.');
       if (!e.fechaIni && !e.horaIni && !e.fechaFin && !e.horaFin && (f.fechaFin + f.horaFin) <= (f.fechaIni + f.horaIni)) e.fin = 'El fin debe ser posterior al inicio.';
-      if (!String(f.capacidad).trim()) e.capacidad = 'Indica la capacidad.'; else if (!(+f.capacidad > 0) || !Number.isInteger(+f.capacidad)) e.capacidad = 'Usa un número entero mayor que 0.'; }
+      if (!String(f.capacidad).trim()) e.capacidad = 'Indica la capacidad.'; else if (!(+f.capacidad > 0) || !Number.isInteger(+f.capacidad)) e.capacidad = 'Usa un número entero mayor que 0.';
+      if (!e.capacidad && this.state.formId) { const o = this.occ(this.state.formId); if (+f.capacidad < o.total) e.capacidad = `Hay ${o.total} lugares ocupados. El aforo no puede ser menor.`; } }
     if (kind === 'notif') { if (!f.to.length) e.to = 'Elige al menos un destinatario.'; req('titulo','Escribe el título.'); req('mensaje','Escribe el mensaje.'); if ((f.mensaje || '').length > 2000) e.mensaje = 'Máximo 2000 caracteres.'; }
     if (kind === 'notifEdit') { req('titulo','Escribe el título.'); req('mensaje','Escribe el mensaje.'); }
     return e;
@@ -1363,6 +1742,113 @@ class Component extends DCLogic {
   delNotif(n) { this.ask({ title:'Eliminar notificación', body:`¿Seguro que quieres eliminar "${n.title}" enviada a ${this.uname(this.user(n.to))}? Esta acción no se puede deshacer.`, label:'Eliminar',
     action:() => { this.setState(s => ({ notifs:s.notifs.filter(x => x.id !== n.id), nSel: s.nSel === n.id ? null : s.nSel })); this.toast('Notificación eliminada.'); } }); }
 
+  sortBy(key, arr, acc) { const st = (this.state.sort || {})[key]; if (!st || !acc[st.col]) return arr; const f = acc[st.col]; const d = st.dir === 'desc' ? -1 : 1;
+    return [...arr].sort((a, b) => { const x = f(a), y = f(b); return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x ?? '').localeCompare(String(y ?? ''), 'es', { numeric:true, sensitivity:'base' })) * d; }); }
+  sortUI(key, cols) { const st = (this.state.sort || {})[key] || {}; const o = {};
+    cols.forEach(c => { const on = st.col === c; o[c] = { aria: on ? (st.dir === 'asc' ? 'ascending' : 'descending') : 'none', icon: on ? (st.dir === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more',
+      iconColor: on ? '#2F5540' : '#8A8C83', color: on ? '#23261F' : '#4C5047', label: on ? (st.dir === 'asc' ? 'orden ascendente; activa para descendente' : 'orden descendente; activa para quitar el orden') : 'sin orden; activa para ordenar',
+      onClick: () => this.setState(s2 => { const cur = (s2.sort || {})[key]; const next = !cur || cur.col !== c ? { col:c, dir:'asc' } : cur.dir === 'asc' ? { col:c, dir:'desc' } : null;
+        const pg = { ...(s2.pg || {}) }; Object.keys(pg).forEach(k => { if (k === key || k.startsWith(key + '_')) pg[k] = 0; }); return { sort:{ ...(s2.sort || {}), [key]: next }, pg }; }) }; });
+    return o; }
+  pager(key, n, def = 10) {
+    const s = this.state; const ps = (s.ps || {})[key] || def; const pages = Math.max(1, Math.ceil(n / ps)); const pg = Math.min((s.pg || {})[key] || 0, pages - 1);
+    const set = p => this.setState(st => ({ pg:{ ...(st.pg || {}), [key]:p } })); const first = pg === 0, last = pg >= pages - 1;
+    return { from: pg * ps, to: pg * ps + ps, ui: { show: n > 0, label: `${n ? pg * ps + 1 : 0}–${Math.min(n, pg * ps + ps)} de ${n}`, page:`Página ${pg + 1} de ${pages}`, size: String(ps),
+      sizes: [10, 25, 50, 100].map(v => ({ v:String(v) })), onSize: e => { const v = +e.target.value; this.setState(st => ({ ps:{ ...(st.ps || {}), [key]:v }, pg:{ ...(st.pg || {}), [key]:0 } })); },
+      first: () => set(0), prev: () => set(Math.max(0, pg - 1)), next: () => set(Math.min(pages - 1, pg + 1)), last: () => set(pages - 1),
+      prevDis: first, nextDis: last, prevColor: first ? '#B9B6AD' : '#23261F', nextColor: last ? '#B9B6AD' : '#23261F' } };
+  }
+  partsOf(evId) { return [...new Set(this.state.sched.filter(x => x.ev === evId && x.who && this.user(x.who)).map(x => x.who))]; }
+  enrOf(evId) { return (this.state.enr || ENR)[evId] || []; }
+  occ(evId) { const e = this.state.events.find(x => x.id === evId); const parts = this.partsOf(evId).length, pub = this.enrOf(evId).length; const cap = e ? e.cap : 0; const total = parts + pub; return { cap, parts, pub, total, disp: cap - total, over: total > cap }; }
+  setEnr(evId, fn) { this.setState(st => { const all = st.enr || ENR; return { enr:{ ...all, [evId]: fn(all[evId] || []) } }; }); }
+  dropEnr(evId, uids) { this.setEnr(evId, rs => rs.filter(r => !uids.includes(r.uid))); }
+  assignNote(evId, uid) { if (!uid || this.partsOf(evId).includes(uid)) return null; const o = this.occ(evId);
+    if (this.enrOf(evId).some(r => r.uid === uid)) return { kind:'info', text:`${this.uname(this.user(uid))} está inscrito como público. Su inscripción se reemplazará por la participación.` };
+    if (o.disp <= 0) return { kind:'warn', text:`El evento está lleno. Si continúas quedará con sobrecupo de ${-o.disp + 1}.` };
+    return null; }
+  occV(e) { const o = this.occ(e.id); return { occLabel:`${o.total} / ${o.cap}`, occSub: o.over ? `Sobrecupo: ${-o.disp}` : o.disp === 0 ? 'Lleno' : `${o.disp} disponibles`,
+    occColor: o.over ? '#A3372A' : '#23261F', occSubColor: o.over ? '#A3372A' : o.disp === 0 ? '#7A5410' : '#5F6259' }; }
+  aforoVals(ev0) {
+    if (!ev0) return {};
+    const s = this.state; const o = this.occ(ev0.id); const base = Math.max(o.cap, o.total) || 1; const pc = n => `${(n / base * 100).toFixed(2)}%`;
+    const tab = s.insTab || 'publico'; const q = (s.insQ || '').trim().toLowerCase(); const past = (ev0.dateEnd || ev0.date) < TODAY;
+    const all = this.enrOf(ev0.id).map(r => { const u = r.uid ? this.user(r.uid) : null; return { r, name: u ? this.uname(u) : r.name, email: u ? u.correo : r.email }; })
+      .filter(x => !q || (x.name + ' ' + x.email).toLowerCase().includes(q));
+    const allS = this.sortBy('ins', all, { persona: x => x.name, inscripcion: x => x.r.date, por: x => x.r.by === 'self' ? '' : x.r.by, nota: x => x.r.note || '\uffff' });
+    const pI = this.pager('ins_' + ev0.id, allS.length);
+    const rows = allS.slice(pI.from, pI.to).map(({ r, name, email }) => ({ name, email, ini: ini(name), date: fmtD(r.date),
+      by: r.by === 'self' ? 'Él mismo' : this.uname(this.user(r.by)) + (r.by === ME ? ' (Tú)' : ''), byIcon: r.by === 'self' ? 'person' : 'admin_panel_settings',
+      note: r.note || '—', noteColor: r.note ? '#3A3D35' : '#8A8C83',
+      edit: () => this.setState({ insEdit:{ id:r.id, note:r.note || '', name } }), editAria:`Editar nota de ${name}`,
+      del: () => this.ask({ title:'Eliminar inscripción', body:`${name} perderá su cupo en «${ev0.name}». El cupo quedará disponible.`, label:'Eliminar inscripción',
+        action: () => { this.setEnr(ev0.id, rs => rs.filter(x => x.id !== r.id)); this.toast(`Inscripción de ${name} eliminada.`); } }), delAria:`Eliminar inscripción de ${name}` }));
+    const partIds = this.partsOf(ev0.id);
+    const partRows = partIds.map(uid => { const u = this.user(uid); const acts = s.sched.filter(x => x.ev === ev0.id && x.who === uid).map(x => x.act);
+      const iv = (s.invs || INVS).filter(x => x.ev === ev0.id && x.who === uid && !x.moved); const st = iv.some(x => x.st === 'pendiente') ? INV_ST.pendiente : iv.length && iv.every(x => x.st === 'aceptada') ? INV_ST.aceptada : null;
+      return { name: this.uname(u) + (uid === ME ? ' (Tú)' : ''), ini: ini(this.uname(u)), role: u.rol, acts: acts.join(' · '), hasSt: !!st, stL: st ? st.l : '', stI: st ? st.i : '', stBg: st ? st.bg : '', stC: st ? st.c : '', noSt: !st, go: () => this.go('participaciones'), goAria:`Gestionar participación de ${this.uname(u)}` }; });
+    let im = {};
+    if (s.insAdd) { const iq = (s.insAdd.q || '').trim().toLowerCase(); const enrolledIds = this.enrOf(ev0.id).map(r => r.uid).filter(Boolean); const sel = s.insAdd.sel;
+      const list = s.users.filter(u => u.activo && (!iq || (this.uname(u) + ' ' + u.correo).toLowerCase().includes(iq))).sort((a,b) => (b.id === ME) - (a.id === ME) || this.uname(a).localeCompare(this.uname(b))).map(u => {
+        const why = partIds.includes(u.id) ? 'Participa en el evento' : enrolledIds.includes(u.id) ? 'Ya está inscrito' : ''; const on = sel === u.id;
+        return { name: this.uname(u) + (u.id === ME ? ' (Tú)' : ''), email:u.correo, ini: ini(this.uname(u)), dis: !!why, why, hasWhy: !!why, sel: on ? 'true' : 'false',
+          icon: why ? 'block' : on ? 'radio_button_checked' : 'radio_button_unchecked', iconColor: why ? '#B9B6AD' : on ? '#3E6B4F' : '#8A8C83', bg: on ? '#F3F7F2' : '#fff', nameColor: why ? '#6B6E65' : '#23261F', cursor: why ? 'not-allowed' : 'pointer',
+          pick: why ? undefined : () => this.setState(st => ({ insAdd:{ ...st.insAdd, sel:u.id } })) }; });
+      im = { insList: list, insListEmpty: !list.length, insQ2: s.insAdd.q || '', onInsQ2: e => { const v = e.target.value; this.setState(st => ({ insAdd:{ ...st.insAdd, q:v } })); },
+        insNote: s.insAdd.note || '', onInsNote: e => { const v = e.target.value.slice(0, 200); this.setState(st => ({ insAdd:{ ...st.insAdd, note:v } })); }, insNoteCount: `${(s.insAdd.note || '').length}/200`,
+        insAddBtn: { disabled: !sel, bg: sel ? '#3E6B4F' : '#ECE7DE', color: sel ? '#fff' : '#7C7E76', cursor: sel ? 'pointer' : 'not-allowed' },
+        insAddSubmit: () => { if (!sel) return; const u = this.user(sel); this.setEnr(ev0.id, rs => [{ id:'r' + Date.now(), uid:sel, date:TODAY, by:ME, note:(s.insAdd.note || '').trim() }, ...rs]);
+          this.setState({ insAdd:null, insPage:0, insQ:'' }); const left = Math.max(0, o.disp - 1); this.toast(`${this.uname(u)} quedó inscrito. Quedan ${left} ${left === 1 ? 'cupo' : 'cupos'}.`); } };
+    }
+    const full = o.disp <= 0; const block = full || past;
+    return { af: { cap:o.cap, parts:o.parts, pub:o.pub, dispLabel: o.over ? `Sobrecupo: ${-o.disp}` : String(o.disp), dispColor: o.over ? '#A3372A' : o.disp === 0 ? '#7A5410' : '#23261F',
+        dispSub: o.over ? 'Supera el aforo' : o.disp === 0 ? 'Evento lleno' : 'Para público', dispBg: o.over ? '#FDF5F3' : '#FBFAF7', dispBd: o.over ? '#F4DCD6' : '#EFEAE1',
+        wParts: pc(o.parts), wPub: pc(o.pub), capLeft: pc(o.cap), capMarker: o.over ? '#A3372A' : '#5F6259', over: o.over, full: o.disp === 0,
+        barAria: `${o.parts} participantes, ${o.pub} de público y ${Math.max(0, o.disp)} disponibles sobre un aforo de ${o.cap}${o.over ? `; sobrecupo de ${-o.disp}` : ''}.`,
+        overText: `Hay ${o.total} lugares ocupados y el aforo es de ${o.cap}. Se asignaron participantes cuando el evento ya estaba lleno. Elimina inscripciones de público o aumenta el aforo.`,
+        cupoPub: `Cupo para público: ${o.cap - o.parts} (aforo menos participantes).` },
+      insTabs: [['publico', `Público · ${o.pub}`], ['participantes', `Participantes · ${o.parts}`]].map(([k, l]) => ({ label:l, pressed: tab === k ? 'true' : 'false', bg: tab === k ? '#fff' : 'transparent', color: tab === k ? '#23261F' : '#4C5047', shadow: tab === k ? '0 1px 3px rgba(35,38,31,0.12)' : 'none', onClick: () => this.setState({ insTab:k }) })),
+      insPub: tab === 'publico', insPart: tab === 'participantes', insQ: s.insQ || '', onInsQ: e => this.setState({ insQ:e.target.value, insPage:0 }),
+      insRows: rows, insHas: !!rows.length, insEmpty: !rows.length, insEmptyText: q ? 'Nadie coincide con la búsqueda.' : 'Aún no hay inscritos.',
+      insPager: pI.ui,
+      partRows, partHas: !!partRows.length, partEmpty: !partRows.length,
+      insAddDis: block, insAddWhy: past ? 'El evento ya finalizó.' : o.over ? 'No hay cupos: el evento tiene sobrecupo.' : full ? 'No hay cupos disponibles para público.' : '',
+      insAddBg: block ? '#ECE7DE' : '#3E6B4F', insAddColor: block ? '#6B6E65' : '#fff', insAddCursor: block ? 'not-allowed' : 'pointer',
+      openInsAdd: () => { if (!block) this.setState({ insAdd:{ q:'', sel:null, note:'' } }); }, insAdd: !!s.insAdd, closeInsAdd: () => this.setState({ insAdd:null }), insAddDisp: `Quedan ${Math.max(0, o.disp)} cupos para público en «${ev0.name}».`, ...im,
+      insEdit: !!s.insEdit, insEditName: s.insEdit ? s.insEdit.name : '', insEditNote: s.insEdit ? s.insEdit.note : '', insEditCount: `${s.insEdit ? s.insEdit.note.length : 0}/200`,
+      onInsEditNote: e => { const v = e.target.value.slice(0, 200); this.setState(st => ({ insEdit:{ ...st.insEdit, note:v } })); },
+      closeInsEdit: () => this.setState({ insEdit:null }), saveInsEdit: () => { const ed = s.insEdit; this.setEnr(ev0.id, rs => rs.map(x => x.id === ed.id ? { ...x, note: ed.note.trim() } : x)); this.setState({ insEdit:null }); this.toast('Nota actualizada.'); } };
+  }
+  myVals() {
+    const s = this.state; const all = (s.invs || INVS).filter(i => i.who === ME); const tab = s.myTab || 'pendientes';
+    const pend = all.filter(i => i.st === 'pendiente'), resp = all.filter(i => i.st !== 'pendiente');
+    const evOf = i => s.events.find(x => x.id === i.ev) || {};
+    const rows = (tab === 'pendientes' ? pend : resp).slice().sort((a,b) => ((evOf(a).date || '') + a.ini).localeCompare((evOf(b).date || '') + b.ini)).map(i => {
+      const e = evOf(i); const m = INV_ST[i.st]; const d = e.date ? pd(e.date) : pd(TODAY); const self = i.mail === 'self'; const by = this.user(i.by); const muted = ['vencida','cancelada','revocada'].includes(i.st);
+      return { act:i.act, ev:e.name || '', place:e.place || '', mon:MON[d.getMonth()].toUpperCase(), day:String(d.getDate()).padStart(2,'0'), date: e.date ? fmtD(e.date) : '', time:`${fmtT(i.ini)} – ${fmtT(i.fin)}`,
+        stLabel:m.l, stIcon:m.i, stBg:m.bg, stColor:m.c, dateBg: muted ? '#EFEAE1' : '#EEF3EE', dateColor: muted ? '#55594F' : '#2F5540', titleColor: muted ? '#5F6259' : '#23261F',
+        origin: self ? `Te asignaste el ${fmtD(i.answered || i.sent)}` : `Invitado por ${by ? this.uname(by) : 'la administración'} el ${fmtD(i.sent)}`,
+        pending: i.st === 'pendiente', hasDue: i.st === 'pendiente' && !!i.due, dueLabel: i.due ? `Responde antes del ${fmtD(i.due)}` : '',
+        isAcc: i.st === 'aceptada', accText: self ? 'Asignación propia: no requiere respuesta.' : `Confirmaste tu participación el ${fmtD(i.answered || TODAY)}.`,
+        isRej: i.st === 'rechazada', rejText: `Indicaste que no podrás participar${i.reason ? ': «' + i.reason + '»' : ''}.`,
+        isOff: muted, offText: i.st === 'vencida' ? 'El plazo para responder terminó.' : i.st === 'revocada' ? 'Tu asignación fue revocada.' : 'La invitación fue cancelada.',
+        accept: () => this.setState({ myDlg:{ id:i.id, acc:true }, myReason:'' }), reject: () => this.setState({ myDlg:{ id:i.id, acc:false }, myReason:'' }),
+        acceptAria:`Aceptar participación en ${i.act}`, rejectAria:`Rechazar participación en ${i.act}` }; });
+    const tb = (k, l, n) => ({ label:l, count:n, pressed: tab === k ? 'true' : 'false', bg: tab === k ? '#fff' : 'transparent', color: tab === k ? '#23261F' : '#4C5047', shadow: tab === k ? '0 1px 3px rgba(35,38,31,0.12)' : 'none', onClick: () => this.setState({ myTab:k }) });
+    const empty = !all.length ? ['Aún no tienes invitaciones', 'Cuando te asignen a una actividad, la verás aquí para confirmar.'] : tab === 'pendientes' ? ['No tienes invitaciones pendientes', 'Las nuevas invitaciones aparecerán aquí.'] : ['Aún no has respondido invitaciones', 'Las que aceptes o rechaces aparecerán aquí.'];
+    const dl = s.myDlg && (s.invs || INVS).find(i => i.id === s.myDlg.id); const acc = !!(s.myDlg && s.myDlg.acc); const de = dl ? evOf(dl) : {};
+    return { myTabs:[tb('pendientes','Pendientes',pend.length), tb('respondidas','Respondidas',resp.length)], myRows: rows, myHas: !!rows.length, myEmpty: !rows.length, myEmptyTitle: empty[0], myEmptyBody: empty[1],
+      mySummary: pend.length ? `Tienes ${pend.length} ${pend.length === 1 ? 'invitación pendiente' : 'invitaciones pendientes'}.` : 'No tienes invitaciones pendientes.',
+      myDlg: !!dl, myRej: !acc, myDlgTitle: acc ? 'Confirmar participación' : 'Rechazar participación', myDlgAct: dl ? dl.act : '', myDlgEv: dl ? `${de.name || ''} · ${de.date ? fmtD(de.date) : ''} · ${fmtT(dl.ini)} – ${fmtT(dl.fin)}` : '',
+      myDlgBody: acc ? 'Quien te invitó verá que confirmaste.' : 'Tu respuesta quedará registrada y la actividad quedará pendiente de asignación.',
+      myDlgIcon: acc ? 'how_to_reg' : 'event_busy', myDlgIconBg: acc ? '#E3EEE5' : '#FBE9E5', myDlgIconColor: acc ? '#2F7D4F' : '#A3372A',
+      myDlgBtn: s.myBusy ? (acc ? 'Confirmando…' : 'Enviando…') : (acc ? 'Sí, participaré' : 'No podré participar'), myDlgBtnBg: acc ? '#3E6B4F' : '#A3372A', myBusy: !!s.myBusy,
+      myReason: s.myReason || '', onMyReason: e => this.setState({ myReason: e.target.value.slice(0, 255) }), myReasonCount: `${(s.myReason || '').length}/255`,
+      myCancel: () => { if (!this.state.myBusy) this.setState({ myDlg:null }); },
+      mySubmit: () => { if (s.myBusy || !dl) return; this.setState({ myBusy:true }); clearTimeout(this.myT); this.myT = setTimeout(() => { const reason = (this.state.myReason || '').trim();
+        this.setState(st => ({ myBusy:false, myDlg:null, invs:(st.invs || INVS).map(x => x.id === dl.id ? { ...x, st: acc ? 'aceptada' : 'rechazada', answered:TODAY, reason: acc ? '' : reason } : x) }));
+        this.toast(acc ? `Confirmaste tu participación en «${dl.act}».` : 'Registramos que no podrás participar. La actividad quedó pendiente de asignación.'); }, 800); } };
+  }
   invVals() {
     const s = this.state; const invs = s.invs || INVS; const tab = s.invTab || 'todas'; const q = (s.invQ || '').trim().toLowerCase();
     const evOk = i => { const e = s.events.find(x => x.id === i.ev); return !!e && Math.round((pd(e.date) - pd(TODAY)) / 86400000) >= 2; };
@@ -1373,9 +1859,9 @@ class Component extends DCLogic {
       .filter(r => !q || (r.i.act + ' ' + (r.e ? r.e.name : '') + ' ' + this.uname(r.u)).toLowerCase().includes(q))
       .sort((a,b) => ((a.e ? a.e.date : '') + a.i.ini).localeCompare((b.e ? b.e.date : '') + b.i.ini))
       .map(({ i, e, u }) => { const m = INV_ST[i.st]; const err = i.mail === 'error'; const nd = needs(i);
-        return { act:i.act, evLine: e ? `${e.name} · ${fmtD(e.date)} · ${fmtT(i.ini)} – ${fmtT(i.fin)}` : '', who:this.uname(u), whoIni: ini(this.uname(u)),
-          sent: fmtD(i.sent), mailErr: err, mailOk: !err, stLabel:m.l, stIcon:m.i, stBg:m.bg, stColor:m.c,
-          hasAnswered: !!i.answered, answered: i.answered ? `Respondió el ${fmtD(i.answered)}` : '', hasReason: !!i.reason, reason: i.reason ? `«${i.reason}»` : '',
+        return { _sent: i.sent, act:i.act, evLine: e ? `${e.name} · ${fmtD(e.date)} · ${fmtT(i.ini)} – ${fmtT(i.fin)}` : '', who:this.uname(u) + (i.who === ME ? ' (Tú)' : ''), whoIni: ini(this.uname(u)),
+          sent: fmtD(i.sent), mailErr: err, mailOk: !err && i.mail !== 'self', mailSelf: i.mail === 'self', stLabel:m.l, stIcon:m.i, stBg:m.bg, stColor:m.c,
+          hasAnswered: !!i.answered, answered: i.answered ? (i.mail === 'self' ? 'Autoasignada el ' : 'Respondió el ') + fmtD(i.answered) : '', hasReason: !!i.reason, reason: i.reason ? `«${i.reason}»` : '',
           needs: nd, canCancel: i.st === 'pendiente', canRevoke: i.st === 'aceptada' && evOk(i),
           hasMoved: !!i.moved, movedLabel: i.moved ? `Reasignada a ${this.uname(this.user(i.moved))}` : '',
           hasDue: i.st === 'pendiente' && !!i.due, dueLabel: i.due ? `Plazo: ${fmtD(i.due)}` : '',
@@ -1394,7 +1880,8 @@ class Component extends DCLogic {
       const toEv = e ? Math.round((pd(e.date) - pd(TODAY)) / 86400000) : 0; const maxD = Math.min(30, toEv - 1);
       const err = {}; const n = Number(d.days);
       if (!d.to) err.to = 'Elige a quién asignar la actividad.';
-      if (maxD < 1) err.days = 'El evento es mañana o ya pasó: no queda tiempo para pedir confirmación.';
+      const selfP = d.to === ME;
+      if (selfP) {} else if (maxD < 1) err.days = 'El evento es mañana o ya pasó: no queda tiempo para pedir confirmación.';
       else if (!String(d.days).trim()) err.days = `Escribe un número de días entre 1 y ${maxD}.`;
       else if (!/^\d+$/.test(String(d.days).trim())) err.days = 'Usa solo números enteros.';
       else if (n < 1 || n > 30) err.days = 'El plazo debe estar entre 1 y 30 días.';
@@ -1404,25 +1891,28 @@ class Component extends DCLogic {
       const show = k => !!err[k] && (d.tried || (k === 'days' && (String(d.days).length > 0 || maxD < 1)));
       const setD = (k, v) => this.setState(st => ({ rDlg:{ ...st.rDlg, [k]:v } }));
       const taken = invs.filter(x => x.ev === ri.ev && x.act === ri.act && x.st === 'pendiente').map(x => x.who);
-      rV = { rDlg:true, rRev: rev, rReas: !rev, rTitle: rev ? 'Revocar confirmación y cambiar participante' : 'Reasignar actividad',
+      const anR = d.to ? this.assignNote(ri.ev, d.to) : null; const wR = !!anR && anR.kind === 'warn';
+      rV = { rDlg:true, rHasAn: !!anR, rAnText: anR ? anR.text : '', rAnBg: wR ? '#FBF0D9' : '#E4EEF6', rAnBd: wR ? '#F0DDB4' : '#C9DCEC', rAnC: wR ? '#5E4210' : '#2A5C82', rAnIcon: wR ? 'warning' : 'info', rRev: rev && ri.who !== ME, rReas: !rev, rSelf: selfP, rNotSelf: !selfP, rTitle: rev ? (ri.who === ME ? 'Dejar esta actividad y asignar a otra persona' : 'Revocar confirmación y cambiar participante') : 'Reasignar actividad',
         rAct: ri.act, rEv: e ? `${e.name} · ${fmtD(e.date)} · ${fmtT(ri.ini)} – ${fmtT(ri.fin)}` : '',
-        rCur: this.uname(cur), rCurState: rev ? 'Confirmó su participación' : (ri.st === 'vencida' ? 'No respondió a tiempo' : 'Indicó que no podrá participar'),
+        rCur: this.uname(cur) + (ri.who === ME ? ' (Tú)' : ''), rCurState: rev ? (ri.mail === 'self' ? 'Te asignaste esta actividad' : 'Confirmó su participación') : (ri.st === 'vencida' ? 'No respondió a tiempo' : 'Indicó que no podrá participar'),
         rCurReason: ri.reason ? `«${ri.reason}»` : '', rHasReason: !!ri.reason,
-        rUsers: s.users.filter(u => u.activo && u.id !== ri.who && !taken.includes(u.id)).map(u => ({ id:u.id, label:`${this.uname(u)} · ${u.rol}` })),
+        rUsers: s.users.filter(u => u.activo && u.id !== ri.who && !taken.includes(u.id)).sort((a,b) => (b.id === ME) - (a.id === ME) || this.uname(a).localeCompare(this.uname(b))).map(u => ({ id:u.id, label:`${this.uname(u)}${u.id === ME ? ' (Tú)' : ''} · ${u.rol} · ${u.correo}` })),
         rTo: d.to, onRTo: ev => setD('to', ev.target.value), rDays: d.days, onRDays: ev => setD('days', ev.target.value.replace(/[^\d]/g, '').slice(0, 2)),
         rToErr: err.to || '', rShowTo: show('to'), rToBorder: show('to') ? '#A3372A' : '#DDD6CA',
         rDaysErr: err.days || '', rShowDays: show('days'), rDaysBorder: show('days') ? '#A3372A' : '#DDD6CA',
         rMax: maxD, rHelp: maxD >= 1 ? `Entre 1 y ${maxD} días. El evento es el ${e ? fmtD(e.date) : ''} (en ${toEv} días).` : '',
         rHasDue: !!dueStr, rDue: dueStr ? `Deberá responder antes del ${fmtD(dueStr)}, ${toEv - n} ${toEv - n === 1 ? 'día' : 'días'} antes del evento.` : '',
-        rBtn: rev ? 'Revocar y enviar invitación' : 'Enviar invitación', rBtnBg: rev ? '#A3372A' : '#3E6B4F',
+        rBtn: selfP ? 'Asignarme' : rev ? 'Revocar y enviar invitación' : 'Enviar invitación', rBtnBg: rev && !selfP && ri.who !== ME ? '#A3372A' : '#3E6B4F',
         rClose: () => this.setState({ rDlg:null }),
         rSubmit: () => { if (Object.keys(err).length) { setD('tried', true); return; }
           const nu = this.user(d.to); const nid2 = 'i' + Date.now();
           this.setState(st => ({ rDlg:null, invs:[ ...(st.invs || INVS).map(x => x.id === ri.id ? { ...x, st: rev ? 'revocada' : x.st, moved: d.to } : x),
-            { id:nid2, ev:ri.ev, act:ri.act, ini:ri.ini, fin:ri.fin, who:d.to, sent:TODAY, mail:'ok', st:'pendiente', due:dueStr } ] }));
+            { id:nid2, ev:ri.ev, act:ri.act, ini:ri.ini, fin:ri.fin, who:d.to, sent:TODAY, ...(selfP ? { mail:'self', st:'aceptada', answered:TODAY, due:'' } : { mail:'ok', st:'pendiente', due:dueStr }) } ] }));
+          this.dropEnr(ri.ev, [d.to]);
+          if (selfP) { this.toast(`Te asignaste «${ri.act}».`); return; }
           this.toast(`${rev ? 'Confirmación revocada. ' : ''}Invitación enviada a ${this.uname(nu)}; tiene hasta el ${fmtD(dueStr)} para responder.`); } };
     }
-    return { ...rV, invTabsA: tabs, invRowsA: rows, invHasA: !!rows.length, invEmptyA: !rows.length, invQ: s.invQ || '', onInvQ: e => this.setState({ invQ:e.target.value }),
+    return { ...rV, invTabsA: tabs, invRowsA: this.sortBy('inv', rows, { actividad: r => r.act, participante: r => r.who, envio: r => r._sent, respuesta: r => r.stLabel }).slice(this.pager('inv', rows.length).from, this.pager('inv', rows.length).to), invPager: this.pager('inv', rows.length).ui, invHasA: !!rows.length, invEmptyA: !rows.length, invQ: s.invQ || '', onInvQ: e => this.setState({ invQ:e.target.value }),
       invAlert: nA + nE > 0, invAlertText: [nA ? `${nA} ${nA === 1 ? 'actividad necesita' : 'actividades necesitan'} una nueva asignación` : '', nE ? `${nE} ${nE === 1 ? 'invitación no se pudo enviar' : 'invitaciones no se pudieron enviar'}` : ''].filter(Boolean).join(' y ') + '.',
       invAlertGo: () => this.setState({ invTab: nA ? 'asignar' : 'error' }), goParticipaciones: () => this.go('participaciones') };
   }
@@ -1432,16 +1922,18 @@ class Component extends DCLogic {
     const badge = (bg, color) => ({ bg, color });
     const NAV = [
       { k:'inicio', l:'Inicio', i:'space_dashboard', m:['inicio'] },
+      { k:'misparticipaciones', l:'Mis participaciones', i:'event_available', m:['misparticipaciones'], b:(s.invs || INVS).filter(i => i.who === ME && i.st === 'pendiente').length },
       { k:'usuarios', l:'Usuarios', i:'group', m:['usuarios'] },
       { k:'eventos', l:'Eventos', i:'calendar_month', m:['eventos','evento','eventoForm'] },
+      { k:'inscripciones', l:'Inscripciones', i:'confirmation_number', m:['inscripciones'] },
       { k:'cronogramas', l:'Cronogramas', i:'list_alt', m:['cronogramas'] },
       { k:'participaciones', l:'Participaciones', i:'how_to_reg', m:['participaciones'] },
       { k:'ministerios', l:'Ministerios', i:'diversity_3', m:['ministerios','ministerio'] },
       { k:'notificaciones', l:'Notificaciones', i:'notifications', m:['notificaciones'] },
     ];
-    const navItem = n => { const on = n.m.includes(s.screen); return { label:n.l, icon:n.i, current: on ? 'page' : undefined,
+    const navItem = n => { const on = n.m.includes(s.screen); return { label:n.l, icon:n.i, current: on ? 'page' : undefined, hasBadge: !!n.b, badge: n.b || 0, badgeAria: `${n.b || 0} invitaciones pendientes`,
       bg: on ? 'rgba(255,255,255,0.14)' : 'transparent', color: on ? '#fff' : '#D6E3D9', weight: on ? 800 : 600, onClick: go(n.k) }; };
-    const is = {}; ['inicio','usuarios','eventos','evento','eventoForm','cronogramas','ministerios','ministerio','notificaciones','perfil','guia','participaciones'].forEach(k => is[k] = s.screen === k);
+    const is = {}; ['inicio','usuarios','eventos','evento','eventoForm','cronogramas','ministerios','ministerio','notificaciones','perfil','guia','participaciones','misparticipaciones','inscripciones'].forEach(k => is[k] = s.screen === k);
 
     // events
     const evV = e => { const past = (e.dateEnd || e.date) < TODAY; const n = s.sched.filter(x => x.ev === e.id).length; const d = pd(e.date);
@@ -1457,7 +1949,7 @@ class Component extends DCLogic {
         sub: multi ? `${range} · ${nDays} días · ${past ? 'Finalizado' : 'Próximo'}` : `${fmtT(e.ini)} – ${fmtT(e.fin)} · ${past ? 'Finalizado' : 'Próximo'}`, stLabel: past ? 'Finalizado' : 'Próximo', stBg: past ? '#EFEAE1' : '#E3EEE5', stColor: past ? '#55594F' : '#2B5A3E',
         dateBg: past ? '#EFEAE1' : '#EEF3EE', dateColor: past ? '#55594F' : '#2F5540',
         cronoLabel: n ? `${n} actividades` : 'Sin cronograma', cronoBg: n ? '#E3EEE5' : '#FBF0D9', cronoColor: n ? '#2B5A3E' : '#7A5410', cronoIcon: n ? 'event_available' : 'warning',
-        open: go('evento', { evId:e.id }), openSched: past ? undefined : () => this.openSm(e.id), edit: () => this.openEventForm(e), del: () => this.delEvent(e),
+        ...this.occV(e), open: go('evento', { evId:e.id }), openSched: past ? undefined : () => this.openSm(e.id), edit: () => this.openEventForm(e), del: () => this.delEvent(e),
         schedLabel: past ? 'Evento finalizado' : n ? 'Editar cronograma' : 'Crear cronograma', schedAria: past ? 'Evento finalizado: el cronograma no se puede modificar' : (n ? 'Editar cronograma' : 'Crear cronograma'),
         schedIcon: past ? 'lock' : 'edit_calendar', schedColor: past ? '#9A9C93' : '#4C5047', schedCursor: past ? 'not-allowed' : 'pointer', schedBg: past ? '#F4F0E8' : '#fff', schedText: past ? '#6B6E65' : '#23261F' }; };
     const evAll = [...s.events].sort((a,b) => a.date.localeCompare(b.date)).map(evV);
@@ -1476,8 +1968,9 @@ class Component extends DCLogic {
     const uq = s.uQ.trim().toLowerCase();
     const uF = s.users.filter(u => (s.uRole === 'todos' || u.rol === s.uRole) && (s.uStatus === 'todos' || (s.uStatus === 'activo') === u.activo)
       && (!uq || (this.uname(u) + ' ' + u.correo).toLowerCase().includes(uq)));
-    const PS = 8; const pages = Math.max(1, Math.ceil(uF.length / PS)); const pg = Math.min(s.uPage, pages - 1);
-    const uRows = uF.slice(pg*PS, pg*PS + PS).map(u => { const me = u.id === ME; const rc = ROLE_C[u.rol];
+    const uFS = this.sortBy('users', uF, { nombre: u => this.uname(u), rol: u => u.rol, estado: u => u.activo ? 0 : 1, creado: u => u.created });
+    const pU = this.pager('users', uFS.length);
+    const uRows = uFS.slice(pU.from, pU.to).map(u => { const me = u.id === ME; const rc = ROLE_C[u.rol];
       return { name:this.uname(u), email:u.correo, ini:ini(this.uname(u)), role:u.rol, roleBg:rc[0], roleColor:rc[1], isMe:me,
         stLabel: u.activo ? 'Activo' : 'Inactivo', stBg: u.activo ? '#E3EEE5' : '#EFEAE1', stColor: u.activo ? '#2B5A3E' : '#55594F', stDot: u.activo ? '#2F7D4F' : '#8A8C83',
         created: fmtD(u.created), edit: () => this.openUser(u), editAria:`Editar a ${this.uname(u)}`,
@@ -1537,23 +2030,24 @@ class Component extends DCLogic {
         const pFin = picker(r.fin, r.ini ? mins(r.ini) + 1 : w0 + 1, w1, setT('fin'));
         const whoOpen = s.sm.whoOpen === r.id; const wq = (s.sm.whoQ || '').trim().toLowerCase();
         const pickWho = id => this.setState(st => ({ sm:{ ...st.sm, whoOpen:null, whoQ:'', newP: st.sm.newP && st.sm.newP.rowId === r.id ? null : st.sm.newP, rows: st.sm.rows.map(x => x.id === r.id ? { ...x, who:id } : x) } }));
-        const whoOpts = s.users.filter(u => (u.activo || u.id === r.who) && (!wq || (this.uname(u) + ' ' + u.correo).toLowerCase().includes(wq))).sort((a,b) => this.uname(a).localeCompare(this.uname(b)))
-          .map(u => { const on = u.id === r.who; return { id:u.id, name:this.uname(u), ini:ini(this.uname(u)), rol:u.rol, email:u.correo || 'sin correo', sel: on ? 'true' : 'false', bg: on ? '#F3F7F2' : '#fff', check: on ? 'check' : '', pick: () => pickWho(u.id) }; });
+        const whoOpts = s.users.filter(u => (u.activo || u.id === r.who) && (!wq || (this.uname(u) + ' ' + u.correo).toLowerCase().includes(wq))).sort((a,b) => (b.id === ME) - (a.id === ME) || this.uname(a).localeCompare(this.uname(b)))
+          .map(u => { const on = u.id === r.who; return { id:u.id, me: u.id === ME, name:this.uname(u) + (u.id === ME ? ' (Tú)' : ''), ini:ini(this.uname(u)), rol:u.rol, rolBg:(ROLE_C[u.rol] || ROLE_C.Miembro)[0], rolColor:(ROLE_C[u.rol] || ROLE_C.Miembro)[1], email:u.correo || 'sin correo', sel: on ? 'true' : 'false', bg: on ? '#F3F7F2' : '#fff', check: on ? 'check' : '', pick: () => pickWho(u.id) }; });
         const whoU = this.user(r.who); const reloading = s.sm.reload === r.id;
         const newAssign = !!whoU && (r.who !== (initMap[r.id] || '') || !!r.reinvite); const dv = String(r.days || '').trim();
-        if (newAssign) { if (maxD < 1) er.days = 'El evento es mañana o ya pasó: no queda tiempo para pedir confirmación.';
+        const selfA = newAssign && r.who === ME;
+        if (newAssign && !selfA) { if (maxD < 1) er.days = 'El evento es mañana o ya pasó: no queda tiempo para pedir confirmación.';
           else if (!dv) er.days = `Indica de 1 a ${maxD} días para confirmar.`;
           else if (+dv < 1 || +dv > 30) er.days = 'El plazo debe estar entre 1 y 30 días.';
           else if (+dv > maxD) er.days = `El evento empieza en ${toEv} días. El plazo máximo es de ${maxD} ${maxD === 1 ? 'día' : 'días'}.`; }
         const daysShow = !!er.days && (show || dv.length > 0 || maxD < 1);
-        const daysUI = { rid:r.id, needDays:newAssign, days:r.days || '', onDays: ev2 => { const v = ev2.target.value.replace(/[^\d]/g, '').slice(0, 2); this.smSet(rs => rs.map(x => x.id === r.id ? { ...x, days:v } : x)); },
+        const daysUI = { rid:r.id, needDays:newAssign && !selfA, selfAssign: selfA, days:r.days || '', onDays: ev2 => { const v = ev2.target.value.replace(/[^\d]/g, '').slice(0, 2); this.smSet(rs => rs.map(x => x.id === r.id ? { ...x, days:v } : x)); },
           daysShow, daysErr: er.days || '', bDays: daysShow ? '#A3372A' : '#DDD6CA', daysHelp: maxD >= 1 ? `Entre 1 y ${maxD} días. El evento es el ${fmtD(e.date)} (en ${toEv} días).` : '',
-          hasDue: newAssign && !er.days, dueText: newAssign && !er.days ? `Se le enviará la invitación al guardar. Deberá responder antes del ${fmtD(addD(+dv))}.` : '' };
+          hasDue: newAssign && !selfA && !er.days, dueText: newAssign && !er.days ? `Se le enviará la invitación al guardar. Deberá responder antes del ${fmtD(addD(+dv))}.` : '' };
         const inv = invFor(r.id); const sameWho = !!inv && r.who === inv.who; const invU = inv ? this.user(inv.who) : null; const invName = this.uname(invU);
         const locked = sameWho && (inv.st === 'aceptada' || inv.st === 'pendiente');
         let card = null;
         if (inv && sameWho) {
-          if (inv.st === 'aceptada') card = { icon:'verified', bg:'#F3F7F2', bd:'#CFE0D3', c:'#2B5A3E', title:`${invName} confirmó su participación${inv.answered ? ' el ' + fmtD(inv.answered) : ''}.`,
+          if (inv.st === 'aceptada') card = { icon:'verified', bg:'#F3F7F2', bd:'#CFE0D3', c:'#2B5A3E', title: inv.mail === 'self' ? `Te asignaste esta actividad${inv.answered ? ' el ' + fmtD(inv.answered) : ''}.` : `${invName} confirmó su participación${inv.answered ? ' el ' + fmtD(inv.answered) : ''}.`,
             body:'El responsable no se puede cambiar mientras la aceptación esté vigente. Si ya no podrá participar, revoca la aceptación primero. Si cambias el horario, se le avisará del cambio.', revoke:true };
           else if (inv.st === 'pendiente' && inv.mail === 'error') card = { icon:'error', bg:'#FDF5F3', bd:'#F4DCD6', c:'#862C21', title:`La invitación a ${invName} no se pudo enviar.`, body:'Reenvíala o cancélala para poder elegir otro responsable.', resend:true, cancel:true };
           else if (inv.st === 'pendiente') card = { icon:'hourglass_top', bg:'#FBF7EE', bd:'#F0DDB4', c:'#7A5410', title:`Invitación enviada a ${invName} el ${fmtD(inv.sent)}${inv.due ? ' · plazo hasta el ' + fmtD(inv.due) : ''}. Pendiente de respuesta.`,
@@ -1577,11 +2071,13 @@ class Component extends DCLogic {
             action: () => { setInv(inv.id, { st:'revocada', answered: inv.answered }); this.toast(`Aceptación de ${invName} revocada. Elige un nuevo responsable.`); } }),
           resendInv: () => { setInv(inv.id, { mail:'ok', sent:TODAY }); this.toast(`Invitación reenviada a ${invName}.`); } };
         cardUI.whoPickDisplay = locked ? 'none' : 'flex';
+        { const an = newAssign ? this.assignNote(e.id, r.who) : null; const w = !!an && an.kind === 'warn';
+          Object.assign(cardUI, { hasAn: !!an, anText: an ? an.text : '', anBg: w ? '#FBF0D9' : '#E4EEF6', anBd: w ? '#F0DDB4' : '#C9DCEC', anC: w ? '#5E4210' : '#2A5C82', anIcon: w ? 'warning' : 'info' }); }
         const whoUI = { whoOpen, ...daysUI, ...cardUI, whoOpenAria: whoOpen ? 'true' : 'false', whoChevron: whoOpen ? 'expand_less' : 'expand_more', whoQ: s.sm.whoQ || '', whoEmpty: whoOpen && !whoOpts.length,
-          whoLabel: reloading ? 'Actualizando lista de usuarios…' : whoU ? `${this.uname(whoU)} · ${whoU.rol}` : 'Selecciona un usuario registrado', whoColor: whoU && !reloading ? '#23261F' : '#6B6E65',
+          whoLabel: reloading ? 'Actualizando lista de usuarios…' : whoU ? `${this.uname(whoU)}${whoU.id === ME ? ' (Tú)' : ''} · ${whoU.rol}` : 'Selecciona un usuario registrado', whoColor: whoU && !reloading ? '#23261F' : '#6B6E65',
           toggleWho: () => !reloading && this.setState(st => ({ sm:{ ...st.sm, whoOpen: st.sm.whoOpen === r.id ? null : r.id, whoQ:'' } })),
           onWhoQ: ev2 => { const v = ev2.target.value; this.setState(st => ({ sm:{ ...st.sm, whoQ:v } })); },
-          openNew: () => { this.setState(st => ({ sm:{ ...st.sm, whoOpen:null, newP:null }, fromSm:r.id })); this.openForm('user', { nombre:'', apellido:'', correo:'', tel:'', password:'', rol:'Participante', activo:true }, null); } };
+          openNew: () => { this.setState(st => ({ sm:{ ...st.sm, whoOpen:null, newP:null }, fromSm:r.id })); this.openForm('user', { nombre:'', apellido:'', correo:'', tel:'', password:'', rol:'Miembro', activo:true }, null); } };
         const NP = s.sm.newP && s.sm.newP.rowId === r.id ? s.sm.newP : null;
         let np = {};
         if (NP) { const ne = {}; const c = NP.correo.trim();
@@ -1593,7 +2089,7 @@ class Component extends DCLogic {
             hN: t && !!ne.n, eN: ne.n || '', bN: b('n'), hA: t && !!ne.a, eA: ne.a || '', bA: b('a'), hC: t && !!ne.c, eC: ne.c || '', bC: b('c'),
             cancel: () => this.setState(st => ({ sm:{ ...st.sm, newP:null } })), okBg: npOk ? '#3E6B4F' : '#ECE7DE', okColor: npOk ? '#fff' : '#7C7E76', okCursor: npOk ? 'pointer' : 'not-allowed', okDis: !npOk,
             save: () => { if (Object.keys(ne).length) { this.setState(st => ({ sm:{ ...st.sm, newP:{ ...st.sm.newP, tried:true } } })); return; }
-              const nu = { id:nid('u'), nombre:NP.nombre.trim(), apellido:NP.apellido.trim(), correo:c, tel:'', rol:'Participante', activo:true, created:TODAY };
+              const nu = { id:nid('u'), nombre:NP.nombre.trim(), apellido:NP.apellido.trim(), correo:c, tel:'', rol:'Miembro', activo:true, created:TODAY };
               this.setState(st => ({ users:[nu, ...st.users], sm:{ ...st.sm, newP:null, reload:r.id, rows: st.sm.rows.map(x => x.id === r.id ? { ...x, who:nu.id } : x) } }));
               clearTimeout(this.reloadT); this.reloadT = setTimeout(() => { this.setState(st => st.sm ? { sm:{ ...st.sm, reload:null } } : null);
                 const el = document.querySelector(`[data-days-input="${r.id}"]`) || document.querySelector(`[data-who-btn="${r.id}"]`); el && el.focus(); }, 700);
@@ -1618,7 +2114,7 @@ class Component extends DCLogic {
         save: () => { if (!changed) return; if (!allOk) { this.setState(st => ({ sm:{ ...st.sm, tried:true } })); return; }
           const rs = s.sm.rows.map(r => ({ ...r, ev:e.id, act:r.act.trim(), who:r.who.trim() }));
           const clean = rs.map(({ reinvite, ...x }) => x);
-          const newInv = rs.filter(r => this.user(r.who) && (r.who !== (initMap[r.id] || '') || r.reinvite)).map(r => ({ id:'i' + r.id + Date.now(), ev:e.id, act:r.act, ini:r.ini, fin:r.fin, who:r.who, sent:TODAY, mail:'ok', st:'pendiente', due:addD(+r.days) }));
+          const newInv = rs.filter(r => this.user(r.who) && (r.who !== (initMap[r.id] || '') || r.reinvite)).map(r => ({ id:'i' + r.id + Date.now(), ev:e.id, act:r.act, ini:r.ini, fin:r.fin, who:r.who, sent:TODAY, ...(r.who === ME ? { mail:'self', st:'aceptada', answered:TODAY, due:'' } : { mail:'ok', st:'pendiente', due:addD(+r.days) }) }));
           this.setState(st => ({ sched:[...st.sched.filter(x => x.ev !== e.id), ...clean], sm:null,
             invs:[ ...(st.invs || INVS).map(x => { if (x.ev !== e.id || x.moved) return x;
               const row = Object.keys(initAct).find(id => initAct[id] === x.act && initMap[id] === x.who); const kept = row && rs.find(r => r.id === row);
@@ -1626,6 +2122,7 @@ class Component extends DCLogic {
               const nv = row && newInv.find(n => n.id.startsWith('i' + row));
               if (!nv) return x;
               return x.st === 'pendiente' ? { ...x, st:'cancelada', moved:nv.who } : { ...x, moved:nv.who }; }), ...newInv ] }));
+          if (newInv.length) this.dropEnr(e.id, newInv.map(n => n.who));
           const names = newInv.map(n => this.uname(this.user(n.who)));
           this.toast(newInv.length ? `Cronograma guardado. Invitación enviada a ${names.length === 1 ? names[0] : names.length + ' participantes'}.` : `Cronograma de «${e.name}» guardado.`, newInv.length ? 'Ver participaciones' : undefined, newInv.length ? () => this.go('participaciones') : undefined); },
         onPick: ev2 => this.openSm(ev2.target.value, true) };
@@ -1634,7 +2131,7 @@ class Component extends DCLogic {
     // cronogramas
     const cronoRows = s.sched.filter(x => s.cronoEv === 'all' || x.ev === s.cronoEv).map(x => ({ x, e: s.events.find(v => v.id === x.ev) }))
       .sort((a,b) => (a.e.date + a.x.ini).localeCompare(b.e.date + b.x.ini))
-      .map(({ x, e }) => { const lk = (e.dateEnd || e.date) < TODAY; return { act:x.act, who:this.wn(x.who), time:`${fmtT(x.ini)} – ${fmtT(x.fin)}`, evName:e.name, evDate: lk ? `${fmtD(e.date)} · Finalizado` : fmtD(e.date), openEv: go('evento', { evId:e.id }),
+      .map(({ x, e }) => { const lk = (e.dateEnd || e.date) < TODAY; return { _ts: e.date + x.ini, _ev: e.name + e.date, act:x.act, who:this.wn(x.who), time:`${fmtT(x.ini)} – ${fmtT(x.fin)}`, evName:e.name, evDate: lk ? `${fmtD(e.date)} · Finalizado` : fmtD(e.date), openEv: go('evento', { evId:e.id }),
         locked: lk, lockColor: lk ? '#B9B6AD' : '#4C5047', lockDel: lk ? '#C9B6B1' : '#A3372A', lockCursor: lk ? 'not-allowed' : 'pointer',
         edit: lk ? undefined : () => this.openSm(e.id), editAria: lk ? `Evento finalizado: no se puede editar ${x.act}` : `Editar cronograma de ${e.name}`,
         del: lk ? undefined : () => this.ask({ title:'Eliminar actividad', body:`Se quitará «${x.act}» del cronograma de «${e.name}».`, label:'Eliminar', action: () => { this.setState(st => ({ sched: st.sched.filter(y => y.id !== x.id) })); this.toast('Actividad eliminada.'); } }), delAria: lk ? `Evento finalizado: no se puede eliminar ${x.act}` : `Eliminar ${x.act}` }; });
@@ -1684,7 +2181,7 @@ class Component extends DCLogic {
     return {
       is, isGuia, narrow:s.narrow, wide:!s.narrow,
       sideDisplay: s.narrow ? 'none' : 'flex', topDisplay: s.narrow ? 'flex' : 'none', navOverlay: s.narrow && s.navOpen,
-      navMain: NAV.slice(0,1).map(navItem), navManage: NAV.slice(1).map(navItem),
+      navMain: NAV.slice(0,2).map(navItem), navManage: NAV.slice(2).map(navItem),
       perfilNav: navItem({ k:'perfil', l:'Mi perfil', i:'person', m:['perfil'] }),
       toggleNav: () => this.setState(st => ({ navOpen:!st.navOpen })), closeNav: () => this.setState({ navOpen:false }),
       logout: () => this.toast('Sesión cerrada (simulación del prototipo).'),
@@ -1696,16 +2193,14 @@ class Component extends DCLogic {
       quick: [ { icon:'person_add', label:'Nuevo usuario', onClick: () => this.openUser(null) }, { icon:'event', label:'Nuevo evento', onClick: () => this.openEventForm(null) },
         { icon:'send', label:'Enviar notificación', onClick: () => this.openNotif() }, { icon:'add_circle', label:'Nuevo ministerio', onClick: () => this.openMin(null) } ],
       upcoming: upcoming.slice(0, 4), hasUpcoming: !!upcoming.length,
-      counts: [ { label:'Usuarios', v:s.users.length, onClick: go('usuarios') }, { label:'Eventos próximos', v:upcoming.length, onClick: go('eventos') }, { label:'Ministerios', v:s.mins.length, onClick: go('ministerios') } ],
+      counts: [ { label:'Usuarios', v:s.users.length, onClick: go('usuarios') }, { label:'Eventos próximos', v:upcoming.length, onClick: go('eventos') }, { label:'Ministerios', v:s.mins.length, onClick: go('ministerios') }, { label:'Inscritos en eventos próximos', v: upcoming.reduce((a, e) => a + this.enrOf(e.id).length, 0), onClick: go('inscripciones') } ],
       uQ:s.uQ, onUQ: e => this.setState({ uQ:e.target.value, uPage:0 }), uRole:s.uRole, onURole: e => this.setState({ uRole:e.target.value, uPage:0 }), uStatus:s.uStatus, onUStatus: e => this.setState({ uStatus:e.target.value, uPage:0 }),
       roles: ROLES.map(r => ({ v:r })), uRows, uHas: !!uRows.length, uEmpty: !uRows.length, uFiltered, clearU: () => this.setState({ uQ:'', uRole:'todos', uStatus:'todos', uPage:0 }),
       uCount: uFiltered ? `${uF.length} de ${s.users.length} usuarios` : `${s.users.length} usuarios`,
-      uPager: { show: pages > 1, label:`${pg*PS + 1}–${Math.min(uF.length, pg*PS + PS)} de ${uF.length}`, page:`Página ${pg + 1} de ${pages}`,
-        prev: () => this.setState({ uPage: Math.max(0, pg - 1) }), next: () => this.setState({ uPage: Math.min(pages - 1, pg + 1) }), prevDis: pg === 0, nextDis: pg >= pages - 1,
-        prevColor: pg === 0 ? '#B9B6AD' : '#23261F', nextColor: pg >= pages - 1 ? '#B9B6AD' : '#23261F' },
+      uPager: pU.ui,
       newUser: () => this.openUser(null),
       evTabs: [ tab(s.evTab,'proximos','Próximos', upcoming.length,'evTab'), tab(s.evTab,'pasados','Pasados', evAll.length - upcoming.length,'evTab'), tab(s.evTab,'todos','Todos', evAll.length,'evTab') ],
-      evQ:s.evQ, onEvQ: e => this.setState({ evQ:e.target.value }), evRows, evHas: !!evRows.length, evEmpty: !evRows.length, newEvent: () => this.openEventForm(null),
+      evQ:s.evQ, onEvQ: e => this.setState({ evQ:e.target.value }), evRows: this.sortBy('ev', evRows, { evento: e => e.date + e.ini, lugar: e => e.place, ocupacion: e => { const o = this.occ(e.id); return o.cap ? o.total / o.cap : 0; }, crono: e => e.nAct }).slice(this.pager('ev', evRows.length).from, this.pager('ev', evRows.length).to), evPager: this.pager('ev', evRows.length).ui, evHas: !!evRows.length, evEmpty: !evRows.length, newEvent: () => this.openEventForm(null),
       ev, evSched, evHasSched: !!evSched.length, evNoSched: !evSched.length,
       ...(() => { const st = (f.fechaIni && f.fechaIni === f.fechaFin && f.horaIni) ? mins(f.horaIni) : -1;
         return { hiHours: HOURS.map(h => ({ v:h, label:h.padStart(2,'0') })), hiMins: MIN60.map(m => ({ v:m, label:m })),
@@ -1748,7 +2243,7 @@ class Component extends DCLogic {
       readT: { bg: f.read ? '#3E6B4F' : '#C9C3B7', x: f.read ? '22px' : '2px', label: f.read ? 'Leída' : 'No leída', aria: f.read ? 'true' : 'false', toggle: () => this.setF('read', !f.read) },
       sm: !!s.sm, smV, closeSm: () => this.closeSm(),
       evOptions: evAll.map(e => ({ id:e.id, label:`${e.name} · ${e.dateLabel}${e.past ? ' (finalizado)' : ''}` })), evOptionsOpen: upcoming.map(e => ({ id:e.id, label:`${e.name} · ${e.dateLabel}` })), cronoEv:s.cronoEv, onCronoEv: e => this.setState({ cronoEv:e.target.value }),
-      cronoRows, cronoHas: !!cronoRows.length, cronoEmpty: !cronoRows.length, cronoCount:`${cronoRows.length} ${cronoRows.length === 1 ? 'actividad' : 'actividades'}`,
+      cronoRows: this.sortBy('crono', cronoRows, { actividad: r => r.act, evento: r => r._ev, horario: r => r._ts, responsable: r => r.who }).slice(this.pager('crono', cronoRows.length).from, this.pager('crono', cronoRows.length).to), cronoPager: this.pager('crono', cronoRows.length).ui, cronoHas: !!cronoRows.length, cronoEmpty: !cronoRows.length, cronoCount:`${cronoRows.length} ${cronoRows.length === 1 ? 'actividad' : 'actividades'}`,
       cronoEmptyTitle: cronoEvObj ? `«${cronoEvObj.name}» aún no tiene cronograma` : 'Todavía no hay cronogramas',
       cronoEmptyAction: () => { const t = cronoEvObj && !this.isPastEv(cronoEvObj.id) ? cronoEvObj : upcoming[0]; if (t) this.openSm(t.id, !cronoEvObj || t.id !== cronoEvObj.id); else this.toast('No hay eventos próximos para crear un cronograma.'); },
       cronoEmptyPast: !!(cronoEvObj && this.isPastEv(cronoEvObj.id)), cronoEmptyCan: !(cronoEvObj && this.isPastEv(cronoEvObj.id)),
@@ -1801,6 +2296,21 @@ class Component extends DCLogic {
       cfOk: () => { const a = cf.action; this.setState({ confirm:null }); a(); }, cfAlt: () => { const a = cf.alt; this.setState({ confirm:null }); a(); }, cfCancel: () => this.setState({ confirm:null }),
       hasToast: !!s.toast, toastMsg: s.toast ? s.toast.msg : '', toastHasAction: !!(s.toast && s.toast.actionLabel), toastActionLabel: s.toast ? s.toast.actionLabel : '',
       toastAction: () => { const a = s.toast && s.toast.action; this.setState({ toast:null }); a && a(); }, toastClose: () => this.setState({ toast:null }),
+      ...this.myVals(), ...this.aforoVals(ev0),
+      sU: this.sortUI('users', ['nombre','rol','estado','creado']), sE: this.sortUI('ev', ['evento','lugar','ocupacion','crono']), sC: this.sortUI('crono', ['actividad','evento','horario','responsable']),
+      sV: this.sortUI('inv', ['actividad','participante','envio','respuesta']), sI: this.sortUI('ins', ['persona','inscripcion','por','nota']), sO: this.sortUI('ov', ['evento','fecha','aforo','participantes','publico','disponibles']),
+      goInscritos: () => this.go('inscripciones', { insPage:0, insQ:'', insTab:'publico', insView:'evento' }), goEvDetail: () => this.go('evento'),
+      onInsEv: e2 => this.setState({ evId: e2.target.value, insPage:0, insQ:'' }),
+      insVEvento: (s.insView || 'evento') === 'evento', insVResumen: s.insView === 'resumen',
+      insViews: [['evento','Por evento','event'],['resumen','Total de inscritos','bar_chart']].map(([k, l, i]) => { const on = (s.insView || 'evento') === k;
+        return { label:l, icon:i, pressed: on ? 'true' : 'false', bg: on ? '#fff' : 'transparent', color: on ? '#23261F' : '#4C5047', shadow: on ? '0 1px 3px rgba(35,38,31,0.12)' : 'none', onClick: () => this.setState({ insView:k }) }; }),
+      ...(() => { const cur = ev0 ? ev0.id : ''; const rows = evAll.map(e => { const o = this.occ(e.id); const on = e.id === cur;
+          return { _date: e.date, _disp: o.disp, name:e.name, date:e.dateLabel, past:e.past, stLabel: e.past ? 'Finalizado' : 'Próximo', stBg: e.past ? '#EFEAE1' : '#E3EEE5', stC: e.past ? '#55594F' : '#2B5A3E', cap:o.cap, disp: Math.max(0, o.disp), aria:`Ver inscritos de ${e.name}`, pub:o.pub, parts:o.parts, occ:`${o.total} / ${o.cap}`, occColor: o.over ? '#A3372A' : o.disp === 0 ? '#7A5410' : '#3A3D35',
+            occSub: o.over ? `Sobrecupo ${-o.disp}` : o.disp === 0 ? 'Lleno' : `${o.disp} libres`, bg: on ? '#F3F7F2' : '#fff', current: on ? 'true' : undefined, weight: on ? 800 : 700,
+            pick: () => this.setState({ evId:e.id, insPage:0, insQ:'', insView:'evento' }) }; });
+        const up = rows.filter(r => !r.past);
+        return { ovPager: this.pager('ov', rows.length).ui, ov: { rows: this.sortBy('ov', rows, { evento: r => r.name, fecha: r => r._date, aforo: r => r.cap, participantes: r => r.parts, publico: r => r.pub, disponibles: r => r._disp }).slice(this.pager('ov', rows.length).from, this.pager('ov', rows.length).to), total: rows.reduce((a, r) => a + r.pub, 0), nEv: rows.length, up: up.reduce((a, r) => a + r.pub, 0), nUp: up.length, parts: rows.reduce((a, r) => a + r.parts, 0), cap: rows.reduce((a, r) => a + r.cap, 0), disp: rows.reduce((a, r) => a + r.disp, 0) } }; })(),
+      capHelp: s.formKind === 'event' && s.formId ? (() => { const o = this.occ(s.formId); return `${o.total} lugares ocupados: ${o.parts} participantes y ${o.pub} inscritos.`; })() : 'Incluye participantes y público inscrito.',
       drawerZ: s.fromSm ? 86 : 70, drawerZ2: s.fromSm ? 87 : 71, fromSmNote: !!s.fromSm,
       ...this.invVals(), stop: e => e.stopPropagation(),
     };

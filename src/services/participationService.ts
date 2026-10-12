@@ -17,7 +17,7 @@ const ADMIN = "/admin/participaciones";
 
 /* ── Participante: solo sus propias invitaciones ──────────────────────── */
 
-/** `GET /participante/invitaciones` — requiere rol PARTICIPANT. */
+/** `GET /participante/invitaciones` — cualquier usuario; solo ve las suyas. */
 async function listOwn(
   vista: InvitationView,
   signal?: AbortSignal,
@@ -85,8 +85,9 @@ async function listByEvent(
 
 /**
  * `POST /admin/participaciones` — invita a una persona a una actividad sin
- * invitación activa. `409` si ya tiene una; `422` si el plazo o la persona
- * no son válidos.
+ * invitación activa. Si el administrador se elige a sí mismo queda aceptada
+ * de inmediato y sin correo. `409` si ya tiene una; `422` si el plazo o la
+ * persona no son válidos.
  */
 async function invite(
   actividadId: string,

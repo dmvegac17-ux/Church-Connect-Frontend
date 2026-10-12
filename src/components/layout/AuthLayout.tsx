@@ -2,6 +2,7 @@ import { BookOpen, Calendar, MessagesSquare, UsersRound } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
+import { LegalLinks } from "../legal/LegalLinks";
 import { BrandLogo } from "./BrandLogo";
 import { DailyVerse } from "./DailyVerse";
 
@@ -17,7 +18,7 @@ const BENEFITS: { icon: IconType; label: string }[] = [
 /** Columna de marca: logo, propuesta de valor, beneficios y versículo del día. */
 function BrandPanel() {
   return (
-    <aside className="flex flex-col justify-center gap-7 bg-primary p-[clamp(28px,6vw,72px)] text-primary-foreground">
+    <aside className="hidden flex-col justify-center gap-7 bg-primary p-[clamp(28px,6vw,72px)] text-primary-foreground min-[840px]:flex">
       <div className="flex items-center gap-4">
         <BrandLogo className="size-16" />
         <span className="text-[28px] font-extrabold tracking-[-0.01em]">
@@ -58,6 +59,25 @@ function BrandPanel() {
   );
 }
 
+/**
+ * Marca en celular (cuando las dos columnas ya no caben): un encabezado
+ * corto con el degradado de la app, para que el formulario quede a la vista
+ * sin desplazarse. El panel completo se reserva para pantallas anchas.
+ */
+function MobileBrand() {
+  return (
+    <header className="flex items-center gap-3 bg-linear-to-br from-primary to-primary-hover px-5 py-4 text-primary-foreground min-[840px]:hidden">
+      <BrandLogo className="size-11 shrink-0" />
+      <div className="flex min-w-0 flex-col">
+        <span className="text-xl leading-tight font-extrabold tracking-[-0.01em]">
+          Church Connect
+        </span>
+        <span className="text-sm text-[#E3ECE5]">Conectados con tu fe</span>
+      </div>
+    </header>
+  );
+}
+
 function TabSwitcher({ active }: { active: "login" | "register" }) {
   const base =
     "flex h-11 items-center justify-center rounded-[10px] text-[15px] font-extrabold transition-colors";
@@ -88,7 +108,8 @@ function TabSwitcher({ active }: { active: "login" | "register" }) {
 }
 
 /**
- * Layout de Acceso: dos columnas que se apilan en móvil. `tab` muestra el
+ * Layout de Acceso: dos columnas en pantallas anchas; en celular, un
+ * encabezado compacto y el formulario. `tab` muestra el
  * selector Iniciar sesión / Registrarse; se omite en la vista de recuperación.
  */
 export function AuthLayout({
@@ -99,13 +120,21 @@ export function AuthLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="grid min-h-screen grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] bg-card [--control-h:46px] [--field-bg:var(--input-auth)]">
+    <div className="grid min-h-screen grid-cols-1 bg-card [--control-h:46px] [--field-bg:var(--input-auth)] max-[839px]:grid-rows-[auto_1fr] min-[840px]:grid-cols-2">
+      <MobileBrand />
       <BrandPanel />
 
-      <main className="flex items-center justify-center px-5 py-[clamp(24px,5vw,64px)]">
+      <main className="flex items-start justify-center px-5 py-[clamp(20px,5vw,64px)] min-[840px]:items-center">
         <div className="flex w-full max-w-[460px] flex-col gap-[22px]">
           {tab ? <TabSwitcher active={tab} /> : null}
           {children}
+          {/* En celular el versículo va después del formulario, en pequeño. */}
+          <DailyVerse
+            className="border-t border-divider pt-4 min-[840px]:hidden"
+            textClassName="text-sm leading-normal text-muted-foreground"
+            referenceClassName="text-[13px] text-text-secondary"
+          />
+          <LegalLinks className="justify-center text-[13px] text-muted-foreground" />
         </div>
       </main>
     </div>

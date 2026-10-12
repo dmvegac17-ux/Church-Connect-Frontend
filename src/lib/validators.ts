@@ -3,6 +3,13 @@ const PERSON_NAME_RE =
   /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+( [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/;
 const PHONE_RE = /^\+?\d{7,15}$/;
 
+/**
+ * Tope del aforo de un evento: 10 millones, suficiente para encuentros
+ * internacionales multitudinarios y muy por debajo del máximo de la columna
+ * de la base de datos. Debe coincidir con `CAPACIDAD_MAX` del backend.
+ */
+export const EVENT_CAPACITY_MAX = 10_000_000;
+
 export const PERSON_NAME_MIN = 2;
 export const PERSON_NAME_MAX = 50;
 export const EMAIL_MAX = 100;

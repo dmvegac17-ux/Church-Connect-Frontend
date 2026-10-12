@@ -36,6 +36,21 @@
   --info-foreground: #2a5c82;
   --warning-soft: #fbf0d9;
   --warning-foreground: #7a5410;
+  /* Cajas de aviso: texto, borde y barra de «pocos cupos». */
+  --warning-strong: #5e4210;
+  --warning-border: #f0ddb4;
+  --warning-bar: #a8741a;
+  --info-border: #c9dcec;
+  /* Agotado y sobrecupo: fondo de chip, de caja y su borde. */
+  --destructive-tint: #fbe9e5;
+  --destructive-wash: #fdf5f3;
+  --destructive-wash-border: #f4dcd6;
+  /* Barra de aforo: participantes, público y borde del tramo disponible. */
+  --aforo-participantes: #2f5540;
+  --aforo-publico: #8db59a;
+  --aforo-libre-border: #c9c3b7;
+  /* Iconos neutros de orden y casillas sin marcar. */
+  --icon-neutral: #8a8c83;
   --border: #e6e1d8;
   --divider: #efeae1;
   --divider-soft: #f2eee7;
@@ -115,6 +130,17 @@
   --color-info-foreground: var(--info-foreground);
   --color-warning-soft: var(--warning-soft);
   --color-warning-foreground: var(--warning-foreground);
+  --color-warning-strong: var(--warning-strong);
+  --color-warning-border: var(--warning-border);
+  --color-warning-bar: var(--warning-bar);
+  --color-info-border: var(--info-border);
+  --color-destructive-tint: var(--destructive-tint);
+  --color-destructive-wash: var(--destructive-wash);
+  --color-destructive-wash-border: var(--destructive-wash-border);
+  --color-aforo-participantes: var(--aforo-participantes);
+  --color-aforo-publico: var(--aforo-publico);
+  --color-aforo-libre-border: var(--aforo-libre-border);
+  --color-icon-neutral: var(--icon-neutral);
   --color-border: var(--border);
   --color-divider: var(--divider);
   --color-divider-soft: var(--divider-soft);

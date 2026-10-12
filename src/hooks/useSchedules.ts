@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useRefreshSignal } from "../lib/refresh";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { DEFAULT_PAGE_SIZE } from "../config/env";
 import { scheduleService } from "../services/scheduleService";
@@ -38,11 +39,13 @@ export function useSchedules(
     error: null,
   });
 
+  const hasLoaded = useRef(false);
   const effectivePage = eventoId ? 1 : page;
 
   useEffect(() => {
     const controller = new AbortController();
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
+    // En recargas se conserva lo visible: sin parpadeo de «Cargando…».
+    setState((prev) => ({ ...prev, isLoading: !hasLoaded.current, error: null }));
 
     scheduleService
       .list({
@@ -52,6 +55,7 @@ export function useSchedules(
         signal: controller.signal,
       })
       .then((result) => {
+        hasLoaded.current = true;
         setState({
           schedules: result.items,
           total: result.total,
@@ -70,6 +74,7 @@ export function useSchedules(
   }, [eventoId, effectivePage, pageSize, reloadKey]);
 
   const refetch = useCallback(() => setReloadKey((k) => k + 1), []);
+  useRefreshSignal(refetch);
 
   const pageCount = eventoId
     ? 1

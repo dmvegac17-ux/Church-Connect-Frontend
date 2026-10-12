@@ -5,11 +5,12 @@ import {
   MailWarning,
   Send,
   UserPlus,
+  UserRoundX,
   UsersRound,
   UserX,
   type LucideIcon,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../../auth/useAuth";
@@ -27,10 +28,14 @@ import {
   sortEventsForDisplay,
   todayLabel,
 } from "../../lib/eventDates";
+import { dayMonth } from "../../lib/participations";
+import { useRefreshSignal } from "../../lib/refresh";
 import { eventService } from "../../services/eventService";
 import { ministryService } from "../../services/ministryService";
+import { participationService } from "../../services/participationService";
 import { userService } from "../../services/userService";
 import type { Event } from "../../types/event";
+import type { Participation } from "../../types/participation";
 import { ScheduleModal } from "../events/components/ScheduleModal";
 
 const UPCOMING_PREVIEW = 5;
@@ -84,6 +89,23 @@ function AttentionRow({
   );
 }
 
+/** Cuántas actividades por reasignar se listan una a una antes de resumir. */
+const REASSIGN_ROWS = 4;
+
+/** Por qué quedó libre la actividad, dicho como lo leería el administrador. */
+function releasedText(row: Participation): string {
+  // Ya reasignada no llega aquí; `estado_previo` cubre las marcadas así.
+  const estado =
+    row.estado_respuesta === "reasignada" ? row.estado_previo : row.estado_respuesta;
+  if (estado === "rechazada") {
+    return "indicó que no puede participar en";
+  }
+  if (estado === "vencida") {
+    return "no respondió a tiempo la invitación a";
+  }
+  return "ya no está a cargo de";
+}
+
 const ROW_ACTION_CLASS =
   "inline-flex h-9 shrink-0 items-center rounded-[9px] border border-button-border bg-card px-3 text-sm font-bold whitespace-nowrap text-foreground transition-colors hover:bg-accent max-md:h-11";
 
@@ -103,9 +125,31 @@ export function AdminHomePage() {
   const withoutSchedule = upcoming.filter((e) => e.total_actividades === 0);
   const inactiveUsers = users.items.filter((u) => u.activo === false).length;
 
+  // Actividades que se quedaron sin responsable (alguien rechazó, canceló o
+  // no respondió) y todavía nadie las tomó.
+  const [toReassign, setToReassign] = useState<Participation[]>([]);
+  const [reassignKey, setReassignKey] = useState(0);
+  useRefreshSignal(useCallback(() => setReassignKey((k) => k + 1), []));
+  useEffect(() => {
+    const controller = new AbortController();
+    participationService
+      .list({ filtro: "por_reasignar", porPagina: 100, signal: controller.signal })
+      .then((result) => setToReassign(result.items))
+      .catch(() => {
+        // Silencioso: sin este dato, el resto de pendientes se sigue mostrando.
+        if (!controller.signal.aborted) {
+          setToReassign([]);
+        }
+      });
+    return () => controller.abort();
+  }, [reassignKey]);
+
   const loadingAttention = events.isLoading || users.isLoading;
   const hasAttention =
-    withoutSchedule.length > 0 || unreadCount > 0 || inactiveUsers > 0;
+    toReassign.length > 0 ||
+    withoutSchedule.length > 0 ||
+    unreadCount > 0 ||
+    inactiveUsers > 0;
   const loadError = events.error ?? users.error ?? ministries.error;
 
   const counts = [
@@ -123,6 +167,13 @@ export function AdminHomePage() {
       to: "/ministries",
       value: ministries.isLoading ? "…" : ministries.items.length,
       label: ministries.items.length === 1 ? "Ministerio" : "Ministerios",
+    },
+    {
+      to: "/registrations?vista=resumen",
+      value: events.isLoading
+        ? "…"
+        : upcoming.reduce((total, event) => total + (event.aforo.publico ?? 0), 0),
+      label: "Inscritos en eventos próximos",
     },
   ];
 
@@ -166,6 +217,49 @@ export function AdminHomePage() {
             </div>
           ) : hasAttention ? (
             <ul>
+              {toReassign.slice(0, REASSIGN_ROWS).map((row) => (
+                <AttentionRow
+                  key={row.id}
+                  icon={UserRoundX}
+                  tone="warning"
+                  action={
+                    <Link
+                      to="/participations?filtro=por_reasignar"
+                      className={ROW_ACTION_CLASS}
+                    >
+                      Reasignar
+                    </Link>
+                  }
+                >
+                  <strong className="font-extrabold">
+                    {row.participante.nombre_completo}
+                  </strong>{" "}
+                  {releasedText(row)}{" "}
+                  <strong className="font-extrabold">{row.actividad.nombre}</strong> de{" "}
+                  {row.evento.nombre} ({dayMonth(row.actividad.fecha)}). Falta
+                  asignar a otra persona.
+                </AttentionRow>
+              ))}
+              {toReassign.length > REASSIGN_ROWS ? (
+                <AttentionRow
+                  icon={UserRoundX}
+                  tone="warning"
+                  action={
+                    <Link
+                      to="/participations?filtro=por_reasignar"
+                      className={ROW_ACTION_CLASS}
+                    >
+                      Ver todas
+                    </Link>
+                  }
+                >
+                  Y {toReassign.length - REASSIGN_ROWS}{" "}
+                  {toReassign.length - REASSIGN_ROWS === 1
+                    ? "actividad más espera"
+                    : "actividades más esperan"}{" "}
+                  una nueva asignación.
+                </AttentionRow>
+              ) : null}
               {withoutSchedule.map((ev) => {
                 const info = eventDateInfo(ev, now);
                 return (

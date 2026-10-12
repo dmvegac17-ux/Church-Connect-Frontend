@@ -1,3 +1,5 @@
+import { isoToWall, wallToIso } from "./dateTimeRange";
+
 /** Formatea una fecha ISO del backend a algo legible en es-CO. */
 export function formatDate(iso: string | null): string {
   if (!iso) {
@@ -59,19 +61,18 @@ export function formatDurationMinutes(totalMinutes: number): string {
   return `${sign}${hours}h ${minutes}m`;
 }
 
-/** Convierte un ISO datetime del backend al valor local que espera un `<input type="datetime-local">`. */
+/**
+ * Convierte un ISO datetime del backend a la hora de pared de Colombia
+ * (`YYYY-MM-DDTHH:mm`) que usan los formularios, sea cual sea la zona
+ * horaria del navegador.
+ */
 export function toDatetimeLocalValue(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  return isoToWall(iso);
 }
 
-/** Convierte el valor de un `<input type="datetime-local">` (hora local) a ISO datetime para el backend. */
+/** Convierte una hora de pared de Colombia (`YYYY-MM-DDTHH:mm`) a ISO datetime para el backend. */
 export function fromDatetimeLocalValue(local: string): string {
-  return new Date(local).toISOString();
+  return wallToIso(local.slice(0, 16));
 }
 
 /**
