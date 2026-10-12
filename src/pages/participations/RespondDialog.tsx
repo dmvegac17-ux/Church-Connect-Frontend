@@ -15,6 +15,8 @@ interface RespondDialogProps {
   /** Invitación a responder; `null` cierra el diálogo. */
   invitation: Invitation | null;
   mode: "accept" | "reject";
+  /** `admin`: el administrador responde una invitación propia. */
+  variant?: "member" | "admin";
   reason: string;
   onReasonChange: (value: string) => void;
   busy: boolean;
@@ -28,6 +30,7 @@ interface RespondDialogProps {
 export function RespondDialog({
   invitation,
   mode,
+  variant = "member",
   reason,
   onReasonChange,
   busy,
@@ -120,9 +123,13 @@ export function RespondDialog({
             </div>
 
             <p id={bodyId} className="text-[15px] leading-normal text-text-strong">
-              {accept
-                ? "El responsable verá que confirmaste. Si después no puedes asistir, avísale con tiempo."
-                : "Tu respuesta quedará registrada y el administrador podrá asignar la actividad a otra persona."}
+              {variant === "admin"
+                ? accept
+                  ? "Quien te invitó verá que confirmaste."
+                  : "Tu respuesta quedará registrada y la actividad quedará pendiente de asignación."
+                : accept
+                  ? "El responsable verá que confirmaste. Si después no puedes asistir, avísale con tiempo."
+                  : "Tu respuesta quedará registrada y el administrador podrá asignar la actividad a otra persona."}
             </p>
 
             {accept ? null : (

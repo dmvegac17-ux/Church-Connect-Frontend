@@ -1,3 +1,4 @@
+import { useRefreshSignal } from "../lib/refresh";
 import { useCallback, useEffect, useState } from "react";
 
 import { notificationService } from "../services/notificationService";
@@ -47,6 +48,7 @@ export function useNotification(id: string | undefined): UseNotificationResult {
   }, [id, reloadKey]);
 
   const refetch = useCallback(() => setReloadKey((k) => k + 1), []);
+  useRefreshSignal(refetch);
 
   return { notification, isLoading, error, refetch };
 }

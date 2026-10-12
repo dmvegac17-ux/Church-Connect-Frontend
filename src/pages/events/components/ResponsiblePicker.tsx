@@ -6,6 +6,7 @@ import { Button } from "../../../components/forms/Button";
 import { FieldError } from "../../../components/forms/fieldStyles";
 import { TextField } from "../../../components/forms/TextField";
 import { Avatar } from "../../../components/ui/primitives";
+import { RoleBadge } from "../../../components/users/Badges";
 import { fullNameOf, matchesPerson } from "../../../lib/people";
 import {
   compactErrors,
@@ -17,15 +18,17 @@ import {
 } from "../../../lib/validators";
 import { userService } from "../../../services/userService";
 import { ApiError } from "../../../types/api";
-import { ROLE_LABELS, type User } from "../../../types/user";
+import type { User } from "../../../types/user";
 
 interface ResponsiblePickerProps {
   /** Nombre del responsable tal como se guarda en la actividad. */
   value: string;
   /** `user` es la cuenta elegida: permite enviarle la invitación al guardar. */
   onChange: (name: string, user: User) => void;
-  /** Usuarios activos disponibles. */
+  /** Usuarios activos disponibles: miembros, administradores y uno mismo. */
   users: User[];
+  /** Quien está asignando: aparece fijado al inicio con «(Tú)». */
+  currentUserId?: string;
   loading: boolean;
   error?: string;
   /** Se invoca con el usuario recién registrado para sumarlo a la lista. */
@@ -34,8 +37,8 @@ interface ResponsiblePickerProps {
 }
 
 /**
- * El backend exige una contraseña al crear un usuario. Al registrar un
- * participante desde el cronograma se genera una provisional que nadie
+ * El backend exige una contraseña al crear un usuario. Al registrar a una
+ * persona desde el cronograma se genera una provisional que nadie
  * conoce: la cuenta queda creada, pero no puede iniciar sesión hasta que un
  * administrador le asigne una contraseña desde Usuarios.
  */
@@ -49,12 +52,14 @@ function provisionalPassword(): string {
 
 /**
  * Responsable de una actividad: lista desplegable con buscador y scroll
- * sobre los usuarios activos, más el registro rápido de un participante nuevo.
+ * sobre los usuarios activos (cualquiera puede participar, también quien
+ * asigna), más el registro rápido de un participante nuevo.
  */
 export function ResponsiblePicker({
   value,
   onChange,
   users,
+  currentUserId,
   loading,
   error,
   onUserCreated,
@@ -94,7 +99,17 @@ export function ResponsiblePicker({
     };
   }, [open, onBlur]);
 
-  const matches = users.filter((u) => matchesPerson(u, query));
+  const matches = users
+    .filter((u) => matchesPerson(u, query))
+    // Uno mismo va fijado al inicio; el resto, por nombre.
+    .sort(
+      (a, b) =>
+        Number(b.id === currentUserId) - Number(a.id === currentUserId) ||
+        fullNameOf(a).localeCompare(fullNameOf(b), "es"),
+    );
+  const isMine = users.some(
+    (u) => u.id === currentUserId && fullNameOf(u) === value,
+  );
 
   const pick = (user: User) => {
     onChange(fullNameOf(user), user);
@@ -124,7 +139,11 @@ export function ResponsiblePicker({
               id={`${id}-value`}
               className={`truncate ${value ? "text-foreground" : "text-muted-foreground"}`}
             >
-              {value || (loading ? "Cargando usuarios…" : "Elige un responsable")}
+              {value
+                ? `${value}${isMine ? " (Tú)" : ""}`
+                : loading
+                  ? "Cargando usuarios…"
+                  : "Elige un responsable"}
             </span>
             {open ? (
               <ChevronUp className="size-5 shrink-0 text-icon-muted" aria-hidden="true" />
@@ -178,13 +197,13 @@ export function ResponsiblePicker({
                           <span className="flex min-w-0 flex-1 flex-col">
                             <span className="truncate text-sm font-bold text-foreground">
                               {name}
-                              <span className="font-normal text-muted-foreground">
-                                {" "}
-                                · {ROLE_LABELS[u.rol]}
-                              </span>
+                              {u.id === currentUserId ? " (Tú)" : ""}
                             </span>
-                            <span className="truncate text-[13px] text-muted-foreground">
-                              {u.correo}
+                            <span className="flex min-w-0 items-center gap-1.5">
+                              <RoleBadge role={u.rol} className="!h-5 shrink-0 !px-1.5 !text-[11px]" />
+                              <span className="truncate text-[13px] text-muted-foreground">
+                                {u.correo}
+                              </span>
                             </span>
                           </span>
                           {selected ? (
@@ -280,7 +299,7 @@ function NewParticipantForm({
         apellido: apellido.trim(),
         correo: correo.trim(),
         contrasena: provisionalPassword(),
-        rol: "PARTICIPANT",
+        rol: "MEMBER",
         activo: true,
       });
       onCreated(created);
@@ -311,8 +330,8 @@ function NewParticipantForm({
       className="mt-1 flex flex-col gap-3 rounded-xl border border-primary-soft-border bg-primary-selected p-3.5"
     >
       <p className="text-[13px] leading-snug text-text-secondary">
-        Se creará su cuenta con el rol <strong>Participante</strong> y quedará
-        como responsable. Para que pueda iniciar sesión y confirmar su
+        Se registrará con el rol <strong>Miembro</strong> y quedará asignado a
+        la actividad. Para que pueda iniciar sesión y confirmar su
         participación, asígnale después una contraseña desde Usuarios.
       </p>
       {failure ? <Alert variant="error" message={failure} /> : null}

@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import { Navbar } from "./Navbar";
 
 /**
- * Layout de la vista de miembro (roles MEMBER y PARTICIPANT): barra superior
+ * Layout de la vista de miembro: barra superior
  * + contenido centrado. Fija aquí los valores propios de este perfil
  * (controles de 44px, tarjetas de 16px) sin tocar estilos globales.
  */

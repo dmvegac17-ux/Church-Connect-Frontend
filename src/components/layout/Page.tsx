@@ -2,18 +2,26 @@ import type { ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { RefreshButton } from "./RefreshButton";
+
 export function PageHeader({
   title,
   description,
   actions,
   backTo,
   backLabel = "Volver",
+  refresh = true,
 }: {
   title: string;
   description?: string;
   actions?: ReactNode;
   backTo?: string;
   backLabel?: string;
+  /**
+   * Muestra «Actualizar» junto al título. Se apaga en las pantallas que son
+   * un formulario, donde no hay datos que volver a consultar.
+   */
+  refresh?: boolean;
 }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-3">
@@ -34,7 +42,12 @@ export function PageHeader({
           <p className="text-[15px] text-muted-foreground">{description}</p>
         ) : null}
       </div>
-      {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+      {refresh || actions ? (
+        <div className="flex flex-wrap gap-2">
+          {refresh ? <RefreshButton /> : null}
+          {actions}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -47,13 +60,17 @@ export function Card({
   children,
   className = "",
   as: Tag = "div",
+  "aria-label": ariaLabel,
 }: {
   children: ReactNode;
   className?: string;
   as?: "div" | "section" | "article" | "aside";
+  /** Nombre accesible de la región cuando no lleva un título visible propio. */
+  "aria-label"?: string;
 }) {
   return (
     <Tag
+      aria-label={ariaLabel}
       className={`rounded-[var(--card-radius,16px)] border border-border bg-card text-card-foreground ${className}`}
     >
       {children}

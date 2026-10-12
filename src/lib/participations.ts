@@ -85,6 +85,12 @@ export function clockTime(iso: string): string {
   }).format(new Date(iso));
 }
 
+/** "lunes 12 de octubre a las 3:40 p. m." — el momento exacto de una respuesta. */
+export function longDateTime(iso: string): string {
+  const p = parts(new Date(iso), { weekday: "long", day: "numeric", month: "long" });
+  return `${p.weekday} ${p.day} de ${p.month} a las ${clockTime(iso)}`;
+}
+
 export function clockRange(startIso: string, endIso: string): string {
   return `${clockTime(startIso)} – ${clockTime(endIso)}`;
 }
@@ -157,4 +163,91 @@ export function validationField(
   return error.errors.some((e) => e.includes("dias_para_confirmar"))
     ? "dias_para_confirmar"
     : null;
+}
+
+/* ── Filtros del panel de participaciones (en memoria) ────────────────── */
+
+/** Filtros del panel. `vencidas` solo existe aquí: se resuelve en memoria. */
+export type AdminFilter =
+  | "todas"
+  | "pendientes"
+  | "aceptadas"
+  | "vencidas"
+  | "por_reasignar"
+  | "error_envio";
+
+interface FilterableParticipation {
+  actividad: { nombre: string };
+  evento: { nombre: string };
+  participante: { nombre_completo: string };
+  estado_respuesta: string;
+  estado_previo?: string | null;
+  estado_envio: string;
+  requiere_reasignacion: boolean;
+}
+
+function plainText(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+const ADMIN_FILTERS: Record<AdminFilter, (row: FilterableParticipation) => boolean> = {
+  todas: () => true,
+  pendientes: (row) => row.estado_respuesta === "pendiente",
+  aceptadas: (row) => row.estado_respuesta === "aceptada",
+  // Se venció el plazo sin que confirmara: tanto las que siguen libres como
+  // las que ya se le dieron a otra persona (quedan como constancia).
+  vencidas: (row) =>
+    row.estado_respuesta === "vencida" ||
+    (row.estado_respuesta === "reasignada" && row.estado_previo === "vencida"),
+  por_reasignar: (row) => row.requiere_reasignacion,
+  error_envio: (row) => row.estado_envio === "error",
+};
+
+/** Las que coinciden con la búsqueda (actividad, evento o participante; sin tildes). */
+export function searchParticipations<T extends FilterableParticipation>(
+  rows: readonly T[],
+  q: string,
+): T[] {
+  const needle = plainText(q.trim());
+  if (!needle) {
+    return [...rows];
+  }
+  return rows.filter((row) =>
+    plainText(
+      `${row.actividad.nombre} ${row.evento.nombre} ${row.participante.nombre_completo}`,
+    ).includes(needle),
+  );
+}
+
+/** Mismas reglas que los filtros del backend, aplicadas a lo ya cargado. */
+export function filterParticipations<T extends FilterableParticipation>(
+  rows: readonly T[],
+  filter: AdminFilter,
+): T[] {
+  return rows.filter(ADMIN_FILTERS[filter]);
+}
+
+/** Cuántas hay en cada pestaña, de una pasada. */
+export function countParticipations(
+  rows: readonly FilterableParticipation[],
+): Record<AdminFilter, number> {
+  const counts = {
+    todas: 0,
+    pendientes: 0,
+    aceptadas: 0,
+    vencidas: 0,
+    por_reasignar: 0,
+    error_envio: 0,
+  };
+  for (const row of rows) {
+    for (const key of Object.keys(counts) as AdminFilter[]) {
+      if (ADMIN_FILTERS[key](row)) {
+        counts[key] += 1;
+      }
+    }
+  }
+  return counts;
 }

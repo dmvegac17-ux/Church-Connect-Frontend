@@ -15,7 +15,40 @@ export interface Schedule {
   responsable: string;
   /** Usuario con la invitación activa de la actividad, si la hay. */
   responsable_id?: string | null;
+  /**
+   * Solo para miembros: `false` si `responsable` es un texto de «pendiente»
+   * porque nadie confirmó todavía (el nombre no se expone hasta entonces).
+   */
+  responsable_confirmado?: boolean | null;
+  /**
+   * Solo para el administrador: en qué está el responsable (`confirmado`,
+   * `pendiente`, `por_reconfirmar`, `rechazado`, `sin_respuesta`,
+   * `sin_asignar`) o `fuera_de_rango`.
+   */
+  estado?: string | null;
   descripcion: string | null;
+}
+
+/** Valores de una actividad en el historial: solo los campos que cambiaron. */
+export interface ScheduleChangeValues {
+  actividad?: string;
+  hora_inicio?: string;
+  hora_fin?: string;
+  descripcion?: string | null;
+  responsable?: string;
+}
+
+/** Una entrada del historial del cronograma (`GET /schedules/historial`). */
+export interface ScheduleChange {
+  id: string;
+  actividad_id: string | null;
+  actividad: string;
+  tipo: "creada" | "editada" | "eliminada";
+  antes: ScheduleChangeValues | null;
+  despues: ScheduleChangeValues | null;
+  autor_nombre: string;
+  /** ISO datetime. */
+  fecha: string;
 }
 
 /** Cuerpo de `POST /schedules`. */

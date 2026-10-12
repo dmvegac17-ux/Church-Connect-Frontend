@@ -1,5 +1,7 @@
+import { Pill } from "../ui/primitives";
 import { timeRangeLabel } from "../../lib/eventDates";
 import { formatDurationMinutes } from "../../lib/format";
+import { ACTIVITY_STATUS, type ActivityStatus } from "../../lib/scheduleGroups";
 import type { Schedule } from "../../types/schedule";
 
 interface ScheduleTimelineProps {
@@ -25,6 +27,9 @@ export function ScheduleTimeline({
   return (
     <ol>
       {sorted.map((s) => {
+        const status = s.estado
+          ? ACTIVITY_STATUS[s.estado as ActivityStatus]
+          : undefined;
         const minutes =
           (new Date(s.hora_fin).getTime() - new Date(s.hora_inicio).getTime()) /
           60000;
@@ -52,8 +57,23 @@ export function ScheduleTimeline({
                   {s.descripcion}
                 </span>
               ) : null}
-              <span className="text-sm text-muted-foreground">
+              <span className="mt-1 flex flex-wrap items-center gap-1.5">
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${
+                  s.responsable_confirmado === false
+                    ? // Aún sin confirmar: discreto y sin nombre.
+                      "bg-muted text-text-secondary"
+                    : "bg-primary-soft text-primary-hover shadow-[0_0_0_1px_var(--primary-soft-border),0_0_10px_rgba(62,107,79,0.22)]"
+                }`}
+              >
                 Responsable: {s.responsable}
+              </span>
+              {/* Panel de administración: en qué está ese responsable. */}
+              {status ? (
+                <Pill tone={status.tone} className="!h-6 !px-2 !text-xs">
+                  {status.label}
+                </Pill>
+              ) : null}
               </span>
             </span>
           </li>

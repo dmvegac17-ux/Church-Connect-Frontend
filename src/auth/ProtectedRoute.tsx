@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { FullPageSpinner } from "../components/feedback/Spinner";
+import { AcceptanceGate } from "../components/legal/AcceptanceGate";
 import type { UserRole } from "../types/user";
 import { useAuth } from "./useAuth";
 
@@ -27,5 +28,6 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     return <Navigate to="/403" replace />;
   }
 
-  return <>{children}</>;
+  // Con documentos legales por aceptar, primero ese paso.
+  return <AcceptanceGate>{children}</AcceptanceGate>;
 }

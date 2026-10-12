@@ -3,7 +3,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../auth/useAuth";
-import { SocialButtons } from "../../components/auth/SocialButtons";
+import { consumeIdleLogout } from "../../auth/useIdleSession";
 import { Alert, ErrorAlert } from "../../components/feedback/ErrorAlert";
 import { useToast } from "../../components/feedback/useToast";
 import { Button } from "../../components/forms/Button";
@@ -14,11 +14,14 @@ import { AuthHeading, AuthLayout } from "../../components/layout/AuthLayout";
 import { HOME_PATH } from "../../config/navigation";
 import { useTouched } from "../../hooks/useTouched";
 import { emailError, sanitizeEmail } from "../../lib/validators";
+import { authService } from "../../services/authService";
 import { ApiError } from "../../types/api";
 
 interface LocationState {
   from?: { pathname: string };
   registered?: boolean;
+  /** Llega desde un enlace de restablecimiento vencido: abre «Recupera tu contraseña». */
+  forgot?: boolean;
 }
 
 const BAD_CREDENTIALS =
@@ -31,11 +34,15 @@ export function LoginPage() {
   const toast = useToast();
   const state = (location.state ?? null) as LocationState | null;
 
-  const [view, setView] = useState<"login" | "forgot">("login");
+  const [view, setView] = useState<"login" | "forgot">(
+    state?.forgot ? "forgot" : "login",
+  );
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<unknown>(null);
+  // Se lee una vez: el aviso no reaparece al recargar.
+  const [closedForIdle] = useState(consumeIdleLogout);
   const [submitting, setSubmitting] = useState(false);
   const fields = useTouched<"correo" | "contrasena">();
 
@@ -105,6 +112,11 @@ export function LoginPage() {
           <Alert variant="error" message={BAD_CREDENTIALS} />
         ) : error ? (
           <ErrorAlert error={error} onClose={() => setError(null)} />
+        ) : closedForIdle ? (
+          <Alert
+            variant="info"
+            message="Cerramos tu sesión porque pasaron 15 minutos sin actividad. Inicia sesión de nuevo para continuar."
+          />
         ) : null}
 
         <TextField
@@ -158,17 +170,15 @@ export function LoginPage() {
         >
           Iniciar sesión
         </Button>
-
-        <SocialButtons />
       </form>
     </AuthLayout>
   );
 }
 
 /**
- * Vista de recuperación dentro de Acceso. El backend todavía no expone un
- * endpoint para enviar el enlace, así que no se confirma un envío que no
- * ocurre: se indica el camino que sí funciona hoy.
+ * Vista de recuperación dentro de Acceso: pide el correo y solicita el
+ * enlace. El mensaje final es siempre el mismo, exista o no la cuenta, para
+ * no revelar quién está registrado.
  */
 function ForgotPassword({
   initialEmail,
@@ -179,14 +189,25 @@ function ForgotPassword({
 }) {
   const [correo, setCorreo] = useState(initialEmail);
   const [touched, setTouched] = useState(false);
-  const [requested, setRequested] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState<string | null>(null);
+  const [failure, setFailure] = useState<unknown>(null);
   const error = emailError(correo);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setTouched(true);
-    if (!error) {
-      setRequested(true);
+    setFailure(null);
+    if (error) {
+      return;
+    }
+    setSending(true);
+    try {
+      setSent(await authService.requestPasswordReset(correo.trim()));
+    } catch (err) {
+      setFailure(err);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -202,7 +223,7 @@ function ForgotPassword({
       </button>
       <AuthHeading
         title="Recupera tu contraseña"
-        description="Escribe el correo de tu cuenta para restablecer el acceso."
+        description="Escribe el correo de tu cuenta y te enviaremos un enlace para elegir una nueva."
       />
       <TextField
         label="Correo electrónico"
@@ -216,24 +237,29 @@ function ForgotPassword({
         value={correo}
         onChange={(e) => {
           setCorreo(sanitizeEmail(e.target.value));
-          setRequested(false);
+          setSent(null);
         }}
         onBlur={() => setTouched(true)}
         error={touched ? error : undefined}
       />
-      {requested ? (
+      {failure ? (
+        <ErrorAlert error={failure} onClose={() => setFailure(null)} />
+      ) : null}
+      {sent ? (
         <Alert
           variant="info"
-          title="El envío automático aún no está disponible"
-          message={`Todavía no podemos enviar el enlace a ${correo}. Pide a un administrador de tu iglesia que restablezca tu contraseña; podrá asignarte una nueva al instante.`}
+          title="Revisa tu correo"
+          message={`${sent} Si no lo ves, mira en la carpeta de correo no deseado.`}
         />
       ) : null}
       <Button
         type="submit"
         className="!h-12 !rounded-xl !text-base !font-extrabold"
+        loading={sending}
+        loadingLabel="Enviando…"
         disabled={Boolean(error)}
       >
-        Enviar enlace
+        {sent ? "Enviar de nuevo" : "Enviar enlace"}
       </Button>
     </form>
   );

@@ -1,9 +1,13 @@
 import {
   Bell,
   Calendar,
+  CalendarCheck,
   Home,
   LayoutDashboard,
   ListChecks,
+  Scale,
+  Ticket,
+  TicketCheck,
   User,
   UserCheck,
   Users,
@@ -21,6 +25,14 @@ export interface NavItem {
 
 export const HOME_PATH = "/";
 export const PROFILE_PATH = "/profile";
+/** Miembro: sus participaciones e invitaciones. Administrador: supervisar todas. */
+export const PARTICIPATIONS_PATH = "/participations";
+/** Miembro: sus inscripciones. Administrador: gestión de inscritos. */
+export const REGISTRATIONS_PATH = "/registrations";
+/** Solo administrador: las actividades en las que participa él mismo. */
+export const MY_PARTICIPATIONS_PATH = "/my-participations";
+/** Solo administrador: los eventos donde él mismo reservó su cupo. */
+export const MY_REGISTRATIONS_PATH = "/my-registrations";
 
 const EVENTS: NavItem = {
   to: "/events",
@@ -28,11 +40,24 @@ const EVENTS: NavItem = {
   description: "Consulta los eventos, su sede y su cronograma.",
   icon: Calendar,
 };
+const MY_REGISTRATIONS: NavItem = {
+  to: REGISTRATIONS_PATH,
+  label: "Mis inscripciones",
+  description: "Eventos en los que reservaste tu cupo.",
+  icon: Ticket,
+};
 const SCHEDULES: NavItem = {
   to: "/schedules",
   label: "Cronogramas",
   description: "Revisa las actividades programadas de cada evento.",
   icon: ListChecks,
+};
+/** Cualquier usuario puede ser asignado a una actividad: no depende del rol. */
+const OWN_PARTICIPATIONS: NavItem = {
+  to: PARTICIPATIONS_PATH,
+  label: "Mis participaciones",
+  description: "Actividades en las que participas y tus invitaciones.",
+  icon: UserCheck,
 };
 const MINISTRIES: NavItem = {
   to: "/ministries",
@@ -46,22 +71,15 @@ const NOTIFICATIONS: NavItem = {
   description: "Lee los avisos que te han enviado.",
   icon: Bell,
 };
-
-export const PARTICIPATIONS_PATH = "/participations";
-
-/** Solo rol participante: confirmar sus invitaciones a actividades. */
-const OWN_PARTICIPATIONS: NavItem = {
-  to: PARTICIPATIONS_PATH,
-  label: "Participaciones",
-  description: "Acepta o rechaza las actividades a las que te invitaron.",
-  icon: UserCheck,
+const PROFILE: NavItem = {
+  to: PROFILE_PATH,
+  label: "Mi perfil",
+  description: "Actualiza tus datos y tu contraseña.",
+  icon: User,
 };
 
-/**
- * Menú "Eventos" del participante: agrupa eventos, cronogramas y sus
- * invitaciones. El miembro conserva los enlaces sueltos de siempre.
- */
-export const PARTICIPANT_EVENT_MENU: readonly NavItem[] = [
+/** Desplegable «Eventos» de la barra superior del miembro. */
+export const MEMBER_EVENT_MENU: readonly NavItem[] = [
   {
     ...EVENTS,
     label: "Todos los eventos",
@@ -69,58 +87,73 @@ export const PARTICIPANT_EVENT_MENU: readonly NavItem[] = [
   },
   { ...SCHEDULES, description: "Actividades programadas por evento" },
   {
+    ...MY_REGISTRATIONS,
+    description: "Eventos en los que reservaste tu cupo",
+  },
+  {
     ...OWN_PARTICIPATIONS,
-    label: "Confirmar participaciones",
-    description: "Acepta o rechaza tus invitaciones",
+    description: "Lo que debes confirmar y lo ya confirmado",
   },
 ];
 
-/** Navegación del participante en móvil: la del miembro más sus invitaciones. */
-export const PARTICIPANT_NAV: readonly NavItem[] = [
+/** Barra superior del miembro: los enlaces que van fuera del desplegable. */
+export const MEMBER_NAV: readonly NavItem[] = [
+  { to: HOME_PATH, label: "Inicio", description: "Resumen del día.", icon: Home },
+  MINISTRIES,
+  NOTIFICATIONS,
+];
+
+/** Navegación del miembro en móvil: todo en una sola lista. */
+export const MEMBER_MOBILE_NAV: readonly NavItem[] = [
   { to: HOME_PATH, label: "Inicio", description: "Resumen del día.", icon: Home },
   EVENTS,
   SCHEDULES,
+  MY_REGISTRATIONS,
   OWN_PARTICIPATIONS,
   MINISTRIES,
   NOTIFICATIONS,
 ];
 
-/** Acceso rápido extra del Inicio del participante. */
-export const PARTICIPANT_QUICK_LINK: NavItem = {
-  ...OWN_PARTICIPATIONS,
-  label: "Confirmar participaciones",
-};
+export type QuickLinkKey =
+  | "eventos"
+  | "inscripciones"
+  | "cronogramas"
+  | "participaciones"
+  | "ministerios"
+  | "notificaciones"
+  | "perfil";
 
-/** Barra superior de la vista de miembro. */
-export const MEMBER_NAV: readonly NavItem[] = [
-  { to: HOME_PATH, label: "Inicio", description: "Resumen del día.", icon: Home },
-  EVENTS,
-  SCHEDULES,
-  MINISTRIES,
-  NOTIFICATIONS,
+/** Catálogo de accesos rápidos que el miembro puede poner en su Inicio. */
+export const QUICK_LINK_CATALOG: readonly (NavItem & { key: QuickLinkKey })[] = [
+  { key: "eventos", ...EVENTS },
+  { key: "inscripciones", ...MY_REGISTRATIONS },
+  { key: "cronogramas", ...SCHEDULES },
+  { key: "participaciones", ...OWN_PARTICIPATIONS },
+  { key: "ministerios", ...MINISTRIES },
+  { key: "notificaciones", ...NOTIFICATIONS },
+  { key: "perfil", ...PROFILE },
 ];
 
-/** Accesos rápidos del Inicio de miembro. */
-export const MEMBER_QUICK_LINKS: readonly NavItem[] = [
-  EVENTS,
-  SCHEDULES,
-  MINISTRIES,
-  NOTIFICATIONS,
-  {
-    to: PROFILE_PATH,
-    label: "Mi perfil",
-    description: "Revisa y actualiza tus datos personales.",
-    icon: User,
-  },
-];
-
-/** Barra lateral del panel de administración: Inicio + sección "GESTIÓN". */
+/** Barra lateral del panel de administración: lo propio y la sección «GESTIÓN». */
 export const ADMIN_NAV_MAIN: readonly NavItem[] = [
   {
     to: HOME_PATH,
     label: "Inicio",
     description: "Pendientes y accesos rápidos.",
     icon: LayoutDashboard,
+  },
+  {
+    to: MY_PARTICIPATIONS_PATH,
+    label: "Mis participaciones",
+    description: "Actividades en las que participas tú.",
+    icon: CalendarCheck,
+  },
+  {
+    // Lo propio va arriba; «Inscripciones», en GESTIÓN, es la de todos.
+    to: MY_REGISTRATIONS_PATH,
+    label: "Mis inscripciones",
+    description: "Eventos en los que reservaste tu cupo.",
+    icon: TicketCheck,
   },
 ];
 
@@ -132,6 +165,12 @@ export const ADMIN_NAV_MANAGE: readonly NavItem[] = [
     icon: Users,
   },
   EVENTS,
+  {
+    to: REGISTRATIONS_PATH,
+    label: "Inscripciones",
+    description: "Público inscrito y participantes de cada evento.",
+    icon: Ticket,
+  },
   SCHEDULES,
   {
     to: PARTICIPATIONS_PATH,
@@ -141,4 +180,10 @@ export const ADMIN_NAV_MANAGE: readonly NavItem[] = [
   },
   MINISTRIES,
   NOTIFICATIONS,
+  {
+    to: "/legal-documents",
+    label: "Documentos legales",
+    description: "Términos, privacidad y quién los ha aceptado.",
+    icon: Scale,
+  },
 ];

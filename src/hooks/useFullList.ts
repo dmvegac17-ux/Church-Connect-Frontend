@@ -1,3 +1,4 @@
+import { useRefreshSignal } from "../lib/refresh";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /** Máximo que aceptan los listados del backend por página. */
@@ -93,6 +94,7 @@ export function useFullList<T>(
   }, [fetchPage, enabled, reloadKey]);
 
   const refetch = useCallback(() => setReloadKey((k) => k + 1), []);
+  useRefreshSignal(refetch);
   const setItems = useCallback(
     (updater: (items: T[]) => T[]) => setItemsState(updater),
     [],

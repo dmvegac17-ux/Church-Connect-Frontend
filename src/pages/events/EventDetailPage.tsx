@@ -1,24 +1,31 @@
-import { Calendar, CalendarX, Clock, MapPin, SearchX, Users } from "lucide-react";
+import { RefreshButton } from "../../components/layout/RefreshButton";
+import { Calendar, CalendarX, Clock, MapPin, SearchX } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
+import { useAuth } from "../../auth/useAuth";
 import { ErrorAlert } from "../../components/feedback/ErrorAlert";
 import { FullPageSpinner, Spinner } from "../../components/feedback/Spinner";
 import { buttonClass } from "../../components/forms/Button";
 import { Card, CardHeader } from "../../components/layout/Page";
+import { EnrollmentDialog } from "../../components/registrations/EnrollmentDialog";
+import { EnrollmentPanel } from "../../components/registrations/EnrollmentPanel";
 import { ScheduleTimeline } from "../../components/schedule/ScheduleTimeline";
 import { DateBlock, EventStatusPill } from "../../components/ui/EventBits";
 import { Breadcrumb, EmptyState, Fact } from "../../components/ui/primitives";
+import { useEnrollment } from "../../hooks/useEnrollment";
 import { useEvent } from "../../hooks/useEvent";
 import { useSchedules } from "../../hooks/useSchedules";
 import { activitiesLabel, eventDateInfo } from "../../lib/eventDates";
 import { ApiError } from "../../types/api";
 import { EventLocation } from "./components/EventLocation";
 
-/** Detalle de evento (vista de miembro): solo lectura. */
+/** Detalle de evento (vista de miembro): lectura e inscripción. */
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { event, isLoading, error } = useEvent(id);
+  const { user } = useAuth();
+  const { event, isLoading, error, refetch } = useEvent(id);
   const { schedules, isLoading: loadingSchedules } = useSchedules(id);
+  const enrollment = useEnrollment(refetch);
 
   if (isLoading) {
     return <FullPageSpinner label="Cargando evento…" />;
@@ -51,7 +58,12 @@ export function EventDetailPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Breadcrumb to="/events" label="Eventos" current={event.titulo} />
+      <Breadcrumb
+        to="/events"
+        label="Eventos"
+        current={event.titulo}
+        actions={<RefreshButton />}
+      />
 
       <div className="flex flex-wrap items-center gap-[18px]">
         <DateBlock info={info} size="lg" />
@@ -101,6 +113,12 @@ export function EventDetailPage() {
         </div>
 
         <Card as="aside" className="flex flex-col gap-4 p-6">
+          <EnrollmentPanel
+            event={event}
+            userId={user?.id ?? ""}
+            onEnroll={() => enrollment.enroll(event)}
+            onCancel={() => enrollment.cancel(event)}
+          />
           <h2 className="text-[17px] font-extrabold">Detalles</h2>
           <dl className="flex flex-col gap-3.5">
             <Fact icon={Calendar} label="Fecha">
@@ -117,13 +135,19 @@ export function EventDetailPage() {
                 </span>
               ) : null}
             </Fact>
-            <Fact icon={Users} label="Capacidad">
-              {event.capacidad} {event.capacidad === 1 ? "persona" : "personas"}
-            </Fact>
           </dl>
           <EventLocation event={event} />
         </Card>
       </div>
+
+      <EnrollmentDialog
+        event={enrollment.event}
+        mode={enrollment.mode}
+        busy={enrollment.busy}
+        error={enrollment.error}
+        onSubmit={enrollment.submit}
+        onClose={enrollment.close}
+      />
     </div>
   );
 }

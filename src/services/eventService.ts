@@ -36,16 +36,38 @@ async function getById(id: string, signal?: AbortSignal): Promise<Event> {
   return data;
 }
 
+/**
+ * Versión vigente del evento, sin pasar por la caché de lecturas: sirve para
+ * saber si otra persona guardó cambios mientras un formulario estaba abierto.
+ */
+async function getVersion(id: string): Promise<number> {
+  const { data } = await httpClient.get<Event>(`${BASE}/${id}`, {
+    query: { _: Date.now() },
+  });
+  return data.version;
+}
+
 /** `POST /events` — solo ADMIN. `creado_por` lo asigna el backend. */
 async function create(dto: CreateEventDTO): Promise<Event> {
   const { data } = await httpClient.post<Event>(BASE, dto);
   return data;
 }
 
-/** `PUT /events/{id}` — solo ADMIN. Actualización parcial. */
-async function update(id: string, dto: UpdateEventDTO): Promise<Event> {
-  const { data } = await httpClient.put<Event>(`${BASE}/${id}`, dto);
-  return data;
+export interface UpdatedEvent {
+  event: Event;
+  /** Inscritos a los que se avisó porque cambió la fecha, el horario, el lugar o la dirección. */
+  notified: number;
+}
+
+/**
+ * `PUT /events/{id}` — solo ADMIN. Actualización parcial. Si cambia la
+ * fecha, el horario, el lugar o la dirección, el backend avisa por correo y
+ * en su bandeja a los inscritos. No avisan los demás campos ni los retoques
+ * de texto (ver `lib/eventChanges.ts`).
+ */
+async function update(id: string, dto: UpdateEventDTO): Promise<UpdatedEvent> {
+  const { data, meta } = await httpClient.put<Event>(`${BASE}/${id}`, dto);
+  return { event: data, notified: readMetaTotal(meta, "inscritosNotificados") };
 }
 
 /**
@@ -56,4 +78,11 @@ async function remove(id: string): Promise<void> {
   await httpClient.delete<null>(`${BASE}/${id}`);
 }
 
-export const eventService = { list, getById, create, update, remove };
+export const eventService = {
+  list,
+  getById,
+  getVersion,
+  create,
+  update,
+  remove,
+};
