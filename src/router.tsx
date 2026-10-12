@@ -8,6 +8,7 @@ import { AppShell } from "./components/layout/AppShell";
 import { ForbiddenPage } from "./pages/ForbiddenPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { AdminHomePage } from "./pages/admin/AdminHomePage";
+import { AdminAnnouncementsPage } from "./pages/admin/announcements/AdminAnnouncementsPage";
 import { AdminEventDetailPage } from "./pages/admin/events/AdminEventDetailPage";
 import { AdminEventsPage } from "./pages/admin/events/AdminEventsPage";
 import { AdminMinistriesPage } from "./pages/admin/ministries/AdminMinistriesPage";
@@ -22,6 +23,8 @@ import { RegisterPage } from "./pages/auth/RegisterPage";
 import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
 import { AdminLegalPage } from "./pages/admin/legal/AdminLegalPage";
 import { LegalDocumentPage } from "./pages/legal/LegalDocumentPage";
+import { AnnouncementDetailPage } from "./pages/announcements/AnnouncementDetailPage";
+import { AnnouncementsPage } from "./pages/announcements/AnnouncementsPage";
 import { EventCreatePage } from "./pages/events/EventCreatePage";
 import { EventDetailPage } from "./pages/events/EventDetailPage";
 import { EventEditPage } from "./pages/events/EventEditPage";
@@ -229,6 +232,19 @@ export function AppRoutes() {
             </AdminOnly>
           }
         />
+
+        {/* Anuncios: cartelera para cualquier sesión; crear, editar y
+            eliminar solo ADMIN (lo exige también el backend). */}
+        <Route
+          path="/announcements"
+          element={
+            <ByRole
+              admin={<AdminAnnouncementsPage />}
+              member={<AnnouncementsPage />}
+            />
+          }
+        />
+        <Route path="/announcements/:id" element={<AnnouncementDetailPage />} />
 
         {/* Notificaciones: cada sesión ve su propia bandeja; envío, edición
             y eliminación solo ADMIN. */}

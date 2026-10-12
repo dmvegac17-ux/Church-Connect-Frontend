@@ -5,6 +5,7 @@ import {
   Home,
   LayoutDashboard,
   ListChecks,
+  Megaphone,
   Scale,
   Ticket,
   TicketCheck,
@@ -33,6 +34,7 @@ export const REGISTRATIONS_PATH = "/registrations";
 export const MY_PARTICIPATIONS_PATH = "/my-participations";
 /** Solo administrador: los eventos donde él mismo reservó su cupo. */
 export const MY_REGISTRATIONS_PATH = "/my-registrations";
+export const ANNOUNCEMENTS_PATH = "/announcements";
 
 const EVENTS: NavItem = {
   to: "/events",
@@ -64,6 +66,14 @@ const MINISTRIES: NavItem = {
   label: "Ministerios",
   description: "Conoce los ministerios y sus integrantes.",
   icon: UsersRound,
+};
+/** Cartelera: avisos generales para todos. Distinto de las notificaciones,
+ * que van dirigidas a personas concretas. */
+const ANNOUNCEMENTS: NavItem = {
+  to: ANNOUNCEMENTS_PATH,
+  label: "Anuncios",
+  description: "Avisos generales de la iglesia.",
+  icon: Megaphone,
 };
 const NOTIFICATIONS: NavItem = {
   to: "/notifications",
@@ -99,6 +109,7 @@ export const MEMBER_EVENT_MENU: readonly NavItem[] = [
 /** Barra superior del miembro: los enlaces que van fuera del desplegable. */
 export const MEMBER_NAV: readonly NavItem[] = [
   { to: HOME_PATH, label: "Inicio", description: "Resumen del día.", icon: Home },
+  ANNOUNCEMENTS,
   MINISTRIES,
   NOTIFICATIONS,
 ];
@@ -110,6 +121,7 @@ export const MEMBER_MOBILE_NAV: readonly NavItem[] = [
   SCHEDULES,
   MY_REGISTRATIONS,
   OWN_PARTICIPATIONS,
+  ANNOUNCEMENTS,
   MINISTRIES,
   NOTIFICATIONS,
 ];
@@ -120,6 +132,7 @@ export type QuickLinkKey =
   | "cronogramas"
   | "participaciones"
   | "ministerios"
+  | "anuncios"
   | "notificaciones"
   | "perfil";
 
@@ -130,6 +143,7 @@ export const QUICK_LINK_CATALOG: readonly (NavItem & { key: QuickLinkKey })[] = 
   { key: "cronogramas", ...SCHEDULES },
   { key: "participaciones", ...OWN_PARTICIPATIONS },
   { key: "ministerios", ...MINISTRIES },
+  { key: "anuncios", ...ANNOUNCEMENTS },
   { key: "notificaciones", ...NOTIFICATIONS },
   { key: "perfil", ...PROFILE },
 ];
@@ -180,6 +194,7 @@ export const ADMIN_NAV_MANAGE: readonly NavItem[] = [
   },
   MINISTRIES,
   NOTIFICATIONS,
+  ANNOUNCEMENTS,
   {
     to: "/legal-documents",
     label: "Documentos legales",
